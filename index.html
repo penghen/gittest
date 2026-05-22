@@ -1,10 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>我的第一个部署项目</title>
+    <title>好价信息查询工具</title>
+    <meta charset="UTF-8">
+    <!-- 防缓存标签 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        body { padding: 20px; font-family: Arial; }
+        .container { max-width: 800px; margin: 0 auto; }
+        input { width: 300px; padding: 8px; margin: 10px 0; }
+        button { padding: 8px 15px; background: #007bff; color: white; border: none; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; }
+    </style>
 </head>
 <body>
-    <h1>恭喜！部署成功啦！</h1>
-    <p>这是彭恒的项目，全球都可以访问～</p>
+    <div class="container">
+        <h2>请输入需要查询的ID（多个用英文逗号分隔）</h2>
+        <input type="text" id="idsInput" placeholder="例如：25220534,12345678">
+        <button onclick="sendRequest()">查询</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+    function sendRequest() {
+        const ids = document.getElementById('idsInput').value
+            .split(',')
+            .map(id => parseInt(id.trim()));
+
+        fetch('//sh-gateway.shihuo.cn/v4/services/sh-haojiagojob/tmp/GetRecommendAndSearchTag?_=' + Date.now(), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ids })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.code === 0) {
+                const translated = translateResponse(data);
+                document.getElementById('result').innerHTML =
+                    `<pre>${JSON.stringify(translated, null, 4)}</pre>`;
+            } else {
+                alert(`请求失败: ${data.msg}`);
+            }
+        })
+        .catch(error => {
+            alert('请求发生错误: ' + error.message);
+        });
+    }
+
+    function translateResponse(response) {
+        const fieldMap = {
+            "promotion_id": "好价ID",
+            "promotion_description": "促销描述",
+            "parent_data_source_id": "父数据源ID",
+            "parent_data_source_name": "父数据源名称",
+            "data_source": "数据源",
+            "stream_status": "流通状态",
+            "data_source_name": "数据源名称",
+            "child_category_id": "子类目ID",
+            "child_category_name": "子类目名称",
+            "can_recommend": "可推荐",
+            "can_search": "可搜索",
+            "tag_list": "标签列表",
+            "id": "标签ID",
+            "name": "标签名称",
+            "price": "价格",
+            "err_msg": "错误信息",
+            "code": "状态码",
+            "status": "状态",
+            "req_id": "请求ID",
+            "msg": "消息"
+        };
+
+        const translated = JSON.parse(JSON.stringify(response));
+
+        // 翻译字段
+        Object.keys(translated).forEach(key => {
+            if (fieldMap[key]) {
+                translated[fieldMap[key]] = translated[key];
+                delete translated[key];
+            }
+        });
+
+        // 翻译data数组中的字段
+        if (translated.data) {
+            translated.data = translated.data.map(item => {
+                Object.keys(item).forEach(key => {
+                    if (fieldMap[key]) {
+                        const newKey = fieldMap[key];
+                        // 保存原始值
+                        const value = item[key];
+                        // 删除旧键
+                        delete item[key];
+                        // 转换布尔值为中文
+                        if (typeof value === 'boolean') {
+                            item[newKey] = value ? "是" : "否";
+                        } else {
+                            item[newKey] = value;
+                        }
+                    }
+                });
+
+                // 翻译标签列表
+                if (item.标签列表) {
+                    item.标签列表 = item.标签列表.map(tag => {
+                        Object.keys(tag).forEach(tagKey => {
+                            if (fieldMap[tagKey]) {
+                                tag[fieldMap[tagKey]] = tag[tagKey];
+                                delete tag[tagKey];
+                            }
+                        });
+                        return tag;
+                    });
+                }
+                return item;
+            });
+        }
+
+        return translated;
+    }
+    </script>
 </body>
 </html>
