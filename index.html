@@ -3,757 +3,1254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>俄罗斯方块</title>
+    <title>测试工具箱</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f8ee8'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='13' font-family='Arial' font-weight='700' fill='white'%3E%7B%7D%3C/text%3E%3C/svg%3E">
     <style>
+        :root {
+            --blue: #2f8ee8;
+            --blue-dark: #176fc2;
+            --blue-soft: #edf6ff;
+            --line: #e6e9ee;
+            --text: #222831;
+            --muted: #7d8792;
+            --bg: #f5f7fa;
+            --panel: #ffffff;
+            --green: #1f9d55;
+            --red: #d93025;
+            --amber: #c77700;
+        }
+
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+            line-height: 1.5;
         }
 
-        .game-container {
-            display: flex;
-            gap: 30px;
-            align-items: flex-start;
-        }
-
-        .game-board {
-            background: #1a1a2e;
-            border: 4px solid #00d9ff;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3),
-                        inset 0 0 20px rgba(0, 217, 255, 0.1);
-            padding: 10px;
-        }
-
-        #canvas {
-            display: block;
-            background: #0f0f23;
-            border-radius: 4px;
-        }
-
-        .info-panel {
-            background: rgba(26, 26, 46, 0.9);
-            border: 2px solid #00d9ff;
-            border-radius: 8px;
-            padding: 20px;
-            min-width: 200px;
-            box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
-        }
-
-        .info-item {
-            margin-bottom: 20px;
-        }
-
-        .info-label {
-            font-size: 14px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-        }
-
-        .info-value {
-            font-size: 32px;
-            font-weight: bold;
-            color: #00d9ff;
-            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
-        }
-
-        .next-piece {
-            background: #0f0f23;
-            border-radius: 4px;
-            padding: 10px;
-            min-height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #nextCanvas {
-            display: block;
-            background: #0a0a1a;
-            border-radius: 2px;
-        }
-
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
         }
 
         button {
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border: 0;
         }
 
-        #startBtn {
-            background: linear-gradient(135deg, #00d9ff, #0099cc);
-            color: #1a1a2e;
+        .page {
+            width: min(1480px, calc(100% - 48px));
+            margin: 0 auto;
+            padding: 28px 0 56px;
+            display: grid;
+            grid-template-columns: 390px minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
         }
 
-        #startBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+        .header {
+            background: var(--panel);
+            border-bottom: 1px solid #d8dee6;
+            box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03);
         }
 
-        #pauseBtn {
-            background: linear-gradient(135deg, #ff9f43, #ee5a24);
-            color: #fff;
-        }
-
-        #pauseBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 159, 67, 0.4);
-        }
-
-        #restartBtn {
-            background: linear-gradient(135deg, #ee5a24, #c23616);
-            color: #fff;
-        }
-
-        #restartBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(238, 90, 36, 0.4);
-        }
-
-        .instructions {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 217, 255, 0.3);
-        }
-
-        .instructions h3 {
-            font-size: 14px;
-            color: #00d9ff;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .instructions ul {
-            list-style: none;
-            font-size: 13px;
-            color: #aaa;
-            line-height: 1.8;
-        }
-
-        .game-over {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+        .header-inner {
+            width: min(1480px, calc(100% - 48px));
+            margin: 0 auto;
             display: flex;
-            justify-content: center;
             align-items: center;
-            z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            gap: 14px;
+            height: 74px;
         }
 
-        .game-over.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .game-over-content {
-            text-align: center;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            padding: 40px 60px;
-            border-radius: 12px;
-            border: 2px solid #00d9ff;
-            box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
-        }
-
-        .game-over-content h2 {
-            font-size: 36px;
-            color: #ee5a24;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(238, 90, 36, 0.5);
-        }
-
-        .game-over-content p {
-            font-size: 18px;
-            color: #00d9ff;
-            margin-bottom: 30px;
-        }
-
-        .final-score {
-            font-size: 48px;
-            font-weight: bold;
-            color: #ff9f43;
-            text-shadow: 0 0 15px rgba(255, 159, 67, 0.5);
-            margin-bottom: 30px;
-        }
-
-        .pause-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--blue);
             border-radius: 8px;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            display: grid;
+            place-items: center;
+            color: var(--blue);
+            background: #f7fbff;
+            position: relative;
+            flex: 0 0 auto;
         }
 
-        .pause-overlay.show {
-            opacity: 1;
-            visibility: visible;
+        .brand-icon::before {
+            content: "</>";
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0;
         }
 
-        .pause-text {
+        .brand-icon::after {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 3px;
+            border-radius: 999px;
+            background: var(--blue);
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--blue);
             font-size: 32px;
-            font-weight: bold;
-            color: #00d9ff;
-            text-shadow: 0 0 20px rgba(0, 217, 255, 0.8);
-            animation: pulse 1.5s infinite;
+            font-weight: 700;
+            letter-spacing: 0;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .section-title {
+            margin: 0 0 16px;
+            font-size: 24px;
+            font-weight: 700;
         }
 
-        .level-display {
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .tool-card {
+            min-height: 92px;
+            display: grid;
+            grid-template-columns: 86px minmax(0, 1fr);
+            align-items: stretch;
+            padding: 0;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            color: inherit;
+            text-align: left;
+            cursor: pointer;
+            overflow: hidden;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+        }
+
+        .tool-card:hover,
+        .tool-card:focus-visible {
+            border-color: #9dccfb;
+            box-shadow: 0 8px 22px rgba(47, 142, 232, 0.13);
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+        .tool-card.active {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(47, 142, 232, 0.12);
+        }
+
+        .tool-icon {
+            display: grid;
+            place-items: center;
+            background: linear-gradient(90deg, #e9f4ff, #f7fbff);
+            color: var(--blue);
+            font-weight: 800;
             font-size: 18px;
-            color: #ff9f43;
-            text-shadow: 0 0 10px rgba(255, 159, 67, 0.5);
+            letter-spacing: 0;
         }
 
-        .lines-display {
-            font-size: 18px;
-            color: #2ed573;
-            text-shadow: 0 0 10px rgba(46, 213, 115, 0.5);
+        .tool-copy {
+            min-width: 0;
+            padding: 18px 18px 14px;
+        }
+
+        .tool-copy h2 {
+            margin: 0 0 8px;
+            font-size: 19px;
+            line-height: 1.25;
+            font-weight: 700;
+            letter-spacing: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tool-copy p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .workspace {
+            margin-top: 0;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .workspace-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--line);
+            background: #fbfcfe;
+        }
+
+        .workspace-title {
+            min-width: 0;
+        }
+
+        .workspace-title h2 {
+            margin: 0 0 4px;
+            font-size: 22px;
+            line-height: 1.25;
+        }
+
+        .workspace-title p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .status {
+            min-height: 28px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: #eef2f7;
+            color: #53606d;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .status.ok {
+            background: #e8f6ef;
+            color: var(--green);
+        }
+
+        .status.error {
+            background: #fdecea;
+            color: var(--red);
+        }
+
+        .status.warn {
+            background: #fff6e6;
+            color: var(--amber);
+        }
+
+        .tool-panel {
+            display: none;
+            padding: 24px;
+        }
+
+        .tool-panel.active {
+            display: block;
+        }
+
+        .two-cols {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 18px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .field.wide {
+            grid-column: span 2;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: #4d5967;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        textarea,
+        input,
+        select {
+            width: 100%;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            color: var(--text);
+            background: #fff;
+            outline: none;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease;
+        }
+
+        textarea {
+            min-height: 240px;
+            padding: 12px 14px;
+            resize: vertical;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        input,
+        select {
+            height: 40px;
+            padding: 0 12px;
+        }
+
+        textarea:focus,
+        input:focus,
+        select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(47, 142, 232, 0.12);
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .btn {
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            background: var(--blue);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.16s ease, transform 0.16s ease;
+        }
+
+        .btn:hover,
+        .btn:focus-visible {
+            background: var(--blue-dark);
+            outline: none;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn.secondary {
+            background: #eef2f7;
+            color: #344051;
+        }
+
+        .btn.secondary:hover,
+        .btn.secondary:focus-visible {
+            background: #e0e7ef;
+        }
+
+        .btn.danger {
+            background: #f1f3f5;
+            color: #c5221f;
+        }
+
+        .btn.danger:hover,
+        .btn.danger:focus-visible {
+            background: #fdecea;
+        }
+
+        .btn-icon {
+            width: 18px;
+            height: 18px;
+            display: inline-grid;
+            place-items: center;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .output {
+            min-height: 240px;
+            max-height: 520px;
+            overflow: auto;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fbfcfe;
+            padding: 12px 14px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        .output.empty {
+            color: #98a2ad;
+            font-family: inherit;
+        }
+
+        .match-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .match-item {
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fff;
+            padding: 10px 12px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 13px;
+        }
+
+        .diff-line {
+            display: block;
+            min-height: 22px;
+            padding: 1px 8px;
+            margin: 1px 0;
+            border-radius: 4px;
+        }
+
+        .diff-same {
+            color: #52606d;
+        }
+
+        .diff-add {
+            background: #e8f6ef;
+            color: #17683a;
+        }
+
+        .diff-del {
+            background: #fdecea;
+            color: #a52118;
+        }
+
+        .diff-summary {
+            display: block;
+            margin-bottom: 12px;
+            padding: 12px 14px;
+            border-radius: 6px;
+            background: #eef6ff;
+            color: #195f9f;
+            font-family: inherit;
+            white-space: pre-wrap;
+        }
+
+        .diff-detail {
+            display: block;
+            margin: 12px 0 8px;
+            color: #344051;
+            font-family: inherit;
+            font-weight: 700;
+        }
+
+        .timestamp-result {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .metric {
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: #fbfcfe;
+        }
+
+        .metric span {
+            display: block;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 1180px) {
+            .page {
+                grid-template-columns: 330px minmax(0, 1fr);
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .page,
+            .header-inner {
+                width: min(100% - 28px, 1480px);
+            }
+
+            .page {
+                display: block;
+            }
+
+            .header-inner {
+                height: 66px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .tool-grid,
+            .two-cols,
+            .timestamp-result,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-card {
+                grid-template-columns: 86px minmax(0, 1fr);
+                min-height: 96px;
+            }
+
+            .tool-copy {
+                padding: 18px 18px 14px;
+            }
+
+            .tool-copy h2 {
+                font-size: 19px;
+            }
+
+            .tool-copy p {
+                font-size: 14px;
+            }
+
+            .workspace-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .workspace {
+                margin-top: 18px;
+            }
+
+            .status {
+                white-space: normal;
+            }
+
+            .tool-panel {
+                padding: 18px;
+            }
+
+            .field.wide {
+                grid-column: auto;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="game-board">
-            <canvas id="canvas" width="300" height="600"></canvas>
-            <div class="pause-overlay" id="pauseOverlay">
-                <div class="pause-text">已暂停</div>
-            </div>
+    <header class="header">
+        <div class="header-inner">
+            <div class="brand-icon" aria-hidden="true"></div>
+            <h1>测试工具箱</h1>
         </div>
-        
-        <div class="info-panel">
-            <div class="info-item">
-                <div class="info-label">分数</div>
-                <div class="info-value" id="score">0</div>
+    </header>
+
+    <main class="page">
+        <section aria-labelledby="common-title">
+            <h2 class="section-title" id="common-title">常用</h2>
+            <div class="tool-grid" id="toolGrid"></div>
+        </section>
+
+        <section class="workspace" aria-live="polite">
+            <div class="workspace-header">
+                <div class="workspace-title">
+                    <h2 id="activeTitle">JSON格式化/校验</h2>
+                    <p id="activeDesc">格式化、压缩并校验 JSON 数据</p>
+                </div>
+                <div class="status" id="statusText">准备就绪</div>
             </div>
-            
-            <div class="info-item">
-                <div class="info-label">等级</div>
-                <div class="level-display" id="level">1</div>
-            </div>
-            
-            <div class="info-item">
-                <div class="info-label">消除行数</div>
-                <div class="lines-display" id="lines">0</div>
-            </div>
-            
-            <div class="info-item">
-                <div class="info-label">下一个方块</div>
-                <div class="next-piece">
-                    <canvas id="nextCanvas" width="80" height="80"></canvas>
+
+            <div class="tool-panel active" data-panel="json">
+                <div class="two-cols">
+                    <div class="field">
+                        <label for="jsonInput">输入 JSON</label>
+                        <textarea id="jsonInput" spellcheck="false" placeholder='{"name":"tester","enabled":true}'></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="jsonOutput">输出结果</label>
+                        <pre class="output empty" id="jsonOutput">处理结果会显示在这里</pre>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" data-action="json-format"><span class="btn-icon">{}</span>格式化</button>
+                    <button class="btn secondary" data-action="json-minify"><span class="btn-icon">-</span>压缩</button>
+                    <button class="btn secondary" data-copy="jsonOutput"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn danger" data-clear="jsonInput,jsonOutput"><span class="btn-icon">×</span>清空</button>
                 </div>
             </div>
-            
-            <div class="controls">
-                <button id="startBtn">开始游戏</button>
-                <button id="pauseBtn" disabled>暂停</button>
-                <button id="restartBtn" disabled>重新开始</button>
+
+            <div class="tool-panel" data-panel="url">
+                <div class="two-cols">
+                    <div class="field">
+                        <label for="urlInput">输入文本</label>
+                        <textarea id="urlInput" spellcheck="false" placeholder="中文、空格、?a=1&b=2"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="urlOutput">输出结果</label>
+                        <pre class="output empty" id="urlOutput">处理结果会显示在这里</pre>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" data-action="url-encode"><span class="btn-icon">%</span>编码</button>
+                    <button class="btn secondary" data-action="url-decode"><span class="btn-icon">↩</span>解码</button>
+                    <button class="btn secondary" data-copy="urlOutput"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn danger" data-clear="urlInput,urlOutput"><span class="btn-icon">×</span>清空</button>
+                </div>
             </div>
-            
-            <div class="instructions">
-                <h3>操作说明</h3>
-                <ul>
-                    <li>← → 左右移动</li>
-                    <li>↓ 加速下落</li>
-                    <li>↑ 旋转方块</li>
-                    <li>空格键 直接落底</li>
-                    <li>P 暂停/继续</li>
-                </ul>
+
+            <div class="tool-panel" data-panel="base64">
+                <div class="two-cols">
+                    <div class="field">
+                        <label for="base64Input">输入文本</label>
+                        <textarea id="base64Input" spellcheck="false" placeholder="支持中文的 Base64 编解码"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="base64Output">输出结果</label>
+                        <pre class="output empty" id="base64Output">处理结果会显示在这里</pre>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" data-action="base64-encode"><span class="btn-icon">B</span>编码</button>
+                    <button class="btn secondary" data-action="base64-decode"><span class="btn-icon">64</span>解码</button>
+                    <button class="btn secondary" data-copy="base64Output"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn danger" data-clear="base64Input,base64Output"><span class="btn-icon">×</span>清空</button>
+                </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="game-over" id="gameOver">
-        <div class="game-over-content">
-            <h2>游戏结束</h2>
-            <p>最终得分</p>
-            <div class="final-score" id="finalScore">0</div>
-            <button id="restartGameBtn">再来一局</button>
-        </div>
-    </div>
+
+            <div class="tool-panel" data-panel="timestamp">
+                <div class="form-grid">
+                    <div class="field wide">
+                        <label for="timestampInput">时间戳或日期时间</label>
+                        <input id="timestampInput" type="text" placeholder="1719993600 或 2026-06-30 12:00:00">
+                    </div>
+                    <div class="field">
+                        <label for="timestampUnit">输入类型</label>
+                        <select id="timestampUnit">
+                            <option value="auto">自动识别</option>
+                            <option value="seconds">秒时间戳</option>
+                            <option value="milliseconds">毫秒时间戳</option>
+                            <option value="date">日期时间</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" data-action="timestamp-now"><span class="btn-icon">T</span>当前时间</button>
+                    <button class="btn secondary" data-action="timestamp-convert"><span class="btn-icon">↔</span>转换</button>
+                    <button class="btn secondary" data-copy="timestampOutput"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn danger" data-clear="timestampInput,timestampOutput"><span class="btn-icon">×</span>清空</button>
+                </div>
+                <pre class="output empty" id="timestampOutput">处理结果会显示在这里</pre>
+            </div>
+
+            <div class="tool-panel" data-panel="uuid">
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="uuidCount">生成数量</label>
+                        <input id="uuidCount" type="number" min="1" max="100" value="5">
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" data-action="uuid-generate"><span class="btn-icon">#</span>生成</button>
+                    <button class="btn secondary" data-copy="uuidOutput"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn danger" data-clear="uuidOutput"><span class="btn-icon">×</span>清空</button>
+                </div>
+                <pre class="output empty" id="uuidOutput">处理结果会显示在这里</pre>
+            </div>
+
+            <div class="tool-panel" data-panel="regex">
+                <div class="form-grid">
+                    <div class="field wide">
+                        <label for="regexPattern">正则表达式</label>
+                        <input id="regexPattern" type="text" placeholder="例如：\\b\\w+@\\w+\\.com\\b">
+                    </div>
+                    <div class="field">
+                        <label for="regexFlags">Flags</label>
+                        <input id="regexFlags" type="text" value="g" placeholder="gim">
+                    </div>
+                    <div class="field full">
+                        <label for="regexInput">测试文本</label>
+                        <textarea id="regexInput" spellcheck="false" placeholder="在这里输入要匹配的文本"></textarea>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" data-action="regex-test"><span class="btn-icon">.*</span>测试</button>
+                    <button class="btn secondary" data-copy="regexOutput"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn danger" data-clear="regexPattern,regexInput,regexOutput"><span class="btn-icon">×</span>清空</button>
+                </div>
+                <pre class="output empty" id="regexOutput">处理结果会显示在这里</pre>
+            </div>
+
+            <div class="tool-panel" data-panel="hash">
+                <div class="form-grid">
+                    <div class="field full">
+                        <label for="hashInput">输入文本</label>
+                        <textarea id="hashInput" spellcheck="false" placeholder="输入要生成 Hash 的文本"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="hashAlgo">算法</label>
+                        <select id="hashAlgo">
+                            <option value="SHA-256">SHA-256</option>
+                            <option value="SHA-1">SHA-1</option>
+                            <option value="SHA-384">SHA-384</option>
+                            <option value="SHA-512">SHA-512</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" data-action="hash-generate"><span class="btn-icon">H</span>生成</button>
+                    <button class="btn secondary" data-copy="hashOutput"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn danger" data-clear="hashInput,hashOutput"><span class="btn-icon">×</span>清空</button>
+                </div>
+                <pre class="output empty" id="hashOutput">处理结果会显示在这里</pre>
+            </div>
+
+            <div class="tool-panel" data-panel="diff">
+                <div class="two-cols">
+                    <div class="field">
+                        <label for="diffLeft">文本 A</label>
+                        <textarea id="diffLeft" spellcheck="false" placeholder="第一段文本"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="diffRight">文本 B</label>
+                        <textarea id="diffRight" spellcheck="false" placeholder="第二段文本"></textarea>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" data-action="diff-run"><span class="btn-icon">Δ</span>比较</button>
+                    <button class="btn secondary" data-copy="diffOutput"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn danger" data-clear="diffLeft,diffRight,diffOutput"><span class="btn-icon">×</span>清空</button>
+                </div>
+                <pre class="output empty" id="diffOutput">处理结果会显示在这里</pre>
+            </div>
+        </section>
+    </main>
 
     <script>
-        // 游戏常量
-        const COLS = 10;
-        const ROWS = 20;
-        const BLOCK_SIZE = 30;
-        
-        // 方块形状定义
-        const SHAPES = [
-            [[1, 1, 1, 1]], // I
-            [[1, 1], [1, 1]], // O
-            [[0, 1, 0], [1, 1, 1]], // T
-            [[0, 1, 1], [1, 1, 0]], // S
-            [[1, 1, 0], [0, 1, 1]], // Z
-            [[1, 0, 0], [1, 1, 1]], // L
-            [[0, 0, 1], [1, 1, 1]]  // J
+        const tools = [
+            { id: "json", icon: "JSON", title: "JSON格式化/校验", desc: "格式化、压缩并校验 JSON 数据" },
+            { id: "url", icon: "URL", title: "URL编码/解码", desc: "对中文和特殊字符进行 URL 转换" },
+            { id: "base64", icon: "B64", title: "Base64转码/解码", desc: "支持中文 UTF-8 文本转换" },
+            { id: "timestamp", icon: "TIME", title: "Unix时间戳", desc: "秒、毫秒时间戳与日期互转" },
+            { id: "uuid", icon: "UUID", title: "UUID生成", desc: "批量生成 v4 UUID" },
+            { id: "regex", icon: ".*", title: "正则测试", desc: "测试表达式并查看匹配结果" },
+            { id: "hash", icon: "HASH", title: "Hash生成", desc: "生成 SHA 系列摘要" },
+            { id: "diff", icon: "DIFF", title: "Diff文本比较", desc: "按行比较两段文本差异" }
         ];
-        
-        const COLORS = [
-            '#00d9ff', // 青色 - I
-            '#ffeb3b', // 黄色 - O
-            '#9c27b0', // 紫色 - T
-            '#4caf50', // 绿色 - S
-            '#f44336', // 红色 - Z
-            '#ff9800', // 橙色 - L
-            '#2196f3'  // 蓝色 - J
-        ];
-        
-        // 游戏状态
-        let canvas, ctx, nextCanvas, nextCtx;
-        let board = [];
-        let currentPiece = null;
-        let nextPiece = null;
-        let score = 0;
-        let lines = 0;
-        let level = 1;
-        let gameState = 'idle'; // idle, playing, paused, gameover
-        let gameLoop = null;
-        
-        // 分数表
-        const SCORE_TABLE = [0, 100, 300, 500, 800];
-        
-        // 初始化游戏板
-        function initBoard() {
-            board = [];
-            for (let r = 0; r < ROWS; r++) {
-                board[r] = [];
-                for (let c = 0; c < COLS; c++) {
-                    board[r][c] = null;
+
+        const toolGrid = document.getElementById("toolGrid");
+        const activeTitle = document.getElementById("activeTitle");
+        const activeDesc = document.getElementById("activeDesc");
+        const statusText = document.getElementById("statusText");
+
+        function initCards() {
+            toolGrid.innerHTML = tools.map((tool, index) => `
+                <button class="tool-card${index === 0 ? " active" : ""}" type="button" data-tool="${tool.id}">
+                    <span class="tool-icon" aria-hidden="true">${tool.icon}</span>
+                    <span class="tool-copy">
+                        <h2>${tool.title}</h2>
+                        <p>${tool.desc}</p>
+                    </span>
+                </button>
+            `).join("");
+        }
+
+        function setStatus(message, type = "") {
+            statusText.textContent = message;
+            statusText.className = `status${type ? ` ${type}` : ""}`;
+        }
+
+        function getValue(id) {
+            return document.getElementById(id).value;
+        }
+
+        function setOutput(id, value, empty = false) {
+            const output = document.getElementById(id);
+            output.textContent = value;
+            output.classList.toggle("empty", empty);
+        }
+
+        function readOutput(id) {
+            return document.getElementById(id).textContent;
+        }
+
+        function resetOutput(output) {
+            output.textContent = "处理结果会显示在这里";
+            output.classList.add("empty");
+        }
+
+        function clearPanel(id) {
+            const panel = document.querySelector(`[data-panel="${id}"]`);
+            if (!panel) return;
+
+            panel.querySelectorAll("textarea, input").forEach((field) => {
+                field.value = field.defaultValue || "";
+            });
+            panel.querySelectorAll("select").forEach((field) => {
+                field.selectedIndex = 0;
+            });
+            panel.querySelectorAll(".output").forEach(resetOutput);
+        }
+
+        function switchTool(id) {
+            const tool = tools.find((item) => item.id === id);
+            if (!tool) return;
+            const current = document.querySelector(".tool-card.active")?.dataset.tool;
+
+            document.querySelectorAll(".tool-card").forEach((card) => {
+                card.classList.toggle("active", card.dataset.tool === id);
+            });
+            document.querySelectorAll(".tool-panel").forEach((panel) => {
+                panel.classList.toggle("active", panel.dataset.panel === id);
+            });
+
+            if (current !== id) {
+                clearPanel(id);
+            }
+            activeTitle.textContent = tool.title;
+            activeDesc.textContent = tool.desc;
+            setStatus("准备就绪");
+        }
+
+        function normalizeDateInput(value) {
+            return value.trim().replace(/-/g, "/");
+        }
+
+        function formatDate(date) {
+            const pad = (num) => String(num).padStart(2, "0");
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        }
+
+        function renderTimestamp(date) {
+            const millis = date.getTime();
+            const seconds = Math.floor(millis / 1000);
+            const iso = date.toISOString();
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "本地时区";
+            return [
+                `本地时间: ${formatDate(date)}`,
+                `秒时间戳: ${seconds}`,
+                `毫秒时间戳: ${millis}`,
+                `UTC ISO: ${iso}`,
+                `时区: ${timezone}`,
+                `星期: ${["日", "一", "二", "三", "四", "五", "六"][date.getDay()]}`
+            ].join("\n");
+        }
+
+        function encodeBase64(text) {
+            const bytes = new TextEncoder().encode(text);
+            let binary = "";
+            bytes.forEach((byte) => {
+                binary += String.fromCharCode(byte);
+            });
+            return btoa(binary);
+        }
+
+        function decodeBase64(text) {
+            const binary = atob(text);
+            const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+            return new TextDecoder().decode(bytes);
+        }
+
+        function uuidv4() {
+            if (crypto.randomUUID) {
+                return crypto.randomUUID();
+            }
+            const bytes = new Uint8Array(16);
+            crypto.getRandomValues(bytes);
+            bytes[6] = (bytes[6] & 0x0f) | 0x40;
+            bytes[8] = (bytes[8] & 0x3f) | 0x80;
+            const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
+            return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
+        }
+
+        async function hashText(text, algorithm) {
+            const data = new TextEncoder().encode(text);
+            const digest = await crypto.subtle.digest(algorithm, data);
+            return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        function lcsMatrix(left, right) {
+            const matrix = Array.from({ length: left.length + 1 }, () => Array(right.length + 1).fill(0));
+            for (let i = left.length - 1; i >= 0; i--) {
+                for (let j = right.length - 1; j >= 0; j--) {
+                    matrix[i][j] = left[i] === right[j]
+                        ? matrix[i + 1][j + 1] + 1
+                        : Math.max(matrix[i + 1][j], matrix[i][j + 1]);
                 }
             }
+            return matrix;
         }
-        
-        // 创建新方块
-        function createPiece() {
-            const shapeIndex = Math.floor(Math.random() * SHAPES.length);
-            return {
-                shape: SHAPES[shapeIndex].map(row => [...row]),
-                color: COLORS[shapeIndex],
-                x: Math.floor((COLS - SHAPES[shapeIndex][0].length) / 2),
-                y: 0
-            };
-        }
-        
-        // 碰撞检测
-        function isCollision(piece, offsetX = 0, offsetY = 0) {
-            for (let r = 0; r < piece.shape.length; r++) {
-                for (let c = 0; c < piece.shape[r].length; c++) {
-                    if (piece.shape[r][c]) {
-                        const newX = piece.x + c + offsetX;
-                        const newY = piece.y + r + offsetY;
-                        if (newX < 0 || newX >= COLS || newY >= ROWS) {
-                            return true;
-                        }
-                        if (newY >= 0 && board[newY][newX]) {
-                            return true;
-                        }
-                    }
+
+        function diffLines(leftText, rightText) {
+            const left = leftText.split("\n");
+            const right = rightText.split("\n");
+            const matrix = lcsMatrix(left, right);
+            const rows = [];
+            let i = 0;
+            let j = 0;
+
+            while (i < left.length && j < right.length) {
+                if (left[i] === right[j]) {
+                    rows.push({ type: "same", leftLine: i + 1, rightLine: j + 1, value: left[i] });
+                    i++;
+                    j++;
+                } else if (matrix[i + 1][j] >= matrix[i][j + 1]) {
+                    rows.push({ type: "del", leftLine: i + 1, rightLine: null, value: left[i] });
+                    i++;
+                } else {
+                    rows.push({ type: "add", leftLine: null, rightLine: j + 1, value: right[j] });
+                    j++;
                 }
             }
-            return false;
-        }
-        
-        // 旋转方块
-        function rotatePiece(piece) {
-            const rows = piece.shape.length;
-            const cols = piece.shape[0].length;
-            const rotated = [];
-            for (let c = 0; c < cols; c++) {
-                rotated[c] = [];
-                for (let r = rows - 1; r >= 0; r--) {
-                    rotated[c][rows - 1 - r] = piece.shape[r][c];
-                }
+            while (i < left.length) {
+                rows.push({ type: "del", leftLine: i + 1, rightLine: null, value: left[i++] });
             }
-            
-            const temp = { ...piece, shape: rotated };
-            
-            // 尝试旋转，如果碰撞则尝试墙踢
-            const kicks = [0, -1, 1, -2, 2];
-            for (const kick of kicks) {
-                if (!isCollision({ ...temp, x: temp.x + kick })) {
-                    piece.shape = rotated;
-                    piece.x += kick;
+            while (j < right.length) {
+                rows.push({ type: "add", leftLine: null, rightLine: j + 1, value: right[j++] });
+            }
+            return rows;
+        }
+
+        function summarizeJson(value) {
+            if (Array.isArray(value)) {
+                return `数组，${value.length} 项`;
+            }
+            if (value !== null && typeof value === "object") {
+                return `对象，${Object.keys(value).length} 个顶层字段`;
+            }
+            return `${typeof value} 值`;
+        }
+
+        function countChangedBlocks(rows) {
+            let blocks = 0;
+            let inBlock = false;
+            rows.forEach((row) => {
+                if (row.type === "same") {
+                    inBlock = false;
                     return;
                 }
-            }
-        }
-        
-        // 将方块固定到游戏板
-        function lockPiece(piece) {
-            for (let r = 0; r < piece.shape.length; r++) {
-                for (let c = 0; c < piece.shape[r].length; c++) {
-                    if (piece.shape[r][c]) {
-                        const boardY = piece.y + r;
-                        const boardX = piece.x + c;
-                        if (boardY >= 0) {
-                            board[boardY][boardX] = piece.color;
-                        }
-                    }
-                }
-            }
-            clearLines();
-            spawnPiece();
-        }
-        
-        // 清除完整行
-        function clearLines() {
-            let cleared = 0;
-            for (let r = ROWS - 1; r >= 0; r--) {
-                if (board[r].every(cell => cell !== null)) {
-                    board.splice(r, 1);
-                    board.unshift(new Array(COLS).fill(null));
-                    cleared++;
-                    r++;
-                }
-            }
-            
-            if (cleared > 0) {
-                lines += cleared;
-                score += SCORE_TABLE[cleared] * level;
-                
-                // 每消除10行升级
-                const newLevel = Math.floor(lines / 10) + 1;
-                if (newLevel > level) {
-                    level = newLevel;
-                    updateInterval();
-                }
-                
-                updateUI();
-            }
-        }
-        
-        // 生成新方块
-        function spawnPiece() {
-            currentPiece = nextPiece || createPiece();
-            nextPiece = createPiece();
-            
-            if (isCollision(currentPiece)) {
-                gameOver();
-                return;
-            }
-            
-            drawNextPiece();
-        }
-        
-        // 游戏结束
-        function gameOver() {
-            gameState = 'gameover';
-            clearInterval(gameLoop);
-            document.getElementById('finalScore').textContent = score;
-            document.getElementById('gameOver').classList.add('show');
-            updateButtons();
-        }
-        
-        // 暂停游戏
-        function pauseGame() {
-            if (gameState === 'playing') {
-                gameState = 'paused';
-                clearInterval(gameLoop);
-                document.getElementById('pauseOverlay').classList.add('show');
-                updateButtons();
-            }
-        }
-        
-        // 继续游戏
-        function resumeGame() {
-            if (gameState === 'paused') {
-                gameState = 'playing';
-                document.getElementById('pauseOverlay').classList.remove('show');
-                gameLoop = setInterval(gameTick, getInterval());
-                updateButtons();
-            }
-        }
-        
-        // 开始游戏
-        function startGame() {
-            initBoard();
-            score = 0;
-            lines = 0;
-            level = 1;
-            nextPiece = createPiece();
-            spawnPiece();
-            gameState = 'playing';
-            gameLoop = setInterval(gameTick, getInterval());
-            updateUI();
-            updateButtons();
-            document.getElementById('gameOver').classList.remove('show');
-        }
-        
-        // 重新开始
-        function restartGame() {
-            if (gameLoop) clearInterval(gameLoop);
-            startGame();
-        }
-        
-        // 获取游戏间隔时间（根据等级调整速度）
-        function getInterval() {
-            return Math.max(100, 1000 - (level - 1) * 100);
-        }
-        
-        // 更新游戏间隔
-        function updateInterval() {
-            if (gameLoop) {
-                clearInterval(gameLoop);
-                gameLoop = setInterval(gameTick, getInterval());
-            }
-        }
-        
-        // 游戏主循环
-        function gameTick() {
-            if (!isCollision(currentPiece, 0, 1)) {
-                currentPiece.y++;
-            } else {
-                lockPiece(currentPiece);
-            }
-            draw();
-        }
-        
-        // 绘制游戏板
-        function draw() {
-            ctx.fillStyle = '#0f0f23';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // 绘制网格
-            ctx.strokeStyle = '#1a1a3e';
-            ctx.lineWidth = 1;
-            for (let r = 0; r < ROWS; r++) {
-                for (let c = 0; c < COLS; c++) {
-                    ctx.strokeRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-                }
-            }
-            
-            // 绘制已固定的方块
-            for (let r = 0; r < ROWS; r++) {
-                for (let c = 0; c < COLS; c++) {
-                    if (board[r][c]) {
-                        drawBlock(c, r, board[r][c]);
-                    }
-                }
-            }
-            
-            // 绘制当前方块
-            if (currentPiece) {
-                for (let r = 0; r < currentPiece.shape.length; r++) {
-                    for (let c = 0; c < currentPiece.shape[r].length; c++) {
-                        if (currentPiece.shape[r][c]) {
-                            drawBlock(currentPiece.x + c, currentPiece.y + r, currentPiece.color);
-                        }
-                    }
-                }
-            }
-        }
-        
-        // 绘制单个方块
-        function drawBlock(x, y, color) {
-            const padding = 2;
-            ctx.fillStyle = color;
-            ctx.fillRect(x * BLOCK_SIZE + padding, y * BLOCK_SIZE + padding, 
-                        BLOCK_SIZE - padding * 2, BLOCK_SIZE - padding * 2);
-            
-            // 高光效果
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.fillRect(x * BLOCK_SIZE + padding, y * BLOCK_SIZE + padding, 
-                        BLOCK_SIZE - padding * 2, 4);
-            ctx.fillRect(x * BLOCK_SIZE + padding, y * BLOCK_SIZE + padding, 
-                        4, BLOCK_SIZE - padding * 2);
-            
-            // 阴影效果
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-            ctx.fillRect(x * BLOCK_SIZE + BLOCK_SIZE - padding - 4, y * BLOCK_SIZE + padding, 
-                        4, BLOCK_SIZE - padding * 2);
-            ctx.fillRect(x * BLOCK_SIZE + padding, y * BLOCK_SIZE + BLOCK_SIZE - padding - 4, 
-                        BLOCK_SIZE - padding * 2, 4);
-        }
-        
-        // 绘制下一个方块
-        function drawNextPiece() {
-            nextCtx.fillStyle = '#0a0a1a';
-            nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
-            
-            if (nextPiece) {
-                const piece = nextPiece;
-                const offsetX = (nextCanvas.width - piece.shape[0].length * BLOCK_SIZE) / 2;
-                const offsetY = (nextCanvas.height - piece.shape.length * BLOCK_SIZE) / 2;
-                
-                for (let r = 0; r < piece.shape.length; r++) {
-                    for (let c = 0; c < piece.shape[r].length; c++) {
-                        if (piece.shape[r][c]) {
-                            const padding = 1;
-                            nextCtx.fillStyle = piece.color;
-                            nextCtx.fillRect(
-                                offsetX + c * BLOCK_SIZE + padding,
-                                offsetY + r * BLOCK_SIZE + padding,
-                                BLOCK_SIZE - padding * 2,
-                                BLOCK_SIZE - padding * 2
-                            );
-                            
-                            // 高光
-                            nextCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-                            nextCtx.fillRect(
-                                offsetX + c * BLOCK_SIZE + padding,
-                                offsetY + r * BLOCK_SIZE + padding,
-                                BLOCK_SIZE - padding * 2, 3
-                            );
-                            nextCtx.fillRect(
-                                offsetX + c * BLOCK_SIZE + padding,
-                                offsetY + r * BLOCK_SIZE + padding,
-                                3, BLOCK_SIZE - padding * 2
-                            );
-                        }
-                    }
-                }
-            }
-        }
-        
-        // 更新UI
-        function updateUI() {
-            document.getElementById('score').textContent = score;
-            document.getElementById('level').textContent = level;
-            document.getElementById('lines').textContent = lines;
-        }
-        
-        // 更新按钮状态
-        function updateButtons() {
-            const startBtn = document.getElementById('startBtn');
-            const pauseBtn = document.getElementById('pauseBtn');
-            const restartBtn = document.getElementById('restartBtn');
-            
-            startBtn.disabled = gameState === 'playing' || gameState === 'paused';
-            pauseBtn.disabled = gameState !== 'playing' && gameState !== 'paused';
-            restartBtn.disabled = gameState === 'idle';
-            
-            if (gameState === 'paused') {
-                pauseBtn.textContent = '继续';
-            } else {
-                pauseBtn.textContent = '暂停';
-            }
-        }
-        
-        // 键盘事件处理
-        function handleKeyDown(e) {
-            if (gameState !== 'playing') {
-                if (e.key === 'p' || e.key === 'P') {
-                    if (gameState === 'paused') {
-                        resumeGame();
-                    }
-                }
-                return;
-            }
-            
-            switch (e.key) {
-                case 'ArrowLeft':
-                    if (!isCollision(currentPiece, -1, 0)) {
-                        currentPiece.x--;
-                    }
-                    break;
-                case 'ArrowRight':
-                    if (!isCollision(currentPiece, 1, 0)) {
-                        currentPiece.x++;
-                    }
-                    break;
-                case 'ArrowDown':
-                    if (!isCollision(currentPiece, 0, 1)) {
-                        currentPiece.y++;
-                        score += 1;
-                        updateUI();
-                    }
-                    break;
-                case 'ArrowUp':
-                    rotatePiece(currentPiece);
-                    break;
-                case ' ':
-                    while (!isCollision(currentPiece, 0, 1)) {
-                        currentPiece.y++;
-                        score += 2;
-                    }
-                    lockPiece(currentPiece);
-                    updateUI();
-                    break;
-                case 'p':
-                case 'P':
-                    pauseGame();
-                    break;
-            }
-            
-            draw();
-        }
-        
-        // 初始化
-        function init() {
-            canvas = document.getElementById('canvas');
-            ctx = canvas.getContext('2d');
-            nextCanvas = document.getElementById('nextCanvas');
-            nextCtx = nextCanvas.getContext('2d');
-            
-            initBoard();
-            draw();
-            drawNextPiece();
-            
-            // 绑定按钮事件
-            document.getElementById('startBtn').addEventListener('click', startGame);
-            document.getElementById('pauseBtn').addEventListener('click', function() {
-                if (gameState === 'playing') {
-                    pauseGame();
-                } else if (gameState === 'paused') {
-                    resumeGame();
+                if (!inBlock) {
+                    blocks++;
+                    inBlock = true;
                 }
             });
-            document.getElementById('restartBtn').addEventListener('click', restartGame);
-            document.getElementById('restartGameBtn').addEventListener('click', function() {
-                document.getElementById('gameOver').classList.remove('show');
-                restartGame();
-            });
-            
-            // 绑定键盘事件
-            document.addEventListener('keydown', handleKeyDown);
-            
-            updateButtons();
+            return blocks;
         }
-        
-        // 页面加载完成后初始化
-        window.addEventListener('load', init);
+
+        function diffRowText(row) {
+            if (row.type === "same") {
+                return `  A${String(row.leftLine).padStart(4, " ")} B${String(row.rightLine).padStart(4, " ")} | ${row.value}`;
+            }
+            if (row.type === "del") {
+                return `- A${String(row.leftLine).padStart(4, " ")}      | ${row.value}`;
+            }
+            return `+      B${String(row.rightLine).padStart(4, " ")} | ${row.value}`;
+        }
+
+        function buildDiffDetails(rows) {
+            const details = [];
+            let index = 0;
+            let blockNo = 1;
+
+            while (index < rows.length) {
+                if (rows[index].type === "same") {
+                    index++;
+                    continue;
+                }
+
+                const block = [];
+                while (index < rows.length && rows[index].type !== "same") {
+                    block.push(rows[index]);
+                    index++;
+                }
+
+                const delRows = block.filter((row) => row.type === "del");
+                const addRows = block.filter((row) => row.type === "add");
+                const leftRange = formatLineRange(delRows.map((row) => row.leftLine));
+                const rightRange = formatLineRange(addRows.map((row) => row.rightLine));
+                const kind = delRows.length && addRows.length ? "修改" : delRows.length ? "删除" : "新增";
+                details.push(`差异 ${blockNo}: ${kind}，A行 ${leftRange || "-"}，B行 ${rightRange || "-"}`);
+                if (delRows.length) {
+                    details.push(`  A: ${delRows.map((row) => row.value || "(空行)").join(" / ")}`);
+                }
+                if (addRows.length) {
+                    details.push(`  B: ${addRows.map((row) => row.value || "(空行)").join(" / ")}`);
+                }
+                blockNo++;
+            }
+
+            return details.join("\n");
+        }
+
+        function formatLineRange(lines) {
+            const filtered = lines.filter((line) => line !== null && line !== undefined);
+            if (!filtered.length) return "";
+            const first = filtered[0];
+            const last = filtered[filtered.length - 1];
+            return first === last ? String(first) : `${first}-${last}`;
+        }
+
+        function handleJson(action) {
+            try {
+                const parsed = JSON.parse(getValue("jsonInput"));
+                const value = action === "json-minify"
+                    ? JSON.stringify(parsed)
+                    : JSON.stringify(parsed, null, 2);
+                setOutput("jsonOutput", value);
+                setStatus(`JSON 处理成功：${summarizeJson(parsed)}，输出 ${value.length} 字符`, "ok");
+            } catch (error) {
+                setOutput("jsonOutput", `JSON 校验失败: ${error.message}`);
+                setStatus("JSON 校验失败", "error");
+            }
+        }
+
+        function handleUrl(action) {
+            const input = getValue("urlInput");
+            try {
+                const value = action === "url-encode" ? encodeURIComponent(input) : decodeURIComponent(input);
+                setOutput("urlOutput", value);
+                setStatus(`URL 处理成功：${input.length} 字符 -> ${value.length} 字符`, "ok");
+            } catch (error) {
+                setOutput("urlOutput", `URL 解码失败: ${error.message}`);
+                setStatus("URL 解码失败", "error");
+            }
+        }
+
+        function handleBase64(action) {
+            try {
+                const input = getValue("base64Input").trim();
+                const value = action === "base64-encode" ? encodeBase64(getValue("base64Input")) : decodeBase64(input);
+                setOutput("base64Output", value);
+                setStatus(`Base64 处理成功：输出 ${value.length} 字符`, "ok");
+            } catch (error) {
+                setOutput("base64Output", `Base64 解码失败: ${error.message}`);
+                setStatus("Base64 解码失败", "error");
+            }
+        }
+
+        function handleTimestamp(action) {
+            let date;
+            const raw = getValue("timestampInput").trim();
+            const unit = getValue("timestampUnit");
+
+            if (action === "timestamp-now" || !raw) {
+                date = new Date();
+            } else if (unit === "seconds" || (unit === "auto" && /^\d{10}$/.test(raw))) {
+                date = new Date(Number(raw) * 1000);
+            } else if (unit === "milliseconds" || (unit === "auto" && /^\d{13}$/.test(raw))) {
+                date = new Date(Number(raw));
+            } else {
+                date = new Date(normalizeDateInput(raw));
+            }
+
+            if (Number.isNaN(date.getTime())) {
+                setOutput("timestampOutput", "无法识别该时间，请输入秒时间戳、毫秒时间戳或日期时间。");
+                setStatus("时间转换失败", "error");
+                return;
+            }
+
+            setOutput("timestampOutput", renderTimestamp(date));
+            setStatus("时间转换成功", "ok");
+        }
+
+        function handleUuid() {
+            const countInput = document.getElementById("uuidCount");
+            const count = Math.min(100, Math.max(1, Number(countInput.value) || 1));
+            countInput.value = String(count);
+            const value = Array.from({ length: count }, uuidv4).join("\n");
+            setOutput("uuidOutput", value);
+            setStatus(`已生成 ${count} 个 UUID，格式为 v4`, "ok");
+        }
+
+        function handleRegex() {
+            try {
+                const pattern = getValue("regexPattern");
+                const flagsInput = getValue("regexFlags");
+                const flags = flagsInput.includes("g") ? flagsInput : `${flagsInput}g`;
+                const regex = new RegExp(pattern, flags);
+                const text = getValue("regexInput");
+                const matches = [];
+                let match;
+
+                while ((match = regex.exec(text)) !== null) {
+                    matches.push({
+                        value: match[0],
+                        index: match.index,
+                        groups: match.slice(1)
+                    });
+                    if (match[0] === "") {
+                        regex.lastIndex++;
+                    }
+                }
+
+                if (matches.length === 0) {
+                    setOutput("regexOutput", "未匹配到结果。");
+                    setStatus("未匹配到结果", "warn");
+                    return;
+                }
+
+                const value = matches.map((item, index) => {
+                    const before = text.slice(0, item.index);
+                    const line = before.split("\n").length;
+                    const column = before.length - before.lastIndexOf("\n");
+                    const groupText = item.groups.length ? `\n  分组: ${JSON.stringify(item.groups)}` : "";
+                    return `#${index + 1} index=${item.index} 行=${line} 列=${column}\n  匹配: ${item.value}${groupText}`;
+                }).join("\n\n");
+                setOutput("regexOutput", value);
+                setStatus(`匹配到 ${matches.length} 项`, "ok");
+            } catch (error) {
+                setOutput("regexOutput", `正则错误: ${error.message}`);
+                setStatus("正则错误", "error");
+            }
+        }
+
+        async function handleHash() {
+            try {
+                const value = await hashText(getValue("hashInput"), getValue("hashAlgo"));
+                setOutput("hashOutput", value);
+                setStatus(`Hash 生成成功：${getValue("hashAlgo")}，${value.length} 位十六进制`, "ok");
+            } catch (error) {
+                setOutput("hashOutput", `Hash 生成失败: ${error.message}`);
+                setStatus("Hash 生成失败", "error");
+            }
+        }
+
+        function handleDiff() {
+            const rows = diffLines(getValue("diffLeft"), getValue("diffRight"));
+            const output = document.getElementById("diffOutput");
+            if (!getValue("diffLeft") && !getValue("diffRight")) {
+                setOutput("diffOutput", "请输入要比较的文本。", true);
+                setStatus("等待输入", "warn");
+                return;
+            }
+
+            const added = rows.filter((row) => row.type === "add").length;
+            const deleted = rows.filter((row) => row.type === "del").length;
+            const changedBlocks = countChangedBlocks(rows);
+
+            if (changedBlocks === 0) {
+                setOutput("diffOutput", "结论：两段文本完全一致。\n\n所有行内容相同。");
+                setStatus("文本完全一致", "ok");
+                return;
+            }
+
+            const summary = [
+                "结论：两段文本不一致。",
+                `差异块：${changedBlocks} 处`,
+                `新增行：${added} 行`,
+                `删除行：${deleted} 行`
+            ].join("\n");
+            const detail = buildDiffDetails(rows);
+            const diffBody = rows.map((row) => {
+                const className = row.type === "add" ? "diff-add" : row.type === "del" ? "diff-del" : "diff-same";
+                return `<span class="diff-line ${className}">${escapeHtml(diffRowText(row)) || " "}</span>`;
+            }).join("");
+            output.innerHTML = [
+                `<span class="diff-summary">${escapeHtml(summary)}</span>`,
+                `<span class="diff-detail">具体不同点</span>`,
+                `<span>${escapeHtml(detail)}</span>`,
+                `<span class="diff-detail">行级对比</span>`,
+                diffBody
+            ].join("");
+            output.classList.remove("empty");
+            setStatus(`文本比较完成：${changedBlocks} 处不同`, "warn");
+        }
+
+        function escapeHtml(value) {
+            return value
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        async function copyText(id) {
+            const value = readOutput(id);
+            if (!value || value === "处理结果会显示在这里") {
+                setStatus("没有可复制的结果", "warn");
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(value);
+                setStatus("已复制到剪贴板", "ok");
+            } catch (error) {
+                setStatus("复制失败，请手动选择文本", "error");
+            }
+        }
+
+        function clearFields(ids) {
+            ids.split(",").forEach((id) => {
+                const element = document.getElementById(id);
+                if (!element) return;
+                if ("value" in element) {
+                    element.value = element.defaultValue || "";
+                } else if (element.classList.contains("output")) {
+                    resetOutput(element);
+                } else {
+                    element.textContent = "处理结果会显示在这里";
+                }
+            });
+            setStatus("已清空", "ok");
+        }
+
+        function bindEvents() {
+            toolGrid.addEventListener("click", (event) => {
+                const card = event.target.closest(".tool-card");
+                if (card) {
+                    switchTool(card.dataset.tool);
+                }
+            });
+
+            document.addEventListener("click", async (event) => {
+                const actionButton = event.target.closest("[data-action]");
+                const copyButton = event.target.closest("[data-copy]");
+                const clearButton = event.target.closest("[data-clear]");
+
+                if (actionButton) {
+                    const action = actionButton.dataset.action;
+                    if (action.startsWith("json-")) handleJson(action);
+                    if (action.startsWith("url-")) handleUrl(action);
+                    if (action.startsWith("base64-")) handleBase64(action);
+                    if (action.startsWith("timestamp-")) handleTimestamp(action);
+                    if (action === "uuid-generate") handleUuid();
+                    if (action === "regex-test") handleRegex();
+                    if (action === "hash-generate") await handleHash();
+                    if (action === "diff-run") handleDiff();
+                }
+
+                if (copyButton) {
+                    await copyText(copyButton.dataset.copy);
+                }
+
+                if (clearButton) {
+                    clearFields(clearButton.dataset.clear);
+                }
+            });
+        }
+
+        initCards();
+        bindEvents();
     </script>
 </body>
 </html>
