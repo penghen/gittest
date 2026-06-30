@@ -25,11 +25,13 @@
         }
 
         body {
+            height: 100vh;
             margin: 0;
             background: var(--bg);
             color: var(--text);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
             line-height: 1.5;
+            overflow: hidden;
         }
 
         button,
@@ -45,12 +47,14 @@
 
         .page {
             width: min(1480px, calc(100% - 48px));
+            height: calc(100vh - 74px);
             margin: 0 auto;
-            padding: 28px 0 56px;
+            padding: 20px 0;
             display: grid;
-            grid-template-columns: 390px minmax(0, 1fr);
+            grid-template-columns: 320px minmax(0, 1fr);
             gap: 24px;
-            align-items: start;
+            align-items: stretch;
+            overflow: hidden;
         }
 
         .header {
@@ -109,64 +113,72 @@
         }
 
         .section-title {
-            margin: 0 0 16px;
-            font-size: 24px;
+            margin: 0 0 12px;
+            padding: 0 4px;
+            font-size: 18px;
             font-weight: 700;
+        }
+
+        .tool-nav {
+            min-height: 0;
+            padding: 16px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            overflow: auto;
         }
 
         .tool-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 6px;
         }
 
         .tool-card {
-            min-height: 92px;
+            min-height: 52px;
             display: grid;
-            grid-template-columns: 86px minmax(0, 1fr);
+            grid-template-columns: 40px minmax(0, 1fr);
             align-items: stretch;
-            padding: 0;
+            padding: 0 10px;
             background: var(--panel);
-            border: 1px solid var(--line);
+            border: 1px solid transparent;
             border-radius: 6px;
             color: inherit;
             text-align: left;
             cursor: pointer;
-            overflow: hidden;
-            transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+            transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
         }
 
         .tool-card:hover,
         .tool-card:focus-visible {
-            border-color: #9dccfb;
-            box-shadow: 0 8px 22px rgba(47, 142, 232, 0.13);
-            transform: translateY(-1px);
+            background: #f4f9ff;
+            border-color: #cde4fb;
             outline: none;
         }
 
         .tool-card.active {
-            border-color: var(--blue);
-            box-shadow: 0 0 0 2px rgba(47, 142, 232, 0.12);
+            background: var(--blue-soft);
+            border-color: #b8dafa;
+            color: var(--blue-dark);
         }
 
         .tool-icon {
             display: grid;
             place-items: center;
-            background: linear-gradient(90deg, #e9f4ff, #f7fbff);
             color: var(--blue);
             font-weight: 800;
-            font-size: 18px;
+            font-size: 12px;
             letter-spacing: 0;
         }
 
         .tool-copy {
             min-width: 0;
-            padding: 18px 18px 14px;
+            padding: 8px 0;
         }
 
         .tool-copy h2 {
-            margin: 0 0 8px;
-            font-size: 19px;
+            margin: 0 0 2px;
+            font-size: 15px;
             line-height: 1.25;
             font-weight: 700;
             letter-spacing: 0;
@@ -178,21 +190,25 @@
         .tool-copy p {
             margin: 0;
             color: var(--muted);
-            font-size: 14px;
+            font-size: 12px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .workspace {
+            min-height: 0;
             margin-top: 0;
             background: var(--panel);
             border: 1px solid var(--line);
             border-radius: 6px;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .workspace-header {
+            flex: 0 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -246,10 +262,13 @@
         .tool-panel {
             display: none;
             padding: 24px;
+            min-height: 0;
         }
 
         .tool-panel.active {
             display: block;
+            flex: 1 1 auto;
+            overflow: auto;
         }
 
         .two-cols {
@@ -485,7 +504,7 @@
 
         @media (max-width: 1180px) {
             .page {
-                grid-template-columns: 330px minmax(0, 1fr);
+                grid-template-columns: 280px minmax(0, 1fr);
             }
 
             .form-grid {
@@ -494,13 +513,23 @@
         }
 
         @media (max-width: 760px) {
+            body {
+                overflow: hidden;
+            }
+
             .page,
             .header-inner {
                 width: min(100% - 28px, 1480px);
             }
 
             .page {
-                display: block;
+                height: calc(100vh - 66px);
+                display: grid;
+                grid-template-columns: 1fr;
+                grid-template-rows: 220px minmax(0, 1fr);
+                gap: 14px;
+                padding: 14px 0;
+                overflow: hidden;
             }
 
             .header-inner {
@@ -519,16 +548,16 @@
             }
 
             .tool-card {
-                grid-template-columns: 86px minmax(0, 1fr);
-                min-height: 96px;
+                grid-template-columns: 40px minmax(0, 1fr);
+                min-height: 52px;
             }
 
             .tool-copy {
-                padding: 18px 18px 14px;
+                padding: 8px 0;
             }
 
             .tool-copy h2 {
-                font-size: 19px;
+                font-size: 15px;
             }
 
             .tool-copy p {
@@ -541,7 +570,7 @@
             }
 
             .workspace {
-                margin-top: 18px;
+                margin-top: 0;
             }
 
             .status {
@@ -567,7 +596,7 @@
     </header>
 
     <main class="page">
-        <section aria-labelledby="common-title">
+        <section class="tool-nav" aria-labelledby="common-title">
             <h2 class="section-title" id="common-title">常用</h2>
             <div class="tool-grid" id="toolGrid"></div>
         </section>
