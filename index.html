@@ -1729,6 +1729,9 @@
             document.querySelectorAll("[data-mock-field]").forEach((field) => {
                 field.checked = false;
             });
+            document.querySelectorAll("[data-mock-template]").forEach((template) => {
+                template.classList.remove("active");
+            });
             mockCustomFields.splice(0, mockCustomFields.length);
             mockLastOutput = "";
             renderMockCustomList();
@@ -1738,6 +1741,9 @@
 
         function loadMockTemplate(name) {
             clearMock();
+            document.querySelectorAll("[data-mock-template]").forEach((template) => {
+                template.classList.toggle("active", template.dataset.mockTemplate === name);
+            });
             (mockTemplates[name] || []).forEach((field) => {
                 const input = document.querySelector(`[data-mock-field="${field}"]`);
                 if (input) input.checked = true;
