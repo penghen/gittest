@@ -346,6 +346,34 @@
             margin: 16px 0;
         }
 
+        .option-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            margin: 12px 0 0;
+        }
+
+        .check-pill {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 10px;
+            border: 1px solid #d8dee6;
+            border-radius: 999px;
+            background: #fff;
+            color: #4d5967;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .check-pill input {
+            width: auto;
+            height: auto;
+            margin: 0;
+            accent-color: var(--blue);
+        }
+
         .btn {
             min-height: 38px;
             display: inline-flex;
@@ -419,6 +447,79 @@
         .output.empty {
             color: #98a2ad;
             font-family: inherit;
+        }
+
+        .visual-output {
+            margin-top: 14px;
+        }
+
+        .visual-output mark {
+            display: inline;
+            padding: 1px 3px;
+            border-radius: 3px;
+            background: #ffe58f;
+            color: #1f2933;
+        }
+
+        .compact-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 13px;
+        }
+
+        .compact-table th,
+        .compact-table td {
+            padding: 8px 10px;
+            border: 1px solid #d8dee6;
+            text-align: left;
+            vertical-align: top;
+            word-break: break-word;
+        }
+
+        .compact-table th {
+            background: #eef6ff;
+            color: #195f9f;
+            font-family: inherit;
+        }
+
+        .mini-tabs,
+        .template-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 0 0 14px;
+        }
+
+        .mini-tab {
+            min-height: 34px;
+            padding: 6px 12px;
+            border: 1px solid #d8dee6;
+            border-radius: 999px;
+            background: #fff;
+            color: #4d5967;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .mini-tab.active {
+            border-color: #b8dafa;
+            background: var(--blue-soft);
+            color: var(--blue-dark);
+        }
+
+        .field-check-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .custom-field-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 140px minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: end;
         }
 
         .match-list {
@@ -543,7 +644,9 @@
             .tool-grid,
             .two-cols,
             .timestamp-result,
-            .form-grid {
+            .form-grid,
+            .field-check-grid,
+            .custom-field-row {
                 grid-template-columns: 1fr;
             }
 
@@ -611,6 +714,23 @@
             </div>
 
             <div class="tool-panel active" data-panel="json">
+                <div class="form-grid">
+                    <div class="field wide">
+                        <label for="jsonPathInput">JSONPath 提取</label>
+                        <input id="jsonPathInput" type="text" value="$" placeholder="例如：$.data.items[*].name、$..name">
+                    </div>
+                    <div class="field wide">
+                        <label>解析选项</label>
+                        <div class="option-row">
+                            <label class="check-pill" for="jsonAutoDecode">
+                                <input id="jsonAutoDecode" type="checkbox"> 自动解码
+                            </label>
+                            <label class="check-pill" for="jsonNestedParse">
+                                <input id="jsonNestedParse" type="checkbox"> 嵌套解析
+                            </label>
+                        </div>
+                    </div>
+                </div>
                 <div class="two-cols">
                     <div class="field">
                         <label for="jsonInput">输入 JSON</label>
@@ -624,8 +744,15 @@
                 <div class="actions">
                     <button class="btn" data-action="json-format"><span class="btn-icon">{}</span>格式化</button>
                     <button class="btn secondary" data-action="json-minify"><span class="btn-icon">-</span>压缩</button>
+                    <button class="btn secondary" data-action="json-sort-asc"><span class="btn-icon">A</span>升序</button>
+                    <button class="btn secondary" data-action="json-sort-desc"><span class="btn-icon">Z</span>降序</button>
+                    <button class="btn secondary" data-action="json-path"><span class="btn-icon">$</span>提取</button>
+                    <button class="btn secondary" data-action="json-table"><span class="btn-icon">▦</span>表格</button>
+                    <button class="btn secondary" data-action="json-unicode-encode"><span class="btn-icon">U</span>Uni 编码</button>
+                    <button class="btn secondary" data-action="json-unicode-decode"><span class="btn-icon">U</span>Uni 解码</button>
+                    <button class="btn secondary" data-action="json-url-decode"><span class="btn-icon">%</span>URL 解码</button>
                     <button class="btn secondary" data-copy="jsonOutput"><span class="btn-icon">[]</span>复制</button>
-                    <button class="btn danger" data-clear="jsonInput,jsonOutput"><span class="btn-icon">×</span>清空</button>
+                    <button class="btn danger" data-clear="jsonInput,jsonPathInput,jsonOutput"><span class="btn-icon">×</span>清空</button>
                 </div>
             </div>
 
@@ -710,12 +837,28 @@
             <div class="tool-panel" data-panel="regex">
                 <div class="form-grid">
                     <div class="field wide">
+                        <label for="regexPreset">常用正则</label>
+                        <select id="regexPreset"></select>
+                    </div>
+                    <div class="field wide">
+                        <label for="regexSearch">模板搜索</label>
+                        <input id="regexSearch" type="text" placeholder="搜索邮箱、手机、URL、中文、HTML...">
+                    </div>
+                    <div class="field wide">
                         <label for="regexPattern">正则表达式</label>
                         <input id="regexPattern" type="text" placeholder="例如：\\b\\w+@\\w+\\.com\\b">
                     </div>
-                    <div class="field">
-                        <label for="regexFlags">Flags</label>
-                        <input id="regexFlags" type="text" value="g" placeholder="gim">
+                    <div class="field wide">
+                        <label for="regexFlags">匹配标志</label>
+                        <input id="regexFlags" type="text" value="g" placeholder="gimuy">
+                        <div class="option-row" aria-label="常用 flags">
+                            <label class="check-pill"><input type="checkbox" data-regex-flag="g" checked> g 全局</label>
+                            <label class="check-pill"><input type="checkbox" data-regex-flag="i"> i 忽略大小写</label>
+                            <label class="check-pill"><input type="checkbox" data-regex-flag="m"> m 多行</label>
+                            <label class="check-pill"><input type="checkbox" data-regex-flag="s"> s 点匹配换行</label>
+                            <label class="check-pill"><input type="checkbox" data-regex-flag="u"> u Unicode</label>
+                            <label class="check-pill"><input type="checkbox" data-regex-flag="y"> y 粘连</label>
+                        </div>
                     </div>
                     <div class="field full">
                         <label for="regexInput">测试文本</label>
@@ -725,9 +868,82 @@
                 <div class="actions">
                     <button class="btn" data-action="regex-test"><span class="btn-icon">.*</span>测试</button>
                     <button class="btn secondary" data-copy="regexOutput"><span class="btn-icon">[]</span>复制</button>
-                    <button class="btn danger" data-clear="regexPattern,regexInput,regexOutput"><span class="btn-icon">×</span>清空</button>
+                    <button class="btn danger" data-clear="regexPreset,regexSearch,regexPattern,regexInput,regexOutput,regexPreview"><span class="btn-icon">×</span>清空</button>
                 </div>
+                <div class="output empty visual-output" id="regexPreview">高亮预览会显示在这里</div>
                 <pre class="output empty" id="regexOutput">处理结果会显示在这里</pre>
+            </div>
+
+            <div class="tool-panel" data-panel="mock">
+                <div class="template-row" aria-label="快速模板">
+                    <button class="mini-tab" type="button" data-mock-template="user">用户信息</button>
+                    <button class="mini-tab" type="button" data-mock-template="employee">员工信息</button>
+                    <button class="mini-tab" type="button" data-mock-template="product">商品信息</button>
+                    <button class="mini-tab" type="button" data-mock-template="order">订单信息</button>
+                    <button class="mini-tab" type="button" data-mock-template="api">API测试数据</button>
+                </div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="mockCount">生成数量</label>
+                        <input id="mockCount" type="number" min="1" max="1000" value="10">
+                    </div>
+                    <div class="field">
+                        <label for="mockFormat">输出格式</label>
+                        <select id="mockFormat">
+                            <option value="json">JSON</option>
+                            <option value="csv">CSV</option>
+                            <option value="sql">SQL INSERT</option>
+                            <option value="xml">XML</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mini-tabs" aria-label="字段分类">
+                    <button class="mini-tab active" type="button" data-mock-tab="personal">个人信息</button>
+                    <button class="mini-tab" type="button" data-mock-tab="business">商业数据</button>
+                    <button class="mini-tab" type="button" data-mock-tab="technical">技术数据</button>
+                    <button class="mini-tab" type="button" data-mock-tab="custom">自定义数据</button>
+                </div>
+                <div class="mock-section" data-mock-section="personal">
+                    <div class="field-check-grid" id="mockPersonalFields"></div>
+                </div>
+                <div class="mock-section" data-mock-section="business" hidden>
+                    <div class="field-check-grid" id="mockBusinessFields"></div>
+                </div>
+                <div class="mock-section" data-mock-section="technical" hidden>
+                    <div class="field-check-grid" id="mockTechnicalFields"></div>
+                </div>
+                <div class="mock-section" data-mock-section="custom" hidden>
+                    <div class="custom-field-row">
+                        <div class="field">
+                            <label for="mockCustomName">字段名称</label>
+                            <input id="mockCustomName" type="text" placeholder="例如：remark">
+                        </div>
+                        <div class="field">
+                            <label for="mockCustomType">数据类型</label>
+                            <select id="mockCustomType">
+                                <option value="string">字符串</option>
+                                <option value="number">数字</option>
+                                <option value="boolean">布尔值</option>
+                                <option value="date">日期</option>
+                                <option value="array">数组</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="mockCustomRule">生成规则</label>
+                            <input id="mockCustomRule" type="text" placeholder="可留空，按类型随机生成">
+                        </div>
+                        <button class="btn secondary" type="button" data-action="mock-add-custom"><span class="btn-icon">+</span>添加字段</button>
+                    </div>
+                    <pre class="output empty" id="mockCustomList">自定义字段会显示在这里</pre>
+                </div>
+                <div class="actions">
+                    <button class="btn" data-action="mock-generate"><span class="btn-icon">M</span>生成数据</button>
+                    <button class="btn secondary" data-action="mock-select-all"><span class="btn-icon">✓</span>全选当前类</button>
+                    <button class="btn secondary" data-copy="mockOutput"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn secondary" data-action="mock-download"><span class="btn-icon">↓</span>下载</button>
+                    <button class="btn danger" data-action="mock-clear"><span class="btn-icon">×</span>清空</button>
+                </div>
+                <pre class="output empty" id="mockOutput">处理结果会显示在这里</pre>
             </div>
 
             <div class="tool-panel" data-panel="hash">
@@ -783,6 +999,7 @@
             { id: "timestamp", icon: "TIME", title: "Unix时间戳", desc: "秒、毫秒时间戳与日期互转" },
             { id: "uuid", icon: "UUID", title: "UUID生成", desc: "批量生成 v4 UUID" },
             { id: "regex", icon: ".*", title: "正则测试", desc: "测试表达式并查看匹配结果" },
+            { id: "mock", icon: "MOCK", title: "数据Mock工具", desc: "按模板批量生成测试数据" },
             { id: "hash", icon: "HASH", title: "Hash生成", desc: "生成 SHA 系列摘要" },
             { id: "diff", icon: "DIFF", title: "Diff文本比较", desc: "按行比较两段文本差异" }
         ];
@@ -791,6 +1008,36 @@
         const activeTitle = document.getElementById("activeTitle");
         const activeDesc = document.getElementById("activeDesc");
         const statusText = document.getElementById("statusText");
+        const regexPresets = [
+            { key: "email", category: "验证类", title: "邮箱验证", pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", flags: "", desc: "验证电子邮箱地址" },
+            { key: "phone", category: "验证类", title: "手机号验证", pattern: "^1[3-9]\\d{9}$", flags: "", desc: "验证中国大陆手机号" },
+            { key: "url", category: "验证类", title: "URL验证", pattern: "^(https?:\\/\\/)?(([\\w-]+\\.)+[\\w-]+|localhost|\\d{1,3}(?:\\.\\d{1,3}){3})(:\\d{1,5})?(\\/[^\\s?#]*)?(\\?[^\\s#]*)?(#[^\\s]*)?$", flags: "i", desc: "验证 URL、localhost 和 IPv4 地址" },
+            { key: "idcard", category: "验证类", title: "身份证验证", pattern: "^[1-9]\\d{5}(19|20)\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])\\d{3}[0-9Xx]$", flags: "", desc: "验证 18 位身份证号" },
+            { key: "ipv4", category: "验证类", title: "IPv4地址验证", pattern: "^((25[0-5]|2[0-4][0-9]|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?\\d\\d?)$", flags: "", desc: "验证 IPv4 地址" },
+            { key: "date", category: "验证类", title: "日期验证", pattern: "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$", flags: "", desc: "验证 YYYY-MM-DD 日期" },
+            { key: "chinese", category: "提取类", title: "中文字符提取", pattern: "[\\u4e00-\\u9fa5]+", flags: "g", desc: "提取中文字符" },
+            { key: "number", category: "提取类", title: "数字提取", pattern: "\\d+(\\.\\d+)?", flags: "g", desc: "提取整数和小数" },
+            { key: "email_extract", category: "提取类", title: "邮箱地址提取", pattern: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", flags: "g", desc: "从文本中提取邮箱" },
+            { key: "html_tag", category: "HTML相关", title: "HTML标签匹配", pattern: "<([a-zA-Z][a-zA-Z0-9]*)\\b[^>]*>([\\s\\S]*?)<\\/\\1>", flags: "g", desc: "匹配成对 HTML 标签" },
+            { key: "remove_html", category: "替换类", title: "去除HTML标签", pattern: "<[^>]*>", flags: "g", desc: "匹配所有 HTML 标签" },
+            { key: "color", category: "提取类", title: "颜色值提取", pattern: "#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\\b", flags: "g", desc: "提取十六进制颜色值" },
+            { key: "uuid", category: "技术类", title: "UUID匹配", pattern: "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}", flags: "g", desc: "匹配 UUID" },
+            { key: "comment", category: "编程相关", title: "JS注释匹配", pattern: "\\/\\*[\\s\\S]*?\\*\\/|\\/\\/.*$", flags: "gm", desc: "匹配 JavaScript 注释" }
+        ];
+        const mockFieldGroups = {
+            personal: [["name", "姓名"], ["email", "邮箱"], ["phone", "手机号"], ["idCard", "身份证号"], ["gender", "性别"], ["age", "年龄"], ["birthday", "生日"], ["address", "地址"]],
+            business: [["company", "公司名称"], ["department", "部门"], ["position", "职位"], ["salary", "薪资"], ["bankCard", "银行卡号"], ["creditCard", "信用卡号"], ["price", "价格"], ["currency", "货币"]],
+            technical: [["uuid", "UUID"], ["ip", "IP地址"], ["mac", "MAC地址"], ["userAgent", "User Agent"], ["url", "URL"], ["domain", "域名"], ["password", "密码"], ["token", "Token"], ["color", "颜色值"], ["timestamp", "时间戳"], ["filename", "文件名"], ["mimeType", "MIME类型"]]
+        };
+        const mockTemplates = {
+            user: ["name", "email", "phone", "gender", "age", "address"],
+            employee: ["name", "email", "phone", "company", "department", "position", "salary"],
+            product: ["name", "price", "currency", "uuid", "timestamp"],
+            order: ["uuid", "name", "email", "phone", "address", "price", "timestamp"],
+            api: ["uuid", "token", "ip", "userAgent", "timestamp"]
+        };
+        const mockCustomFields = [];
+        let mockLastOutput = "";
 
         function initCards() {
             toolGrid.innerHTML = tools.map((tool, index) => `
@@ -802,6 +1049,37 @@
                     </span>
                 </button>
             `).join("");
+        }
+
+        function initRegexPresets() {
+            const select = document.getElementById("regexPreset");
+            if (!select) return;
+            const groups = regexPresets.reduce((acc, item) => {
+                acc[item.category] ||= [];
+                acc[item.category].push(item);
+                return acc;
+            }, {});
+            select.innerHTML = '<option value="">自定义/选择常用正则</option>' + Object.entries(groups).map(([category, items]) => (
+                `<optgroup label="${escapeHtml(category)}">${items.map((item) => (
+                    `<option value="${escapeHtml(item.key)}">${escapeHtml(item.title)}</option>`
+                )).join("")}</optgroup>`
+            )).join("");
+        }
+
+        function initMockFields() {
+            const targets = {
+                personal: document.getElementById("mockPersonalFields"),
+                business: document.getElementById("mockBusinessFields"),
+                technical: document.getElementById("mockTechnicalFields")
+            };
+            Object.entries(targets).forEach(([group, target]) => {
+                if (!target) return;
+                target.innerHTML = mockFieldGroups[group].map(([key, label]) => `
+                    <label class="check-pill">
+                        <input type="checkbox" data-mock-field="${key}"> ${label}
+                    </label>
+                `).join("");
+            });
         }
 
         function setStatus(message, type = "") {
@@ -833,12 +1111,25 @@
             if (!panel) return;
 
             panel.querySelectorAll("textarea, input").forEach((field) => {
-                field.value = field.defaultValue || "";
+                if (field.type === "checkbox") {
+                    field.checked = field.defaultChecked;
+                } else {
+                    field.value = field.defaultValue || "";
+                }
             });
             panel.querySelectorAll("select").forEach((field) => {
                 field.selectedIndex = 0;
             });
             panel.querySelectorAll(".output").forEach(resetOutput);
+            if (id === "regex") {
+                initRegexPresets();
+                syncRegexFlagChecks("g");
+            }
+            if (id === "mock" && Array.isArray(mockCustomFields)) {
+                mockCustomFields.splice(0, mockCustomFields.length);
+                mockLastOutput = "";
+                renderMockCustomList();
+            }
         }
 
         function switchTool(id) {
@@ -1039,12 +1330,445 @@
             return first === last ? String(first) : `${first}-${last}`;
         }
 
+        function deepParseJSONStrings(value) {
+            if (Array.isArray(value)) return value.map(deepParseJSONStrings);
+            if (value && typeof value === "object") {
+                return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, deepParseJSONStrings(item)]));
+            }
+            if (typeof value === "string" && value.trim()) {
+                try {
+                    const parsed = JSON.parse(value);
+                    if (parsed && typeof parsed === "object") return deepParseJSONStrings(parsed);
+                } catch (error) {}
+            }
+            return value;
+        }
+
+        function sortJsonValue(value, direction = 1) {
+            if (Array.isArray(value)) return value.map((item) => sortJsonValue(item, direction));
+            if (value && typeof value === "object") {
+                return Object.keys(value).sort((a, b) => a.localeCompare(b) * direction).reduce((acc, key) => {
+                    acc[key] = sortJsonValue(value[key], direction);
+                    return acc;
+                }, {});
+            }
+            return value;
+        }
+
+        function decodeJsonSource(source) {
+            let value = source;
+            if (document.getElementById("jsonAutoDecode")?.checked) {
+                try {
+                    value = decodeURIComponent(value);
+                } catch (error) {}
+                value = value.replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+            }
+            return value;
+        }
+
+        function parseJsonInput() {
+            const decoded = decodeJsonSource(getValue("jsonInput").trim());
+            let parsed = JSON.parse(decoded);
+            if (document.getElementById("jsonNestedParse")?.checked) {
+                parsed = deepParseJSONStrings(parsed);
+            }
+            return parsed;
+        }
+
+        function unicodeEncode(value) {
+            return value.replace(/[^\x00-\x7F]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`);
+        }
+
+        function unicodeDecode(value) {
+            return value.replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+        }
+
+        function queryJsonPath(root, path) {
+            const results = [];
+            const query = path.trim() || "$";
+            if (query === "$") return [{ path: "$", value: root }];
+
+            function formatKey(key) {
+                return /^[A-Za-z_$][\w$]*$/.test(key) ? `.${key}` : `[${JSON.stringify(key)}]`;
+            }
+
+            function recursiveSearch(value, key, currentPath) {
+                if (!value || typeof value !== "object") return;
+                if (Object.prototype.hasOwnProperty.call(value, key)) {
+                    results.push({ path: `${currentPath}${formatKey(key)}`, value: value[key] });
+                }
+                Object.entries(value).forEach(([childKey, childValue]) => {
+                    const nextPath = Array.isArray(value) ? `${currentPath}[${childKey}]` : `${currentPath}${formatKey(childKey)}`;
+                    recursiveSearch(childValue, key, nextPath);
+                });
+            }
+
+            function walk(value, expression, currentPath) {
+                if (!expression) {
+                    results.push({ path: currentPath, value });
+                    return;
+                }
+                if (expression.startsWith("..")) {
+                    recursiveSearch(value, expression.slice(2), currentPath);
+                    return;
+                }
+                const bracket = expression.match(/^\[([^\]]+)\](.*)$/);
+                if (bracket) {
+                    const token = bracket[1];
+                    const rest = bracket[2];
+                    if (token === "*") {
+                        if (Array.isArray(value)) value.forEach((item, index) => walk(item, rest, `${currentPath}[${index}]`));
+                        return;
+                    }
+                    if (token.includes(":") && Array.isArray(value)) {
+                        const [startText, endText] = token.split(":");
+                        const start = startText ? Number(startText) : 0;
+                        const end = endText ? Number(endText) : value.length;
+                        value.slice(start, end).forEach((item, index) => walk(item, rest, `${currentPath}[${start + index}]`));
+                        return;
+                    }
+                    let index = Number(token);
+                    if (Array.isArray(value) && Number.isInteger(index)) {
+                        if (index < 0) index = value.length + index;
+                        if (index >= 0 && index < value.length) walk(value[index], rest, `${currentPath}[${index}]`);
+                        return;
+                    }
+                    const keyMatch = token.match(/^['"](.+)['"]$/);
+                    const key = keyMatch ? keyMatch[1] : token;
+                    if (value && typeof value === "object" && Object.prototype.hasOwnProperty.call(value, key)) {
+                        walk(value[key], rest, `${currentPath}${formatKey(key)}`);
+                    }
+                    return;
+                }
+                const prop = expression.match(/^\.?([^.\[]+)(.*)$/);
+                if (!prop) return;
+                const key = prop[1];
+                const rest = prop[2];
+                if (key === "*") {
+                    if (value && typeof value === "object") {
+                        Object.entries(value).forEach(([childKey, childValue]) => {
+                            const nextPath = Array.isArray(value) ? `${currentPath}[${childKey}]` : `${currentPath}${formatKey(childKey)}`;
+                            walk(childValue, rest, nextPath);
+                        });
+                    }
+                    return;
+                }
+                if (value && typeof value === "object" && Object.prototype.hasOwnProperty.call(value, key)) {
+                    walk(value[key], rest, `${currentPath}${formatKey(key)}`);
+                }
+            }
+
+            const expression = query.startsWith("$.") ? query.slice(2) : query.startsWith("$") ? query.slice(1) : query;
+            walk(root, expression, "$");
+            return results;
+        }
+
+        function renderJsonPathResults(results) {
+            if (!results.length) return "未找到匹配结果。";
+            return [
+                `找到 ${results.length} 个结果`,
+                "",
+                JSON.stringify(results.map((item, index) => ({
+                    index: index + 1,
+                    path: item.path,
+                    type: Array.isArray(item.value) ? "array" : item.value === null ? "null" : typeof item.value,
+                    value: item.value
+                })), null, 2)
+            ].join("\n");
+        }
+
+        function renderJsonTable(value) {
+            const rows = Array.isArray(value) ? value : [value];
+            if (!rows.every((row) => row && typeof row === "object" && !Array.isArray(row))) {
+                return JSON.stringify(value, null, 2);
+            }
+            const columns = [...new Set(rows.flatMap((row) => Object.keys(row)))];
+            if (!columns.length) return "没有可表格化的字段。";
+            return [
+                columns.join("\t"),
+                ...rows.map((row) => columns.map((column) => {
+                    const cell = row[column];
+                    return typeof cell === "object" ? JSON.stringify(cell) : String(cell ?? "");
+                }).join("\t"))
+            ].join("\n");
+        }
+
+        function parseRegexPattern(rawPattern, rawFlags) {
+            const literal = rawPattern.match(/^\/([\s\S]*)\/([gimsuy]*)$/);
+            if (literal) return { pattern: literal[1], flags: literal[2] };
+            return { pattern: rawPattern, flags: rawFlags };
+        }
+
+        function syncRegexFlagChecks(flags) {
+            document.querySelectorAll("[data-regex-flag]").forEach((box) => {
+                box.checked = flags.includes(box.dataset.regexFlag);
+            });
+        }
+
+        function updateRegexFlagsFromChecks() {
+            const flags = [...document.querySelectorAll("[data-regex-flag]")].filter((box) => box.checked).map((box) => box.dataset.regexFlag).join("");
+            document.getElementById("regexFlags").value = flags;
+        }
+
+        function applyRegexPreset(key) {
+            const preset = regexPresets.find((item) => item.key === key);
+            if (!preset) return;
+            document.getElementById("regexPattern").value = preset.pattern;
+            document.getElementById("regexFlags").value = preset.flags;
+            syncRegexFlagChecks(preset.flags);
+            setOutput("regexOutput", `${preset.title}\n${preset.desc}\n\nJavaScript: /${preset.pattern}/${preset.flags}`);
+            setStatus(`已选择正则模板：${preset.title}`, "ok");
+        }
+
+        function filterRegexPresets(keyword) {
+            const select = document.getElementById("regexPreset");
+            const lower = keyword.trim().toLowerCase();
+            const matched = regexPresets.filter((item) => !lower || `${item.title} ${item.category} ${item.desc} ${item.pattern}`.toLowerCase().includes(lower));
+            select.innerHTML = '<option value="">自定义/选择常用正则</option>' + matched.map((item) => (
+                `<option value="${escapeHtml(item.key)}">${escapeHtml(item.category)} - ${escapeHtml(item.title)}</option>`
+            )).join("");
+            setStatus(lower ? `找到 ${matched.length} 个正则模板` : "准备就绪", lower ? "ok" : "");
+        }
+
+        const fakeData = {
+            surnames: ["王", "李", "张", "刘", "陈", "杨", "赵", "黄", "周", "吴", "徐", "孙"],
+            names: ["伟", "芳", "娜", "敏", "静", "丽", "强", "磊", "军", "洋", "勇", "杰", "浩", "宇", "欣"],
+            companies: ["阿里巴巴", "腾讯", "百度", "京东", "美团", "字节跳动", "华为", "网易", "小米", "拼多多"],
+            departments: ["技术部", "产品部", "运营部", "市场部", "销售部", "人事部", "财务部", "测试部"],
+            positions: ["前端工程师", "后端工程师", "测试工程师", "产品经理", "项目经理", "数据分析师", "架构师"],
+            domains: ["gmail.com", "qq.com", "163.com", "outlook.com", "example.com"],
+            cities: ["北京", "上海", "广州", "深圳", "杭州", "南京", "成都", "武汉"]
+        };
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function randomChoice(items) {
+            return items[Math.floor(Math.random() * items.length)];
+        }
+
+        function randomString(length, chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") {
+            return Array.from({ length }, () => chars[randomInt(0, chars.length - 1)]).join("");
+        }
+
+        function generateMockValue(type) {
+            const map = {
+                name: () => randomChoice(fakeData.surnames) + randomChoice(fakeData.names) + (Math.random() > 0.65 ? randomChoice(fakeData.names) : ""),
+                email: () => `${randomString(randomInt(6, 12)).toLowerCase()}@${randomChoice(fakeData.domains)}`,
+                phone: () => `${randomChoice(["130", "131", "135", "138", "150", "158", "166", "177", "188"])}${randomString(8, "0123456789")}`,
+                idCard: () => `110000${randomInt(1970, 2005)}${String(randomInt(1, 12)).padStart(2, "0")}${String(randomInt(1, 28)).padStart(2, "0")}${randomString(3, "0123456789")}${randomChoice(["0", "1", "2", "3", "X"])}`,
+                gender: () => randomChoice(["男", "女"]),
+                age: () => randomInt(18, 65),
+                birthday: () => `${randomInt(1960, 2005)}-${String(randomInt(1, 12)).padStart(2, "0")}-${String(randomInt(1, 28)).padStart(2, "0")}`,
+                address: () => `${randomChoice(fakeData.cities)}市${randomChoice(["朝阳区", "海淀区", "浦东新区", "南山区"])}${randomInt(1, 999)}号`,
+                company: () => `${randomChoice(fakeData.companies)}${randomChoice(["科技有限公司", "股份有限公司", "集团有限公司"])}`,
+                department: () => randomChoice(fakeData.departments),
+                position: () => randomChoice(fakeData.positions),
+                salary: () => randomInt(5000, 50000),
+                bankCard: () => `622${randomString(13, "0123456789")}`,
+                creditCard: () => `${randomChoice(["4", "5", "6"])}${randomString(15, "0123456789")}`,
+                price: () => Number((Math.random() * 9999 + 1).toFixed(2)),
+                currency: () => randomChoice(["CNY", "USD", "EUR", "JPY", "HKD"]),
+                uuid: () => uuidv4(),
+                ip: () => `${randomInt(1, 255)}.${randomInt(0, 255)}.${randomInt(0, 255)}.${randomInt(1, 255)}`,
+                mac: () => Array.from({ length: 6 }, () => randomString(2, "0123456789ABCDEF")).join(":"),
+                userAgent: () => randomChoice(["Mozilla/5.0 Chrome/126.0 Safari/537.36", "Mozilla/5.0 Firefox/127.0", "Mozilla/5.0 Safari/605.1.15"]),
+                url: () => `https://${randomString(8).toLowerCase()}.com/${randomChoice(["api", "user", "order", "product"])}`,
+                domain: () => `${randomString(8).toLowerCase()}.${randomChoice(["com", "cn", "net", "org"])}`,
+                password: () => randomString(randomInt(10, 16), "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*"),
+                token: () => randomString(32),
+                color: () => `#${randomString(6, "0123456789ABCDEF")}`,
+                timestamp: () => Date.now() + randomInt(-31536000000, 31536000000),
+                filename: () => `${randomString(8).toLowerCase()}.${randomChoice(["jpg", "png", "pdf", "json", "csv", "txt"])}`,
+                mimeType: () => randomChoice(["application/json", "text/plain", "text/csv", "image/png", "application/pdf"])
+            };
+            return map[type] ? map[type]() : randomString(10);
+        }
+
+        function generateCustomValue(type) {
+            if (type === "number") return randomInt(1, 1000);
+            if (type === "boolean") return Math.random() > 0.5;
+            if (type === "date") return new Date(Date.now() - randomInt(0, 1000) * 86400000).toISOString().slice(0, 10);
+            if (type === "array") return Array.from({ length: randomInt(1, 5) }, () => randomString(5));
+            return randomString(randomInt(5, 20));
+        }
+
+        function selectedMockFields() {
+            return [...document.querySelectorAll("[data-mock-field]:checked")].map((field) => field.dataset.mockField);
+        }
+
+        function renderMockCustomList() {
+            if (!mockCustomFields.length) {
+                setOutput("mockCustomList", "自定义字段会显示在这里", true);
+                return;
+            }
+            setOutput("mockCustomList", mockCustomFields.map((field, index) => `${index + 1}. ${field.name} (${field.type}) ${field.rule || ""}`).join("\n"));
+        }
+
+        function formatMockOutput(rows, format) {
+            if (format === "csv") {
+                const keys = Object.keys(rows[0] || {});
+                return [keys.join(","), ...rows.map((row) => keys.map((key) => {
+                    const value = row[key];
+                    const text = typeof value === "object" ? JSON.stringify(value) : String(value ?? "");
+                    return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+                }).join(","))].join("\n");
+            }
+            if (format === "sql") {
+                const keys = Object.keys(rows[0] || {});
+                return [
+                    `CREATE TABLE fake_data (${keys.map((key) => `${key} VARCHAR(255)`).join(", ")});`,
+                    ...rows.map((row) => `INSERT INTO fake_data (${keys.join(", ")}) VALUES (${keys.map((key) => `'${String(row[key] ?? "").replace(/'/g, "''")}'`).join(", ")});`)
+                ].join("\n");
+            }
+            if (format === "xml") {
+                return `<?xml version="1.0" encoding="UTF-8"?>\n<data>\n${rows.map((row, index) => `  <item id="${index + 1}">\n${Object.entries(row).map(([key, value]) => `    <${key}>${escapeHtml(String(typeof value === "object" ? JSON.stringify(value) : value))}</${key}>`).join("\n")}\n  </item>`).join("\n")}\n</data>`;
+            }
+            return JSON.stringify(rows, null, 2);
+        }
+
+        function handleMockGenerate() {
+            const fields = selectedMockFields();
+            if (!fields.length && !mockCustomFields.length) {
+                setOutput("mockOutput", "请至少选择一个字段或添加一个自定义字段。", true);
+                setStatus("Mock 生成失败", "error");
+                return;
+            }
+            const countInput = document.getElementById("mockCount");
+            const count = Math.min(1000, Math.max(1, Number(countInput.value) || 1));
+            countInput.value = String(count);
+            const rows = Array.from({ length: count }, () => {
+                const row = {};
+                fields.forEach((field) => {
+                    row[field] = generateMockValue(field);
+                });
+                mockCustomFields.forEach((field) => {
+                    row[field.name] = generateCustomValue(field.type);
+                });
+                return row;
+            });
+            mockLastOutput = formatMockOutput(rows, getValue("mockFormat"));
+            setOutput("mockOutput", mockLastOutput);
+            setStatus(`已生成 ${count} 条 Mock 数据`, "ok");
+        }
+
+        function clearMock() {
+            document.querySelectorAll("[data-mock-field]").forEach((field) => {
+                field.checked = false;
+            });
+            mockCustomFields.splice(0, mockCustomFields.length);
+            mockLastOutput = "";
+            renderMockCustomList();
+            setOutput("mockOutput", "处理结果会显示在这里", true);
+            setStatus("Mock 配置已清空", "ok");
+        }
+
+        function loadMockTemplate(name) {
+            clearMock();
+            (mockTemplates[name] || []).forEach((field) => {
+                const input = document.querySelector(`[data-mock-field="${field}"]`);
+                if (input) input.checked = true;
+            });
+            handleMockGenerate();
+        }
+
+        function selectAllMockCurrentTab() {
+            const active = document.querySelector("[data-mock-tab].active")?.dataset.mockTab || "personal";
+            if (active === "custom") return;
+            document.querySelectorAll(`[data-mock-section="${active}"] [data-mock-field]`).forEach((field) => {
+                field.checked = true;
+            });
+            setStatus("已全选当前分类字段", "ok");
+        }
+
+        function addMockCustomField() {
+            const name = getValue("mockCustomName").trim();
+            if (!name) {
+                setStatus("请输入自定义字段名称", "error");
+                return;
+            }
+            if (!/^[A-Za-z_$][\w$]*$/.test(name)) {
+                setStatus("字段名称请使用字母、数字、下划线，且不能数字开头", "error");
+                return;
+            }
+            if (mockCustomFields.some((field) => field.name === name)) {
+                setStatus("自定义字段已存在", "warn");
+                return;
+            }
+            mockCustomFields.push({
+                name,
+                type: getValue("mockCustomType"),
+                rule: getValue("mockCustomRule").trim()
+            });
+            document.getElementById("mockCustomName").value = "";
+            document.getElementById("mockCustomRule").value = "";
+            renderMockCustomList();
+            setStatus("自定义字段已添加", "ok");
+        }
+
+        function downloadMockOutput() {
+            if (!mockLastOutput) {
+                setStatus("请先生成 Mock 数据", "warn");
+                return;
+            }
+            const format = getValue("mockFormat");
+            const ext = { json: "json", csv: "csv", sql: "sql", xml: "xml" }[format] || "txt";
+            const blob = new Blob([mockLastOutput], { type: "text/plain;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `mock-data-${Date.now()}.${ext}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            setStatus("Mock 数据下载已开始", "ok");
+        }
+
         function handleJson(action) {
             try {
-                const parsed = JSON.parse(getValue("jsonInput"));
-                const value = action === "json-minify"
-                    ? JSON.stringify(parsed)
-                    : JSON.stringify(parsed, null, 2);
+                if (action === "json-unicode-encode") {
+                    const value = unicodeEncode(getValue("jsonInput"));
+                    document.getElementById("jsonInput").value = value;
+                    setOutput("jsonOutput", value);
+                    setStatus("Unicode 编码完成", "ok");
+                    return;
+                }
+                if (action === "json-unicode-decode") {
+                    const value = unicodeDecode(getValue("jsonInput"));
+                    document.getElementById("jsonInput").value = value;
+                    setOutput("jsonOutput", value);
+                    setStatus("Unicode 解码完成", "ok");
+                    return;
+                }
+                if (action === "json-url-decode") {
+                    const value = decodeURIComponent(getValue("jsonInput"));
+                    document.getElementById("jsonInput").value = value;
+                    setOutput("jsonOutput", value);
+                    setStatus("URL 解码完成", "ok");
+                    return;
+                }
+
+                let parsed = parseJsonInput();
+                if (action === "json-sort-asc") parsed = sortJsonValue(parsed, 1);
+                if (action === "json-sort-desc") parsed = sortJsonValue(parsed, -1);
+
+                if (action === "json-path") {
+                    const results = queryJsonPath(parsed, getValue("jsonPathInput"));
+                    setOutput("jsonOutput", renderJsonPathResults(results));
+                    setStatus(`JSONPath 提取完成：${results.length} 个结果`, results.length ? "ok" : "warn");
+                    return;
+                }
+
+                if (action === "json-table") {
+                    const value = renderJsonTable(parsed);
+                    setOutput("jsonOutput", value);
+                    setStatus("表格视图已生成，可复制到表格软件", "ok");
+                    return;
+                }
+
+                const value = action === "json-minify" ? JSON.stringify(parsed) : JSON.stringify(parsed, null, 2);
                 setOutput("jsonOutput", value);
                 setStatus(`JSON 处理成功：${summarizeJson(parsed)}，输出 ${value.length} 字符`, "ok");
             } catch (error) {
@@ -1113,9 +1837,9 @@
 
         function handleRegex() {
             try {
-                const pattern = getValue("regexPattern");
-                const flagsInput = getValue("regexFlags");
-                const flags = flagsInput.includes("g") ? flagsInput : `${flagsInput}g`;
+                const parsed = parseRegexPattern(getValue("regexPattern"), getValue("regexFlags"));
+                const pattern = parsed.pattern;
+                const flags = parsed.flags.includes("g") ? parsed.flags : `${parsed.flags}g`;
                 const regex = new RegExp(pattern, flags);
                 const text = getValue("regexInput");
                 const matches = [];
@@ -1134,21 +1858,35 @@
 
                 if (matches.length === 0) {
                     setOutput("regexOutput", "未匹配到结果。");
+                    setOutput("regexPreview", text || "高亮预览会显示在这里", !text);
                     setStatus("未匹配到结果", "warn");
                     return;
                 }
+
+                let highlighted = "";
+                let cursor = 0;
+                matches.forEach((item) => {
+                    highlighted += escapeHtml(text.slice(cursor, item.index));
+                    highlighted += `<mark>${escapeHtml(item.value || "(空匹配)")}</mark>`;
+                    cursor = item.index + item.value.length;
+                });
+                highlighted += escapeHtml(text.slice(cursor));
+                const preview = document.getElementById("regexPreview");
+                preview.innerHTML = highlighted || "高亮预览会显示在这里";
+                preview.classList.remove("empty");
 
                 const value = matches.map((item, index) => {
                     const before = text.slice(0, item.index);
                     const line = before.split("\n").length;
                     const column = before.length - before.lastIndexOf("\n");
-                    const groupText = item.groups.length ? `\n  分组: ${JSON.stringify(item.groups)}` : "";
-                    return `#${index + 1} index=${item.index} 行=${line} 列=${column}\n  匹配: ${item.value}${groupText}`;
+                    const groupText = item.groups.length ? `\n  分组: ${item.groups.map((group, groupIndex) => `$${groupIndex + 1}=${JSON.stringify(group)}`).join("；")}` : "";
+                    return `#${index + 1} index=${item.index} 行=${line} 列=${column} 范围=${item.index}-${item.index + item.value.length - 1}\n  匹配: ${item.value}${groupText}`;
                 }).join("\n\n");
-                setOutput("regexOutput", value);
+                setOutput("regexOutput", `表达式: /${pattern}/${flags}\n匹配数量: ${matches.length}\n\n${value}`);
                 setStatus(`匹配到 ${matches.length} 项`, "ok");
             } catch (error) {
                 setOutput("regexOutput", `正则错误: ${error.message}`);
+                setOutput("regexPreview", "高亮预览会显示在这里", true);
                 setStatus("正则错误", "error");
             }
         }
@@ -1264,6 +2002,11 @@
                     if (action.startsWith("timestamp-")) handleTimestamp(action);
                     if (action === "uuid-generate") handleUuid();
                     if (action === "regex-test") handleRegex();
+                    if (action === "mock-generate") handleMockGenerate();
+                    if (action === "mock-select-all") selectAllMockCurrentTab();
+                    if (action === "mock-add-custom") addMockCustomField();
+                    if (action === "mock-download") downloadMockOutput();
+                    if (action === "mock-clear") clearMock();
                     if (action === "hash-generate") await handleHash();
                     if (action === "diff-run") handleDiff();
                 }
@@ -1276,9 +2019,37 @@
                     clearFields(clearButton.dataset.clear);
                 }
             });
+
+            document.getElementById("regexPreset").addEventListener("change", (event) => {
+                applyRegexPreset(event.target.value);
+            });
+            document.getElementById("regexSearch").addEventListener("input", (event) => {
+                filterRegexPresets(event.target.value);
+            });
+            document.getElementById("regexFlags").addEventListener("input", (event) => {
+                syncRegexFlagChecks(event.target.value);
+            });
+            document.querySelectorAll("[data-regex-flag]").forEach((box) => {
+                box.addEventListener("change", updateRegexFlagsFromChecks);
+            });
+
+            document.querySelectorAll("[data-mock-tab]").forEach((tab) => {
+                tab.addEventListener("click", () => {
+                    document.querySelectorAll("[data-mock-tab]").forEach((item) => item.classList.toggle("active", item === tab));
+                    document.querySelectorAll("[data-mock-section]").forEach((section) => {
+                        section.hidden = section.dataset.mockSection !== tab.dataset.mockTab;
+                    });
+                });
+            });
+            document.querySelectorAll("[data-mock-template]").forEach((template) => {
+                template.addEventListener("click", () => loadMockTemplate(template.dataset.mockTemplate));
+            });
         }
 
         initCards();
+        initRegexPresets();
+        initMockFields();
+        renderMockCustomList();
         bindEvents();
     </script>
 </body>
