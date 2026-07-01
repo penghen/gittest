@@ -306,7 +306,7 @@
         }
 
         textarea,
-        input,
+        input:not([type="checkbox"]),
         select {
             width: 100%;
             border: 1px solid #d8dee6;
@@ -326,14 +326,14 @@
             line-height: 1.55;
         }
 
-        input,
+        input:not([type="checkbox"]),
         select {
             height: 40px;
             padding: 0 12px;
         }
 
         textarea:focus,
-        input:focus,
+        input:not([type="checkbox"]):focus,
         select:focus {
             border-color: var(--blue);
             box-shadow: 0 0 0 3px rgba(47, 142, 232, 0.12);
@@ -365,13 +365,34 @@
             color: #4d5967;
             font-size: 13px;
             font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+        }
+
+        .check-pill:has(input:checked) {
+            border-color: #9dccfb;
+            background: var(--blue-soft);
+            color: var(--blue-dark);
         }
 
         .check-pill input {
             width: auto;
             height: auto;
+            padding: 0;
             margin: 0;
             accent-color: var(--blue);
+            box-shadow: none;
+            flex: 0 0 auto;
+        }
+
+        .check-pill input:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .check-pill:focus-within {
+            border-color: #9dccfb;
         }
 
         .btn {
@@ -770,6 +791,7 @@
                 <div class="actions">
                     <button class="btn" data-action="url-encode"><span class="btn-icon">%</span>编码</button>
                     <button class="btn secondary" data-action="url-decode"><span class="btn-icon">↩</span>解码</button>
+                    <button class="btn secondary" data-action="url-parse"><span class="btn-icon">?</span>解析</button>
                     <button class="btn secondary" data-copy="urlOutput"><span class="btn-icon">[]</span>复制</button>
                     <button class="btn danger" data-clear="urlInput,urlOutput"><span class="btn-icon">×</span>清空</button>
                 </div>
@@ -1099,6 +1121,19 @@
 
         function readOutput(id) {
             return document.getElementById(id).textContent;
+        }
+
+        function hasContent(id) {
+            return Boolean(getValue(id).trim());
+        }
+
+        function showInputRequired(outputId, extraOutputId) {
+            setOutput(outputId, "请输入内容", true);
+            if (extraOutputId) {
+                setOutput(extraOutputId, "请输入内容", true);
+            }
+            setStatus("请输入内容", "warn");
+            return false;
         }
 
         function resetOutput(output) {
@@ -1477,6 +1512,43 @@
             ].join("\n");
         }
 
+        function extractJsonPathLastKey(path) {
+            const trimmed = path.trim();
+            const bracket = trimmed.match(/\[['"]?([^'"\]]+)['"]?\]$/);
+            if (bracket) return bracket[1];
+            const dot = trimmed.match(/\.([A-Za-z_$][\w$]*)$/);
+            return dot ? dot[1] : "";
+        }
+
+        function collectJsonPathSuggestions(value, targetKey, currentPath = "$", matches = []) {
+            if (!targetKey || !value || typeof value !== "object") return matches;
+            Object.entries(value).forEach(([key, childValue]) => {
+                const nextPath = Array.isArray(value)
+                    ? `${currentPath}[${key}]`
+                    : `${currentPath}${/^[A-Za-z_$][\w$]*$/.test(key) ? `.${key}` : `[${JSON.stringify(key)}]`}`;
+                if (key === targetKey) {
+                    matches.push({ path: nextPath, value: childValue });
+                }
+                collectJsonPathSuggestions(childValue, targetKey, nextPath, matches);
+            });
+            return matches;
+        }
+
+        function renderJsonPathNoMatch(root, query) {
+            const lastKey = extractJsonPathLastKey(query);
+            const suggestions = collectJsonPathSuggestions(root, lastKey).slice(0, 8);
+            if (!suggestions.length) {
+                return `未找到匹配结果。\n\n当前表达式: ${query}`;
+            }
+            return [
+                "未找到匹配结果。",
+                `当前表达式: ${query}`,
+                "",
+                `你可能想查这些路径（按末级字段 ${lastKey} 匹配）：`,
+                ...suggestions.map((item) => `- ${item.path} = ${JSON.stringify(item.value)}`)
+            ].join("\n");
+        }
+
         function renderJsonTable(value) {
             const rows = Array.isArray(value) ? value : [value];
             if (!rows.every((row) => row && typeof row === "object" && !Array.isArray(row))) {
@@ -1726,7 +1798,107 @@
             setStatus("Mock 数据下载已开始", "ok");
         }
 
+        function safeDecodeURIComponent(value) {
+            try {
+                return decodeURIComponent(value);
+            } catch (error) {
+                return value;
+            }
+        }
+
+        function parseMaybeJson(value) {
+            const trimmed = String(value).trim();
+            if (!trimmed) return null;
+            try {
+                return JSON.parse(trimmed);
+            } catch (error) {
+                const decoded = safeDecodeURIComponent(trimmed);
+                if (decoded !== trimmed) {
+                    try {
+                        return JSON.parse(decoded);
+                    } catch (innerError) {}
+                }
+            }
+            return null;
+        }
+
+        function parseMaybeBase64Json(value) {
+            const trimmed = String(value).trim();
+            if (!/^[A-Za-z0-9+/=]+$/.test(trimmed) || trimmed.length < 16) return null;
+            try {
+                const decoded = decodeBase64(trimmed);
+                return parseMaybeJson(decoded);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function formatParamValue(value) {
+            const json = parseMaybeJson(value);
+            if (json !== null) {
+                return JSON.stringify(json, null, 2);
+            }
+            const base64Json = parseMaybeBase64Json(value);
+            if (base64Json !== null) {
+                return `Base64 JSON:\n${JSON.stringify(base64Json, null, 2)}`;
+            }
+            return value;
+        }
+
+        function parseUrlLike(input) {
+            const trimmed = input.trim();
+            if (!/^[A-Za-z][A-Za-z0-9+.-]*:/.test(trimmed) && !trimmed.includes("?")) {
+                return null;
+            }
+
+            let parsed;
+            try {
+                parsed = new URL(trimmed);
+            } catch (error) {
+                try {
+                    parsed = new URL(`http://placeholder.local/${trimmed.startsWith("?") ? trimmed : `?${trimmed}`}`);
+                } catch (innerError) {
+                    return null;
+                }
+            }
+
+            const lines = [];
+            const params = [...parsed.searchParams.entries()];
+            lines.push("完整解码:");
+            lines.push(safeDecodeURIComponent(trimmed));
+            lines.push("");
+            lines.push("URL 结构:");
+            lines.push(`protocol: ${parsed.protocol || "-"}`);
+            lines.push(`host: ${parsed.host || "-"}`);
+            lines.push(`pathname: ${safeDecodeURIComponent(parsed.pathname || "") || "/"}`);
+            lines.push(`hash: ${safeDecodeURIComponent(parsed.hash || "") || "-"}`);
+            lines.push("");
+            lines.push(`Query 参数 (${params.length} 个):`);
+
+            if (!params.length) {
+                lines.push("无 query 参数");
+                return lines.join("\n");
+            }
+
+            params.forEach(([key, value], index) => {
+                lines.push("");
+                lines.push(`#${index + 1} ${key}`);
+                lines.push(`原始值/解码值: ${value}`);
+                const formatted = formatParamValue(value);
+                if (formatted !== value) {
+                    lines.push("结构化值:");
+                    lines.push(formatted);
+                }
+            });
+
+            return lines.join("\n");
+        }
+
         function handleJson(action) {
+            if (!hasContent("jsonInput")) {
+                showInputRequired("jsonOutput");
+                return;
+            }
             try {
                 if (action === "json-unicode-encode") {
                     const value = unicodeEncode(getValue("jsonInput"));
@@ -1755,8 +1927,9 @@
                 if (action === "json-sort-desc") parsed = sortJsonValue(parsed, -1);
 
                 if (action === "json-path") {
-                    const results = queryJsonPath(parsed, getValue("jsonPathInput"));
-                    setOutput("jsonOutput", renderJsonPathResults(results));
+                    const query = getValue("jsonPathInput");
+                    const results = queryJsonPath(parsed, query);
+                    setOutput("jsonOutput", results.length ? renderJsonPathResults(results) : renderJsonPathNoMatch(parsed, query));
                     setStatus(`JSONPath 提取完成：${results.length} 个结果`, results.length ? "ok" : "warn");
                     return;
                 }
@@ -1779,7 +1952,20 @@
 
         function handleUrl(action) {
             const input = getValue("urlInput");
+            if (!input.trim()) {
+                showInputRequired("urlOutput");
+                return;
+            }
             try {
+                if (action === "url-parse" || action === "url-decode") {
+                    const parsed = parseUrlLike(input);
+                    if (parsed) {
+                        setOutput("urlOutput", parsed);
+                        const count = (parsed.match(/^#/gm) || []).length;
+                        setStatus(`URL 解析成功：${count} 个参数`, "ok");
+                        return;
+                    }
+                }
                 const value = action === "url-encode" ? encodeURIComponent(input) : decodeURIComponent(input);
                 setOutput("urlOutput", value);
                 setStatus(`URL 处理成功：${input.length} 字符 -> ${value.length} 字符`, "ok");
@@ -1790,6 +1976,10 @@
         }
 
         function handleBase64(action) {
+            if (!hasContent("base64Input")) {
+                showInputRequired("base64Output");
+                return;
+            }
             try {
                 const input = getValue("base64Input").trim();
                 const value = action === "base64-encode" ? encodeBase64(getValue("base64Input")) : decodeBase64(input);
@@ -1806,8 +1996,11 @@
             const raw = getValue("timestampInput").trim();
             const unit = getValue("timestampUnit");
 
-            if (action === "timestamp-now" || !raw) {
+            if (action === "timestamp-now") {
                 date = new Date();
+            } else if (!raw) {
+                showInputRequired("timestampOutput");
+                return;
             } else if (unit === "seconds" || (unit === "auto" && /^\d{10}$/.test(raw))) {
                 date = new Date(Number(raw) * 1000);
             } else if (unit === "milliseconds" || (unit === "auto" && /^\d{13}$/.test(raw))) {
@@ -1836,6 +2029,10 @@
         }
 
         function handleRegex() {
+            if (!hasContent("regexPattern") || !hasContent("regexInput")) {
+                showInputRequired("regexOutput", "regexPreview");
+                return;
+            }
             try {
                 const parsed = parseRegexPattern(getValue("regexPattern"), getValue("regexFlags"));
                 const pattern = parsed.pattern;
@@ -1892,6 +2089,10 @@
         }
 
         async function handleHash() {
+            if (!hasContent("hashInput")) {
+                showInputRequired("hashOutput");
+                return;
+            }
             try {
                 const value = await hashText(getValue("hashInput"), getValue("hashAlgo"));
                 setOutput("hashOutput", value);
@@ -1903,13 +2104,12 @@
         }
 
         function handleDiff() {
-            const rows = diffLines(getValue("diffLeft"), getValue("diffRight"));
-            const output = document.getElementById("diffOutput");
-            if (!getValue("diffLeft") && !getValue("diffRight")) {
-                setOutput("diffOutput", "请输入要比较的文本。", true);
-                setStatus("等待输入", "warn");
+            if (!hasContent("diffLeft") || !hasContent("diffRight")) {
+                showInputRequired("diffOutput");
                 return;
             }
+            const rows = diffLines(getValue("diffLeft"), getValue("diffRight"));
+            const output = document.getElementById("diffOutput");
 
             const added = rows.filter((row) => row.type === "add").length;
             const deleted = rows.filter((row) => row.type === "del").length;
