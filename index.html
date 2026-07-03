@@ -266,9 +266,21 @@
         }
 
         .tool-panel.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
             flex: 1 1 auto;
+            overflow: hidden;
+        }
+
+        .panel-body {
+            flex: 1 1 auto;
+            min-height: 0;
             overflow: auto;
+            padding-right: 4px;
+        }
+
+        .panel-body > :first-child {
+            margin-top: 0;
         }
 
         .two-cols {
@@ -340,10 +352,14 @@
         }
 
         .actions {
+            flex: 0 0 auto;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin: 16px 0;
+            margin: 0;
+            padding-top: 16px;
+            border-top: 1px solid var(--line);
+            background: var(--panel);
         }
 
         .option-row {
@@ -1004,7 +1020,7 @@
                     <button class="btn secondary" data-copy="regexOutput"><span class="btn-icon">[]</span>复制</button>
                     <button class="btn danger" data-clear="regexPreset,regexSearch,regexPattern,regexInput,regexOutput,regexPreview"><span class="btn-icon">×</span>清空</button>
                 </div>
-                <div class="output empty visual-output" id="regexPreview">高亮预览会显示在这里</div>
+                <div class="output empty visual-output" id="regexPreview" hidden>高亮预览会显示在这里</div>
                 <pre class="output empty" id="regexOutput">处理结果会显示在这里</pre>
             </div>
 
@@ -1186,6 +1202,26 @@
             `).join("");
         }
 
+        function initPanelBodies() {
+            document.querySelectorAll(".tool-panel").forEach((panel) => {
+                if (panel.querySelector(":scope > .panel-body")) return;
+                const actions = panel.querySelector(":scope > .actions");
+                if (!actions) return;
+
+                [...panel.childNodes].forEach((node) => {
+                    if (node.nodeType === Node.TEXT_NODE && !node.textContent.trim()) {
+                        node.remove();
+                    }
+                });
+
+                const body = document.createElement("div");
+                body.className = "panel-body";
+                const bodyNodes = [...panel.childNodes].filter((node) => node !== actions);
+                panel.insertBefore(body, actions);
+                bodyNodes.forEach((node) => body.appendChild(node));
+            });
+        }
+
         function initRegexPresets() {
             const select = document.getElementById("regexPreset");
             if (!select) return;
@@ -1252,6 +1288,9 @@
         function resetOutput(output) {
             output.textContent = "处理结果会显示在这里";
             output.classList.add("empty");
+            if (output.id === "regexPreview") {
+                output.hidden = true;
+            }
         }
 
         function clearPanel(id) {
@@ -2286,7 +2325,8 @@
 
         function handleRegex() {
             if (!hasContent("regexPattern") || !hasContent("regexInput")) {
-                showInputRequired("regexOutput", "regexPreview");
+                resetOutput(document.getElementById("regexPreview"));
+                showInputRequired("regexOutput");
                 return;
             }
             try {
@@ -2311,7 +2351,7 @@
 
                 if (matches.length === 0) {
                     setOutput("regexOutput", "未匹配到结果。");
-                    setOutput("regexPreview", text || "高亮预览会显示在这里", !text);
+                    resetOutput(document.getElementById("regexPreview"));
                     setStatus("未匹配到结果", "warn");
                     return;
                 }
@@ -2326,6 +2366,7 @@
                 highlighted += escapeHtml(text.slice(cursor));
                 const preview = document.getElementById("regexPreview");
                 preview.innerHTML = highlighted || "高亮预览会显示在这里";
+                preview.hidden = false;
                 preview.classList.remove("empty");
 
                 const value = matches.map((item, index) => {
@@ -2339,7 +2380,7 @@
                 setStatus(`匹配到 ${matches.length} 项`, "ok");
             } catch (error) {
                 setOutput("regexOutput", `正则错误: ${error.message}`);
-                setOutput("regexPreview", "高亮预览会显示在这里", true);
+                resetOutput(document.getElementById("regexPreview"));
                 setStatus("正则错误", "error");
             }
         }
@@ -2523,6 +2564,7 @@
         }
 
         initCards();
+        initPanelBodies();
         initRegexPresets();
         initMockFields();
         renderMockCustomList();
