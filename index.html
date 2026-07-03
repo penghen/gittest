@@ -20,6 +20,21 @@
             --amber: #c77700;
         }
 
+        body[data-theme="dark"] {
+            --blue: #58a6ff;
+            --blue-dark: #9cc9ff;
+            --blue-soft: rgba(88, 166, 255, 0.16);
+            --line: #283241;
+            --text: #e7edf5;
+            --muted: #8f9dad;
+            --bg: #0f141b;
+            --panel: #151b23;
+            --green: #4ade80;
+            --red: #f87171;
+            --amber: #fbbf24;
+            color-scheme: dark;
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -32,6 +47,20 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
             line-height: 1.5;
             overflow: hidden;
+        }
+
+        body,
+        .header,
+        .tool-nav,
+        .workspace,
+        .tool-card,
+        .workspace-header,
+        textarea,
+        input,
+        select,
+        .output,
+        .actions {
+            transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
         }
 
         button,
@@ -70,6 +99,39 @@
             align-items: center;
             gap: 14px;
             height: 74px;
+        }
+
+        .theme-toggle {
+            min-height: 38px;
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: #f7fbff;
+            color: #344051;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+        }
+
+        .theme-toggle:hover,
+        .theme-toggle:focus-visible {
+            border-color: #9dccfb;
+            background: var(--blue-soft);
+            color: var(--blue-dark);
+            outline: none;
+        }
+
+        .theme-icon {
+            width: 18px;
+            height: 18px;
+            display: inline-grid;
+            place-items: center;
+            font-size: 16px;
+            line-height: 1;
         }
 
         .brand-icon {
@@ -731,6 +793,154 @@
             overflow-wrap: anywhere;
         }
 
+        body[data-theme="dark"] .header {
+            border-bottom-color: #263140;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
+
+        body[data-theme="dark"] .brand-icon,
+        body[data-theme="dark"] .theme-toggle,
+        body[data-theme="dark"] .output,
+        body[data-theme="dark"] .json-path-card,
+        body[data-theme="dark"] .metric {
+            background: #0f141b;
+        }
+
+        body[data-theme="dark"] .tool-nav,
+        body[data-theme="dark"] .workspace {
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
+
+        body[data-theme="dark"] .workspace-header {
+            background: #121821;
+        }
+
+        body[data-theme="dark"] .tool-card:hover,
+        body[data-theme="dark"] .tool-card:focus-visible {
+            background: rgba(88, 166, 255, 0.1);
+            border-color: rgba(88, 166, 255, 0.34);
+        }
+
+        body[data-theme="dark"] .tool-card.active,
+        body[data-theme="dark"] .mini-tab.active,
+        body[data-theme="dark"] .check-pill:has(input:checked) {
+            background: rgba(88, 166, 255, 0.16);
+            border-color: rgba(88, 166, 255, 0.46);
+            color: #b8d9ff;
+        }
+
+        body[data-theme="dark"] textarea,
+        body[data-theme="dark"] input:not([type="checkbox"]),
+        body[data-theme="dark"] select,
+        body[data-theme="dark"] .check-pill,
+        body[data-theme="dark"] .mini-tab,
+        body[data-theme="dark"] .path-pick,
+        body[data-theme="dark"] .match-item {
+            border-color: #303b4b;
+            background: #0f141b;
+            color: var(--text);
+        }
+
+        body[data-theme="dark"] textarea::placeholder,
+        body[data-theme="dark"] input::placeholder {
+            color: #6d7b8c;
+        }
+
+        body[data-theme="dark"] label,
+        body[data-theme="dark"] .diff-detail {
+            color: #b6c2cf;
+        }
+
+        body[data-theme="dark"] .status {
+            background: #202a36;
+            color: #bac6d3;
+        }
+
+        body[data-theme="dark"] .status.ok {
+            background: rgba(74, 222, 128, 0.14);
+            color: #86efac;
+        }
+
+        body[data-theme="dark"] .status.error {
+            background: rgba(248, 113, 113, 0.14);
+            color: #fca5a5;
+        }
+
+        body[data-theme="dark"] .status.warn {
+            background: rgba(251, 191, 36, 0.14);
+            color: #fcd34d;
+        }
+
+        body[data-theme="dark"] .btn.secondary {
+            background: #202a36;
+            color: #d9e2ec;
+        }
+
+        body[data-theme="dark"] .btn.secondary:hover,
+        body[data-theme="dark"] .btn.secondary:focus-visible {
+            background: #2a3544;
+        }
+
+        body[data-theme="dark"] .btn.danger {
+            background: #241b1f;
+            color: #fca5a5;
+        }
+
+        body[data-theme="dark"] .btn.danger:hover,
+        body[data-theme="dark"] .btn.danger:focus-visible {
+            background: #332026;
+        }
+
+        body[data-theme="dark"] .compact-table th {
+            background: rgba(88, 166, 255, 0.16);
+            color: #b8d9ff;
+        }
+
+        body[data-theme="dark"] .compact-table th,
+        body[data-theme="dark"] .compact-table td {
+            border-color: #303b4b;
+        }
+
+        body[data-theme="dark"] .json-path-line {
+            border-bottom-color: #222b38;
+        }
+
+        body[data-theme="dark"] .json-path-line:hover {
+            background: rgba(88, 166, 255, 0.08);
+        }
+
+        body[data-theme="dark"] .json-path-key {
+            color: #ff9b9b;
+        }
+
+        body[data-theme="dark"] .json-path-value {
+            color: #9cc9ff;
+        }
+
+        body[data-theme="dark"] .json-path-type {
+            color: #86efac;
+        }
+
+        body[data-theme="dark"] .diff-same {
+            color: #a7b4c2;
+        }
+
+        body[data-theme="dark"] .diff-add,
+        body[data-theme="dark"] .diff-summary {
+            background: rgba(74, 222, 128, 0.14);
+            color: #bbf7d0;
+        }
+
+        body[data-theme="dark"] .diff-del {
+            background: rgba(248, 113, 113, 0.14);
+            color: #fecaca;
+        }
+
+        body[data-theme="dark"] .visual-output mark {
+            background: #854d0e;
+            color: #fef3c7;
+        }
+
         @media (max-width: 1180px) {
             .page {
                 grid-template-columns: 280px minmax(0, 1fr);
@@ -824,6 +1034,10 @@
         <div class="header-inner">
             <div class="brand-icon" aria-hidden="true"></div>
             <h1>测试工具箱</h1>
+            <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换暗黑模式">
+                <span class="theme-icon" id="themeIcon" aria-hidden="true">☾</span>
+                <span id="themeText">暗黑</span>
+            </button>
         </div>
     </header>
 
@@ -1159,6 +1373,9 @@
         const activeTitle = document.getElementById("activeTitle");
         const activeDesc = document.getElementById("activeDesc");
         const statusText = document.getElementById("statusText");
+        const themeToggle = document.getElementById("themeToggle");
+        const themeIcon = document.getElementById("themeIcon");
+        const themeText = document.getElementById("themeText");
         const regexPresets = [
             { key: "email", category: "验证类", title: "邮箱验证", pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", flags: "", desc: "验证电子邮箱地址" },
             { key: "phone", category: "验证类", title: "手机号验证", pattern: "^1[3-9]\\d{9}$", flags: "", desc: "验证中国大陆手机号" },
@@ -1189,6 +1406,26 @@
         };
         const mockCustomFields = [];
         let mockLastOutput = "";
+
+        function preferredTheme() {
+            const saved = localStorage.getItem("toolbox-theme");
+            if (saved === "dark" || saved === "light") return saved;
+            return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+
+        function applyTheme(theme) {
+            const normalized = theme === "dark" ? "dark" : "light";
+            document.body.dataset.theme = normalized;
+            themeToggle.setAttribute("aria-pressed", String(normalized === "dark"));
+            themeIcon.textContent = normalized === "dark" ? "☀" : "☾";
+            themeText.textContent = normalized === "dark" ? "亮色" : "暗黑";
+        }
+
+        function toggleTheme() {
+            const next = document.body.dataset.theme === "dark" ? "light" : "dark";
+            localStorage.setItem("toolbox-theme", next);
+            applyTheme(next);
+        }
 
         function initCards() {
             toolGrid.innerHTML = tools.map((tool, index) => `
@@ -2481,6 +2718,8 @@
         }
 
         function bindEvents() {
+            themeToggle.addEventListener("click", toggleTheme);
+
             toolGrid.addEventListener("click", (event) => {
                 const card = event.target.closest(".tool-card");
                 if (card) {
@@ -2563,6 +2802,7 @@
             });
         }
 
+        applyTheme(preferredTheme());
         initCards();
         initPanelBodies();
         initRegexPresets();
