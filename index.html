@@ -530,6 +530,97 @@
             color: var(--blue-dark);
         }
 
+        .json-workbench {
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .json-side {
+            display: grid;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .json-path-card {
+            min-height: 240px;
+            max-height: 520px;
+            overflow: auto;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fbfcfe;
+        }
+
+        .json-path-card.empty {
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            color: #98a2ad;
+            font-family: inherit;
+        }
+
+        .json-path-line {
+            min-height: 34px;
+            display: grid;
+            grid-template-columns: 44px minmax(110px, 0.42fr) minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            padding: 4px 10px;
+            border-bottom: 1px solid #eef1f5;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 13px;
+        }
+
+        .json-path-line:hover {
+            background: #f2f8ff;
+        }
+
+        .json-path-depth {
+            color: #8a97a5;
+            text-align: right;
+            user-select: none;
+        }
+
+        .json-path-key {
+            min-width: 0;
+            color: #b3261e;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .json-path-value {
+            min-width: 0;
+            color: #185abc;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .json-path-type {
+            color: #1f9d55;
+        }
+
+        .path-pick {
+            min-height: 28px;
+            padding: 4px 8px;
+            border: 1px solid #cfe2f5;
+            border-radius: 999px;
+            background: #fff;
+            color: var(--blue-dark);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .path-pick:hover,
+        .path-pick:focus-visible {
+            background: var(--blue-soft);
+            outline: none;
+        }
+
         .field-check-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -664,6 +755,7 @@
 
             .tool-grid,
             .two-cols,
+            .json-workbench,
             .timestamp-result,
             .form-grid,
             .field-check-grid,
@@ -735,29 +827,31 @@
             </div>
 
             <div class="tool-panel active" data-panel="json">
-                <div class="form-grid">
-                    <div class="field wide">
-                        <label for="jsonPathInput">JSONPath 提取</label>
-                        <input id="jsonPathInput" type="text" value="$" placeholder="例如：$.data.items[*].name、$..name">
-                    </div>
-                    <div class="field wide">
-                        <label>解析选项</label>
-                        <div class="option-row">
-                            <label class="check-pill" for="jsonAutoDecode">
-                                <input id="jsonAutoDecode" type="checkbox"> 自动解码
-                            </label>
-                            <label class="check-pill" for="jsonNestedParse">
-                                <input id="jsonNestedParse" type="checkbox"> 嵌套解析
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="two-cols">
-                    <div class="field">
+                <div class="json-workbench">
+                    <div class="json-side">
                         <label for="jsonInput">输入 JSON</label>
                         <textarea id="jsonInput" spellcheck="false" placeholder='{"name":"tester","enabled":true}'></textarea>
+                        <label for="jsonPathTree">字段路径视图</label>
+                        <div class="json-path-card empty" id="jsonPathTree">格式化或提取后会显示可点击字段路径</div>
                     </div>
-                    <div class="field">
+                    <div class="json-side">
+                        <div class="form-grid">
+                            <div class="field full">
+                                <label for="jsonPathInput">JSONPath 提取</label>
+                                <input id="jsonPathInput" type="text" value="$" placeholder="例如：$.data.items[*].name、$..name">
+                                <div class="option-row">
+                                    <label class="check-pill" for="jsonAutoDecode">
+                                        <input id="jsonAutoDecode" type="checkbox"> 自动解码
+                                    </label>
+                                    <label class="check-pill" for="jsonNestedParse">
+                                        <input id="jsonNestedParse" type="checkbox"> 嵌套解析
+                                    </label>
+                                    <label class="check-pill" for="jsonPathUnpackArray">
+                                        <input id="jsonPathUnpackArray" type="checkbox"> 数组解包
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                         <label for="jsonOutput">输出结果</label>
                         <pre class="output empty" id="jsonOutput">处理结果会显示在这里</pre>
                     </div>
@@ -773,7 +867,7 @@
                     <button class="btn secondary" data-action="json-unicode-decode"><span class="btn-icon">U</span>Uni 解码</button>
                     <button class="btn secondary" data-action="json-url-decode"><span class="btn-icon">%</span>URL 解码</button>
                     <button class="btn secondary" data-copy="jsonOutput"><span class="btn-icon">[]</span>复制</button>
-                    <button class="btn danger" data-clear="jsonInput,jsonPathInput,jsonOutput"><span class="btn-icon">×</span>清空</button>
+                    <button class="btn danger" data-clear="jsonInput,jsonPathInput,jsonOutput,jsonPathTree"><span class="btn-icon">×</span>清空</button>
                 </div>
             </div>
 
@@ -813,6 +907,24 @@
                     <button class="btn secondary" data-action="base64-decode"><span class="btn-icon">64</span>解码</button>
                     <button class="btn secondary" data-copy="base64Output"><span class="btn-icon">[]</span>复制</button>
                     <button class="btn danger" data-clear="base64Input,base64Output"><span class="btn-icon">×</span>清空</button>
+                </div>
+            </div>
+
+            <div class="tool-panel" data-panel="length">
+                <div class="two-cols">
+                    <div class="field">
+                        <label for="lengthInput">输入字符串</label>
+                        <textarea id="lengthInput" spellcheck="false" placeholder="输入要统计长度的文本，支持中文、Emoji、换行和特殊字符"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="lengthOutput">统计结果</label>
+                        <pre class="output empty" id="lengthOutput">处理结果会显示在这里</pre>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" data-action="length-count"><span class="btn-icon">L</span>统计</button>
+                    <button class="btn secondary" data-copy="lengthOutput"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn danger" data-clear="lengthInput,lengthOutput"><span class="btn-icon">×</span>清空</button>
                 </div>
             </div>
 
@@ -1018,6 +1130,7 @@
             { id: "json", icon: "JSON", title: "JSON格式化/校验", desc: "格式化、压缩并校验 JSON 数据" },
             { id: "url", icon: "URL", title: "URL编码/解码", desc: "对中文和特殊字符进行 URL 转换" },
             { id: "base64", icon: "B64", title: "Base64转码/解码", desc: "支持中文 UTF-8 文本转换" },
+            { id: "length", icon: "LEN", title: "字符串长度统计", desc: "统计字符、字节、行数和字符类型" },
             { id: "timestamp", icon: "TIME", title: "Unix时间戳", desc: "秒、毫秒时间戳与日期互转" },
             { id: "uuid", icon: "UUID", title: "UUID生成", desc: "批量生成 v4 UUID" },
             { id: "regex", icon: ".*", title: "正则测试", desc: "测试表达式并查看匹配结果" },
@@ -1164,6 +1277,9 @@
                 mockCustomFields.splice(0, mockCustomFields.length);
                 mockLastOutput = "";
                 renderMockCustomList();
+            }
+            if (id === "json") {
+                resetJsonPathTree();
             }
         }
 
@@ -1410,6 +1526,95 @@
             return parsed;
         }
 
+        function formatJsonPathKey(key) {
+            return /^[A-Za-z_$][\w$]*$/.test(key) ? `.${key}` : `[${JSON.stringify(key)}]`;
+        }
+
+        function resetJsonPathTree() {
+            const tree = document.getElementById("jsonPathTree");
+            if (!tree) return;
+            tree.textContent = "格式化或提取后会显示可点击字段路径";
+            tree.classList.add("empty");
+        }
+
+        function jsonValueType(value) {
+            if (Array.isArray(value)) return `array(${value.length})`;
+            if (value === null) return "null";
+            return typeof value;
+        }
+
+        function previewJsonValue(value) {
+            if (Array.isArray(value)) return `数组，${value.length} 项`;
+            if (value && typeof value === "object") return `对象，${Object.keys(value).length} 个字段`;
+            const text = JSON.stringify(value);
+            if (!text) return String(value);
+            return text.length > 96 ? `${text.slice(0, 96)}...` : text;
+        }
+
+        function buildJsonPathRows(value, path = "$", key = "$", depth = 0, rows = [], state = { count: 0 }) {
+            if (state.count >= 900) return rows;
+            rows.push({ key, path, value, depth });
+            state.count++;
+
+            if (value && typeof value === "object") {
+                Object.entries(value).forEach(([childKey, childValue]) => {
+                    if (state.count >= 900) return;
+                    const nextPath = Array.isArray(value)
+                        ? `${path}[${childKey}]`
+                        : `${path}${formatJsonPathKey(childKey)}`;
+                    buildJsonPathRows(childValue, nextPath, childKey, depth + 1, rows, state);
+                });
+            }
+
+            return rows;
+        }
+
+        function renderJsonPathTree(value) {
+            const tree = document.getElementById("jsonPathTree");
+            if (!tree) return;
+            const rows = buildJsonPathRows(value);
+            tree.innerHTML = rows.map((row, index) => `
+                <div class="json-path-line" title="${escapeHtml(row.path)}">
+                    <span class="json-path-depth">${index + 1}</span>
+                    <span class="json-path-key" style="padding-left:${Math.min(row.depth, 8) * 12}px">${escapeHtml(row.key)}</span>
+                    <span class="json-path-value"><span class="json-path-type">${escapeHtml(jsonValueType(row.value))}</span> ${escapeHtml(previewJsonValue(row.value))}</span>
+                    <button class="path-pick" type="button" data-json-path="${escapeHtml(row.path)}">提取 JSONPath</button>
+                </div>
+            `).join("");
+            if (rows.length >= 900) {
+                tree.insertAdjacentHTML("beforeend", '<div class="json-path-line"><span class="json-path-depth">...</span><span class="json-path-key">已截断</span><span class="json-path-value">字段较多，仅展示前 900 项</span><span></span></div>');
+            }
+            tree.classList.remove("empty");
+        }
+
+        function normalizeJsonPathForUnpack(path) {
+            if (!document.getElementById("jsonPathUnpackArray")?.checked) return path;
+            return path.replace(/\[\d+\]/g, "[*]");
+        }
+
+        function expandJsonPathArrayResults(results) {
+            if (!document.getElementById("jsonPathUnpackArray")?.checked) return results;
+            const expanded = [];
+            results.forEach((item) => {
+                if (Array.isArray(item.value)) {
+                    item.value.forEach((child, index) => {
+                        expanded.push({ path: `${item.path}[${index}]`, value: child });
+                    });
+                } else {
+                    expanded.push(item);
+                }
+            });
+            return expanded;
+        }
+
+        function runJsonPathExtraction(parsed, rawQuery) {
+            const query = normalizeJsonPathForUnpack(rawQuery.trim() || "$");
+            document.getElementById("jsonPathInput").value = query;
+            const results = expandJsonPathArrayResults(queryJsonPath(parsed, query));
+            setOutput("jsonOutput", results.length ? renderJsonPathResults(results) : renderJsonPathNoMatch(parsed, query));
+            setStatus(`JSONPath 提取完成：${results.length} 个结果`, results.length ? "ok" : "warn");
+        }
+
         function unicodeEncode(value) {
             return value.replace(/[^\x00-\x7F]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`);
         }
@@ -1423,17 +1628,13 @@
             const query = path.trim() || "$";
             if (query === "$") return [{ path: "$", value: root }];
 
-            function formatKey(key) {
-                return /^[A-Za-z_$][\w$]*$/.test(key) ? `.${key}` : `[${JSON.stringify(key)}]`;
-            }
-
             function recursiveSearch(value, key, currentPath) {
                 if (!value || typeof value !== "object") return;
                 if (Object.prototype.hasOwnProperty.call(value, key)) {
-                    results.push({ path: `${currentPath}${formatKey(key)}`, value: value[key] });
+                    results.push({ path: `${currentPath}${formatJsonPathKey(key)}`, value: value[key] });
                 }
                 Object.entries(value).forEach(([childKey, childValue]) => {
-                    const nextPath = Array.isArray(value) ? `${currentPath}[${childKey}]` : `${currentPath}${formatKey(childKey)}`;
+                    const nextPath = Array.isArray(value) ? `${currentPath}[${childKey}]` : `${currentPath}${formatJsonPathKey(childKey)}`;
                     recursiveSearch(childValue, key, nextPath);
                 });
             }
@@ -1452,7 +1653,11 @@
                     const token = bracket[1];
                     const rest = bracket[2];
                     if (token === "*") {
-                        if (Array.isArray(value)) value.forEach((item, index) => walk(item, rest, `${currentPath}[${index}]`));
+                        if (Array.isArray(value)) {
+                            value.forEach((item, index) => walk(item, rest, `${currentPath}[${index}]`));
+                        } else if (value && typeof value === "object") {
+                            Object.entries(value).forEach(([childKey, childValue]) => walk(childValue, rest, `${currentPath}${formatJsonPathKey(childKey)}`));
+                        }
                         return;
                     }
                     if (token.includes(":") && Array.isArray(value)) {
@@ -1471,7 +1676,7 @@
                     const keyMatch = token.match(/^['"](.+)['"]$/);
                     const key = keyMatch ? keyMatch[1] : token;
                     if (value && typeof value === "object" && Object.prototype.hasOwnProperty.call(value, key)) {
-                        walk(value[key], rest, `${currentPath}${formatKey(key)}`);
+                        walk(value[key], rest, `${currentPath}${formatJsonPathKey(key)}`);
                     }
                     return;
                 }
@@ -1482,18 +1687,18 @@
                 if (key === "*") {
                     if (value && typeof value === "object") {
                         Object.entries(value).forEach(([childKey, childValue]) => {
-                            const nextPath = Array.isArray(value) ? `${currentPath}[${childKey}]` : `${currentPath}${formatKey(childKey)}`;
+                            const nextPath = Array.isArray(value) ? `${currentPath}[${childKey}]` : `${currentPath}${formatJsonPathKey(childKey)}`;
                             walk(childValue, rest, nextPath);
                         });
                     }
                     return;
                 }
                 if (value && typeof value === "object" && Object.prototype.hasOwnProperty.call(value, key)) {
-                    walk(value[key], rest, `${currentPath}${formatKey(key)}`);
+                    walk(value[key], rest, `${currentPath}${formatJsonPathKey(key)}`);
                 }
             }
 
-            const expression = query.startsWith("$.") ? query.slice(2) : query.startsWith("$") ? query.slice(1) : query;
+            const expression = query.startsWith("$..") ? query.slice(1) : query.startsWith("$.") ? query.slice(2) : query.startsWith("$") ? query.slice(1) : query;
             walk(root, expression, "$");
             return results;
         }
@@ -1525,7 +1730,7 @@
             Object.entries(value).forEach(([key, childValue]) => {
                 const nextPath = Array.isArray(value)
                     ? `${currentPath}[${key}]`
-                    : `${currentPath}${/^[A-Za-z_$][\w$]*$/.test(key) ? `.${key}` : `[${JSON.stringify(key)}]`}`;
+                    : `${currentPath}${formatJsonPathKey(key)}`;
                 if (key === targetKey) {
                     matches.push({ path: nextPath, value: childValue });
                 }
@@ -1900,6 +2105,50 @@
             return lines.join("\n");
         }
 
+        function countPattern(text, pattern) {
+            return (text.match(pattern) || []).length;
+        }
+
+        function handleLengthStats() {
+            if (!hasContent("lengthInput")) {
+                showInputRequired("lengthOutput");
+                return;
+            }
+
+            const input = getValue("lengthInput");
+            const codePoints = Array.from(input);
+            const lines = input.split(/\r\n|\r|\n/);
+            const utf8Bytes = new TextEncoder().encode(input).length;
+            const noWhitespace = input.replace(/\s/g, "");
+            const trimmed = input.trim();
+            const output = [
+                "基础统计",
+                `字符数（Unicode 码点）: ${codePoints.length}`,
+                `JS length（UTF-16 代码单元）: ${input.length}`,
+                `UTF-8 字节数: ${utf8Bytes}`,
+                `行数: ${lines.length}`,
+                `非空行数: ${lines.filter((line) => line.trim()).length}`,
+                "",
+                "字符类型",
+                `中文字符: ${countPattern(input, /[\u4e00-\u9fff]/gu)}`,
+                `英文字母: ${countPattern(input, /[A-Za-z]/g)}`,
+                `数字: ${countPattern(input, /\d/g)}`,
+                `空白字符: ${countPattern(input, /\s/g)}`,
+                `空格/制表符: ${countPattern(input, /[^\S\r\n]/g)}`,
+                `换行符: ${countPattern(input, /\r\n|\r|\n/g)}`,
+                `标点/符号: ${countPattern(input, /[^\p{L}\p{N}\s]/gu)}`,
+                "",
+                "常用口径",
+                `去首尾空白后长度: ${Array.from(trimmed).length}`,
+                `去全部空白后长度: ${Array.from(noWhitespace).length}`,
+                `URL 编码后长度: ${encodeURIComponent(input).length}`,
+                `Base64 编码后长度: ${encodeBase64(input).length}`
+            ].join("\n");
+
+            setOutput("lengthOutput", output);
+            setStatus(`字符串统计完成：${codePoints.length} 字符，${utf8Bytes} 字节`, "ok");
+        }
+
         function handleJson(action) {
             if (!hasContent("jsonInput")) {
                 showInputRequired("jsonOutput");
@@ -1929,14 +2178,15 @@
                 }
 
                 let parsed = parseJsonInput();
+                renderJsonPathTree(parsed);
                 if (action === "json-sort-asc") parsed = sortJsonValue(parsed, 1);
                 if (action === "json-sort-desc") parsed = sortJsonValue(parsed, -1);
+                if (action === "json-sort-asc" || action === "json-sort-desc") {
+                    renderJsonPathTree(parsed);
+                }
 
                 if (action === "json-path") {
-                    const query = getValue("jsonPathInput");
-                    const results = queryJsonPath(parsed, query);
-                    setOutput("jsonOutput", results.length ? renderJsonPathResults(results) : renderJsonPathNoMatch(parsed, query));
-                    setStatus(`JSONPath 提取完成：${results.length} 个结果`, results.length ? "ok" : "warn");
+                    runJsonPathExtraction(parsed, getValue("jsonPathInput"));
                     return;
                 }
 
@@ -2180,6 +2430,8 @@
                     element.value = element.defaultValue || "";
                 } else if (element.classList.contains("output")) {
                     resetOutput(element);
+                } else if (element.id === "jsonPathTree") {
+                    resetJsonPathTree();
                 } else {
                     element.textContent = "处理结果会显示在这里";
                 }
@@ -2199,12 +2451,30 @@
                 const actionButton = event.target.closest("[data-action]");
                 const copyButton = event.target.closest("[data-copy]");
                 const clearButton = event.target.closest("[data-clear]");
+                const jsonPathButton = event.target.closest("[data-json-path]");
+
+                if (jsonPathButton) {
+                    if (!hasContent("jsonInput")) {
+                        showInputRequired("jsonOutput");
+                        return;
+                    }
+                    try {
+                        const parsed = parseJsonInput();
+                        renderJsonPathTree(parsed);
+                        runJsonPathExtraction(parsed, jsonPathButton.dataset.jsonPath);
+                    } catch (error) {
+                        setOutput("jsonOutput", `JSON 校验失败: ${error.message}`);
+                        setStatus("JSON 校验失败", "error");
+                    }
+                    return;
+                }
 
                 if (actionButton) {
                     const action = actionButton.dataset.action;
                     if (action.startsWith("json-")) handleJson(action);
                     if (action.startsWith("url-")) handleUrl(action);
                     if (action.startsWith("base64-")) handleBase64(action);
+                    if (action === "length-count") handleLengthStats();
                     if (action.startsWith("timestamp-")) handleTimestamp(action);
                     if (action === "uuid-generate") handleUuid();
                     if (action === "regex-test") handleRegex();
