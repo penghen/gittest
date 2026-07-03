@@ -799,11 +799,24 @@
         }
 
         body[data-theme="dark"] .brand-icon,
-        body[data-theme="dark"] .theme-toggle,
         body[data-theme="dark"] .output,
         body[data-theme="dark"] .json-path-card,
         body[data-theme="dark"] .metric {
             background: #0f141b;
+        }
+
+        body[data-theme="dark"] .theme-toggle {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: #06111f;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.14);
+        }
+
+        body[data-theme="dark"] .theme-toggle:hover,
+        body[data-theme="dark"] .theme-toggle:focus-visible {
+            border-color: #9cc9ff;
+            background: #9cc9ff;
+            color: #06111f;
         }
 
         body[data-theme="dark"] .tool-nav,
