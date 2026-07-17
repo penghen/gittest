@@ -47,6 +47,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
             line-height: 1.5;
             overflow: hidden;
+            overscroll-behavior: none;
         }
 
         body,
@@ -75,7 +76,7 @@
         }
 
         .page {
-            width: min(1480px, calc(100% - 48px));
+            width: min(1560px, calc(100% - 48px));
             height: calc(100vh - 74px);
             margin: 0 auto;
             padding: 20px 0;
@@ -93,7 +94,7 @@
         }
 
         .header-inner {
-            width: min(1480px, calc(100% - 48px));
+            width: min(1560px, calc(100% - 48px));
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -188,6 +189,9 @@
             border: 1px solid var(--line);
             border-radius: 6px;
             overflow: auto;
+            overscroll-behavior: contain;
+            scrollbar-gutter: stable;
+            -webkit-overflow-scrolling: touch;
         }
 
         .tool-grid {
@@ -339,6 +343,9 @@
             min-height: 0;
             overflow: auto;
             padding-right: 4px;
+            overscroll-behavior: contain;
+            scrollbar-gutter: stable;
+            -webkit-overflow-scrolling: touch;
         }
 
         .panel-body > :first-child {
@@ -398,6 +405,7 @@
             font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
             font-size: 14px;
             line-height: 1.55;
+            -webkit-overflow-scrolling: touch;
         }
 
         input:not([type="checkbox"]),
@@ -541,6 +549,8 @@
             font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
             font-size: 14px;
             line-height: 1.55;
+            scrollbar-gutter: stable;
+            -webkit-overflow-scrolling: touch;
         }
 
         .output.empty {
@@ -613,12 +623,24 @@
             grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
             gap: 18px;
             align-items: start;
+            min-height: 0;
+        }
+
+        .json-input-pane,
+        .json-path-pane,
+        .json-output-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+            min-height: 0;
         }
 
         .json-side {
             display: grid;
             gap: 14px;
             min-width: 0;
+            min-height: 0;
         }
 
         .json-path-card {
@@ -628,6 +650,8 @@
             border: 1px solid #d8dee6;
             border-radius: 6px;
             background: #fbfcfe;
+            scrollbar-gutter: stable;
+            -webkit-overflow-scrolling: touch;
         }
 
         .json-path-card.empty {
@@ -773,6 +797,115 @@
             gap: 14px;
         }
 
+        .timestamp-tool {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 6px 0 10px;
+        }
+
+        .timestamp-now {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 0 0 30px;
+            margin-bottom: 26px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .timestamp-now-label,
+        .timestamp-label {
+            color: #606975;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .timestamp-current {
+            width: 150px;
+            color: #ff4b1f;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .timestamp-btn {
+            min-height: 40px;
+            padding: 8px 16px;
+            border: 1px solid var(--blue);
+            border-radius: 4px;
+            background: transparent;
+            color: var(--blue);
+            cursor: pointer;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+        }
+
+        .timestamp-btn:hover,
+        .timestamp-btn:focus-visible {
+            background: var(--blue-soft);
+            outline: none;
+        }
+
+        .timestamp-grid {
+            display: grid;
+            gap: 26px;
+        }
+
+        .timestamp-row {
+            display: grid;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .timestamp-unix-row {
+            grid-template-columns: 260px minmax(120px, 0.85fr) 72px max-content minmax(150px, 1fr);
+        }
+
+        .timestamp-date-row {
+            grid-template-columns: 235px minmax(130px, 1fr) max-content minmax(110px, 1fr) 72px;
+        }
+
+        .timestamp-parts-row {
+            grid-template-columns: 48px minmax(0, 1fr);
+            gap: 8px;
+        }
+
+        .timestamp-inline-label {
+            color: #2f343b;
+            font-size: 17px;
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .timestamp-part {
+            min-width: 0;
+        }
+
+        .timestamp-parts-fields {
+            display: grid;
+            grid-template-columns: 84px 22px repeat(5, 58px 22px);
+            gap: 8px;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .timestamp-parts-action {
+            grid-column: 2;
+            display: grid;
+            grid-template-columns: max-content minmax(140px, 1fr) 72px;
+            gap: 8px;
+            align-items: center;
+            max-width: 470px;
+        }
+
+        .timestamp-output {
+            background: #fbfdff;
+        }
+
         .metric {
             padding: 14px;
             border: 1px solid var(--line);
@@ -793,6 +926,51 @@
             overflow-wrap: anywhere;
         }
 
+        .ip-map {
+            min-height: 260px;
+            overflow: hidden;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fbfcfe;
+        }
+
+        .ip-map.empty {
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            color: #98a2ad;
+        }
+
+        .ip-map iframe {
+            width: 100%;
+            height: 360px;
+            display: block;
+            border: 0;
+        }
+
+        .ip-summary {
+            display: block;
+            margin-bottom: 12px;
+            padding: 12px 14px;
+            border-radius: 6px;
+            background: #eef6ff;
+            color: #195f9f;
+            font-family: inherit;
+            white-space: pre-wrap;
+        }
+
+        .ip-note {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fbfcfe;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
         body[data-theme="dark"] .header {
             border-bottom-color: #263140;
             box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03);
@@ -801,7 +979,9 @@
         body[data-theme="dark"] .brand-icon,
         body[data-theme="dark"] .output,
         body[data-theme="dark"] .json-path-card,
-        body[data-theme="dark"] .metric {
+        body[data-theme="dark"] .metric,
+        body[data-theme="dark"] .ip-map,
+        body[data-theme="dark"] .ip-note {
             background: #0f141b;
         }
 
@@ -938,8 +1118,24 @@
             color: #a7b4c2;
         }
 
+        body[data-theme="dark"] .timestamp-now-label,
+        body[data-theme="dark"] .timestamp-label,
+        body[data-theme="dark"] .timestamp-inline-label {
+            color: #c9d4df;
+        }
+
+        body[data-theme="dark"] .timestamp-current {
+            color: #ff8a66;
+        }
+
+        body[data-theme="dark"] .timestamp-btn {
+            color: var(--blue-dark);
+            border-color: #4e9cf0;
+        }
+
         body[data-theme="dark"] .diff-add,
-        body[data-theme="dark"] .diff-summary {
+        body[data-theme="dark"] .diff-summary,
+        body[data-theme="dark"] .ip-summary {
             background: rgba(74, 222, 128, 0.14);
             color: #bbf7d0;
         }
@@ -952,6 +1148,106 @@
         body[data-theme="dark"] .visual-output mark {
             background: #854d0e;
             color: #fef3c7;
+        }
+
+        @media (min-width: 1680px) {
+            .page,
+            .header-inner {
+                width: min(1880px, calc(100% - 80px));
+            }
+
+            .page {
+                grid-template-columns: 340px minmax(0, 1fr);
+                gap: 28px;
+                padding: 24px 0;
+            }
+
+            .tool-nav {
+                padding: 20px;
+            }
+
+            .tool-panel {
+                padding: 28px;
+            }
+
+            .json-workbench,
+            .two-cols {
+                gap: 22px;
+            }
+
+            textarea,
+            .output {
+                min-height: 300px;
+                max-height: 640px;
+            }
+
+            .json-path-card {
+                min-height: 300px;
+                max-height: 640px;
+            }
+
+            .timestamp-tool {
+                max-width: 1420px;
+            }
+        }
+
+        @media (min-width: 2100px) {
+            .page,
+            .header-inner {
+                width: min(2160px, calc(100% - 120px));
+            }
+
+            .page {
+                grid-template-columns: 360px minmax(0, 1fr);
+                gap: 32px;
+            }
+
+            .tool-panel {
+                padding: 32px;
+            }
+
+            .json-workbench {
+                grid-template-columns: minmax(420px, 0.95fr) minmax(460px, 1fr) minmax(460px, 1fr);
+                align-items: stretch;
+                min-height: 0;
+            }
+
+            .json-workbench > .json-side:first-child {
+                display: contents;
+            }
+
+            .json-workbench > .json-side:last-child {
+                grid-column: 3;
+                align-self: stretch;
+                grid-template-rows: auto minmax(0, 1fr);
+            }
+
+            .json-input-pane {
+                grid-column: 1;
+            }
+
+            .json-path-pane {
+                grid-column: 2;
+            }
+
+            .json-input-pane,
+            .json-path-pane,
+            .json-output-pane {
+                min-height: 0;
+            }
+
+            .json-path-pane .json-path-card,
+            .json-output-pane .output {
+                flex: 1 1 auto;
+            }
+
+            .json-input-pane textarea,
+            .json-path-pane .json-path-card,
+            .json-output-pane .output {
+                height: calc(100vh - 366px);
+                min-height: 360px;
+                max-height: none;
+            }
         }
 
         @media (max-width: 1180px) {
@@ -971,7 +1267,7 @@
 
             .page,
             .header-inner {
-                width: min(100% - 28px, 1480px);
+                width: min(100% - 28px, 1560px);
             }
 
             .page {
@@ -996,10 +1292,32 @@
             .two-cols,
             .json-workbench,
             .timestamp-result,
+            .timestamp-row,
+            .timestamp-unix-row,
+            .timestamp-date-row,
+            .timestamp-parts-row,
+            .timestamp-parts-fields,
+            .timestamp-parts-action,
             .form-grid,
             .field-check-grid,
             .custom-field-row {
                 grid-template-columns: 1fr;
+            }
+
+            .timestamp-now {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .timestamp-now-label,
+            .timestamp-label,
+            .timestamp-inline-label {
+                text-align: left;
+            }
+
+            .timestamp-parts-action {
+                grid-column: auto;
+                max-width: none;
             }
 
             .tool-card {
@@ -1072,10 +1390,14 @@
             <div class="tool-panel active" data-panel="json">
                 <div class="json-workbench">
                     <div class="json-side">
-                        <label for="jsonInput">输入 JSON</label>
-                        <textarea id="jsonInput" spellcheck="false" placeholder='{"name":"tester","enabled":true}'></textarea>
-                        <label for="jsonPathTree">字段路径视图</label>
-                        <div class="json-path-card empty" id="jsonPathTree">格式化或提取后会显示可点击字段路径</div>
+                        <div class="json-input-pane">
+                            <label for="jsonInput">输入 JSON</label>
+                            <textarea id="jsonInput" spellcheck="false" placeholder='{"name":"tester","enabled":true}'></textarea>
+                        </div>
+                        <div class="json-path-pane">
+                            <label for="jsonPathTree">字段路径视图</label>
+                            <div class="json-path-card empty" id="jsonPathTree">格式化或提取后会显示可点击字段路径</div>
+                        </div>
                     </div>
                     <div class="json-side">
                         <div class="form-grid">
@@ -1095,8 +1417,10 @@
                                 </div>
                             </div>
                         </div>
-                        <label for="jsonOutput">输出结果</label>
-                        <pre class="output empty" id="jsonOutput">处理结果会显示在这里</pre>
+                        <div class="json-output-pane">
+                            <label for="jsonOutput">输出结果</label>
+                            <pre class="output empty" id="jsonOutput">处理结果会显示在这里</pre>
+                        </div>
                     </div>
                 </div>
                 <div class="actions">
@@ -1171,29 +1495,97 @@
                 </div>
             </div>
 
-            <div class="tool-panel" data-panel="timestamp">
+            <div class="tool-panel" data-panel="ip">
                 <div class="form-grid">
                     <div class="field wide">
-                        <label for="timestampInput">时间戳或日期时间</label>
-                        <input id="timestampInput" type="text" placeholder="1719993600 或 2026-06-30 12:00:00">
+                        <label for="ipInput">IP 地址</label>
+                        <input id="ipInput" type="text" placeholder="例如：8.8.8.8 或 2001:4860:4860::8888">
+                    </div>
+                    <div class="field wide">
+                        <label>查询说明</label>
+                        <div class="ip-note" id="ipHint">本机 IP 指当前网络公网出口 IP；浏览器无法稳定读取内网 IP。</div>
+                    </div>
+                </div>
+                <div class="two-cols">
+                    <div class="field">
+                        <label for="ipOutput">查询结果</label>
+                        <pre class="output empty" id="ipOutput">处理结果会显示在这里</pre>
                     </div>
                     <div class="field">
-                        <label for="timestampUnit">输入类型</label>
-                        <select id="timestampUnit">
-                            <option value="auto">自动识别</option>
-                            <option value="seconds">秒时间戳</option>
-                            <option value="milliseconds">毫秒时间戳</option>
-                            <option value="date">日期时间</option>
-                        </select>
+                        <label for="ipMap">出口地图</label>
+                        <div class="ip-map empty" id="ipMap">地图会显示在这里</div>
                     </div>
                 </div>
                 <div class="actions">
-                    <button class="btn" data-action="timestamp-now"><span class="btn-icon">T</span>当前时间</button>
-                    <button class="btn secondary" data-action="timestamp-convert"><span class="btn-icon">↔</span>转换</button>
-                    <button class="btn secondary" data-copy="timestampOutput"><span class="btn-icon">[]</span>复制</button>
-                    <button class="btn danger" data-clear="timestampInput,timestampOutput"><span class="btn-icon">×</span>清空</button>
+                    <button class="btn" data-action="ip-lookup"><span class="btn-icon">IP</span>查询</button>
+                    <button class="btn secondary" data-action="ip-current"><span class="btn-icon">⌂</span>本机 IP</button>
+                    <button class="btn secondary" data-action="ip-map"><span class="btn-icon">⌖</span>出口地图</button>
+                    <button class="btn secondary" data-copy="ipOutput"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn danger" data-clear="ipInput,ipOutput,ipMap"><span class="btn-icon">×</span>清空</button>
                 </div>
-                <pre class="output empty" id="timestampOutput">处理结果会显示在这里</pre>
+            </div>
+
+            <div class="tool-panel" data-panel="timestamp">
+                <div class="timestamp-tool">
+                    <div class="timestamp-now">
+                        <span class="timestamp-now-label">现在的Unix时间戳(Unix timestamp)是：</span>
+                        <input class="timestamp-current" id="timestampCurrent" type="text" readonly aria-label="现在的 Unix 时间戳">
+                        <button class="timestamp-btn" type="button" data-action="timestamp-start">开始</button>
+                        <button class="timestamp-btn" type="button" data-action="timestamp-stop">停止</button>
+                        <button class="timestamp-btn" type="button" data-action="timestamp-refresh">刷新</button>
+                    </div>
+
+                    <div class="timestamp-grid">
+                        <div class="timestamp-row timestamp-unix-row">
+                            <label class="timestamp-label" for="timestampUnixInput">Unix时间戳（Unix timestamp）</label>
+                            <input id="timestampUnixInput" type="text" inputmode="numeric">
+                            <select id="timestampUnixUnit" aria-label="时间戳单位">
+                                <option value="seconds">秒</option>
+                                <option value="milliseconds">毫秒</option>
+                            </select>
+                            <button class="timestamp-btn" type="button" data-action="timestamp-to-date">转换</button>
+                            <input class="timestamp-output" id="timestampDateOutput" type="text" readonly aria-label="转换后的时间">
+                        </div>
+
+                        <div class="timestamp-row timestamp-date-row">
+                            <label class="timestamp-label" for="timestampDateInput">时间（年/月/日 时:分:秒）</label>
+                            <input id="timestampDateInput" type="text" placeholder="2026-07-07 16:31:55">
+                            <button class="timestamp-btn" type="button" data-action="timestamp-date-to-unix">转换成Unix时间戳</button>
+                            <input class="timestamp-output" id="timestampUnixOutput" type="text" readonly aria-label="转换后的 Unix 时间戳">
+                            <select id="timestampDateUnit" aria-label="输出时间戳单位">
+                                <option value="seconds">秒</option>
+                                <option value="milliseconds">毫秒</option>
+                            </select>
+                        </div>
+
+                        <div class="timestamp-row timestamp-parts-row">
+                            <span class="timestamp-label">时间</span>
+                            <div class="timestamp-parts-fields">
+                                <input class="timestamp-part" id="timestampYear" type="number" aria-label="年">
+                                <span class="timestamp-inline-label">年</span>
+                                <input class="timestamp-part" id="timestampMonth" type="number" min="1" max="12" aria-label="月">
+                                <span class="timestamp-inline-label">月</span>
+                                <input class="timestamp-part" id="timestampDay" type="number" min="1" max="31" aria-label="日">
+                                <span class="timestamp-inline-label">日</span>
+                                <input class="timestamp-part" id="timestampHour" type="number" min="0" max="23" aria-label="时">
+                                <span class="timestamp-inline-label">时</span>
+                                <input class="timestamp-part" id="timestampMinute" type="number" min="0" max="59" aria-label="分">
+                                <span class="timestamp-inline-label">分</span>
+                                <input class="timestamp-part" id="timestampSecond" type="number" min="0" max="59" aria-label="秒">
+                                <span class="timestamp-inline-label">秒</span>
+                            </div>
+                            <div class="timestamp-parts-action">
+                                <button class="timestamp-btn" type="button" data-action="timestamp-parts-to-unix">转换Unix时间戳</button>
+                                <input class="timestamp-output" id="timestampPartsOutput" type="text" readonly aria-label="组件时间转换后的 Unix 时间戳">
+                                <select id="timestampPartsUnit" aria-label="组件时间输出时间戳单位">
+                                    <option value="seconds">秒</option>
+                                    <option value="milliseconds">毫秒</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions" hidden></div>
             </div>
 
             <div class="tool-panel" data-panel="uuid">
@@ -1374,6 +1766,7 @@
             { id: "url", icon: "URL", title: "URL编码/解码", desc: "对中文和特殊字符进行 URL 转换" },
             { id: "base64", icon: "B64", title: "Base64转码/解码", desc: "支持中文 UTF-8 文本转换" },
             { id: "length", icon: "LEN", title: "字符串长度统计", desc: "统计字符、字节、行数和字符类型" },
+            { id: "ip", icon: "IP", title: "IP工具", desc: "查询 IP、出口地址和地图位置" },
             { id: "timestamp", icon: "TIME", title: "Unix时间戳", desc: "秒、毫秒时间戳与日期互转" },
             { id: "uuid", icon: "UUID", title: "UUID生成", desc: "批量生成 v4 UUID" },
             { id: "regex", icon: ".*", title: "正则测试", desc: "测试表达式并查看匹配结果" },
@@ -1419,6 +1812,7 @@
         };
         const mockCustomFields = [];
         let mockLastOutput = "";
+        let timestampTimer = null;
 
         function preferredTheme() {
             const saved = localStorage.getItem("toolbox-theme");
@@ -1570,6 +1964,12 @@
             if (id === "json") {
                 resetJsonPathTree();
             }
+            if (id === "ip") {
+                resetIpMap();
+            }
+            if (id === "timestamp") {
+                initTimestampTool();
+            }
         }
 
         function switchTool(id) {
@@ -1614,6 +2014,91 @@
                 `时区: ${timezone}`,
                 `星期: ${["日", "一", "二", "三", "四", "五", "六"][date.getDay()]}`
             ].join("\n");
+        }
+
+        function setFieldValue(id, value) {
+            const field = document.getElementById(id);
+            if (field) field.value = value;
+        }
+
+        function readTimestampUnit(id) {
+            return document.getElementById(id)?.value === "milliseconds" ? "milliseconds" : "seconds";
+        }
+
+        function formatTimestamp(date, unit) {
+            return unit === "milliseconds" ? String(date.getTime()) : String(Math.floor(date.getTime() / 1000));
+        }
+
+        function updateCurrentTimestamp() {
+            setFieldValue("timestampCurrent", String(Math.floor(Date.now() / 1000)));
+        }
+
+        function startTimestampClock(silent = false) {
+            updateCurrentTimestamp();
+            if (!timestampTimer) {
+                timestampTimer = window.setInterval(updateCurrentTimestamp, 1000);
+            }
+            if (!silent) setStatus("当前 Unix 时间戳已开始自动刷新", "ok");
+        }
+
+        function stopTimestampClock() {
+            if (timestampTimer) {
+                window.clearInterval(timestampTimer);
+                timestampTimer = null;
+            }
+            setStatus("当前 Unix 时间戳已停止自动刷新", "ok");
+        }
+
+        function parseTimestampValue(value, unit) {
+            const raw = value.trim();
+            if (!/^\d+$/.test(raw)) return null;
+            const numeric = Number(raw);
+            if (!Number.isFinite(numeric)) return null;
+            const date = new Date(unit === "milliseconds" ? numeric : numeric * 1000);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function parseLocalDateTime(value) {
+            const normalized = normalizeDateInput(value);
+            const date = new Date(normalized);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function numberFieldValue(id, fallback = 0) {
+            const raw = getValue(id).trim();
+            if (raw === "") return fallback;
+            const value = Number(raw);
+            return Number.isInteger(value) ? value : NaN;
+        }
+
+        function readTimestampParts() {
+            const required = ["timestampYear", "timestampMonth", "timestampDay"];
+            if (required.some((id) => !getValue(id).trim())) return null;
+            const year = numberFieldValue("timestampYear", NaN);
+            const month = numberFieldValue("timestampMonth", NaN);
+            const day = numberFieldValue("timestampDay", NaN);
+            const hour = numberFieldValue("timestampHour", 0);
+            const minute = numberFieldValue("timestampMinute", 0);
+            const second = numberFieldValue("timestampSecond", 0);
+            if (![year, month, day, hour, minute, second].every(Number.isInteger)) return null;
+            if (month < 1 || month > 12 || day < 1 || day > 31 || hour < 0 || hour > 23 || minute < 0 || minute > 59 || second < 0 || second > 59) return null;
+
+            const date = new Date(year, month - 1, day, hour, minute, second);
+            const isValid = date.getFullYear() === year
+                && date.getMonth() === month - 1
+                && date.getDate() === day
+                && date.getHours() === hour
+                && date.getMinutes() === minute
+                && date.getSeconds() === second;
+            return isValid ? date : null;
+        }
+
+        function initTimestampTool() {
+            const now = new Date();
+            updateCurrentTimestamp();
+            setFieldValue("timestampUnixInput", formatTimestamp(now, "seconds"));
+            setFieldValue("timestampDateOutput", formatDate(now));
+            setFieldValue("timestampYear", String(now.getFullYear()));
         }
 
         function encodeBase64(text) {
@@ -2394,6 +2879,127 @@
             return lines.join("\n");
         }
 
+        function resetIpMap() {
+            const map = document.getElementById("ipMap");
+            if (!map) return;
+            map.textContent = "地图会显示在这里";
+            map.classList.add("empty");
+        }
+
+        function isIpAddress(value) {
+            const text = value.trim();
+            const ipv4 = /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/;
+            const maybeIpv6 = text.includes(":") && /^[0-9a-fA-F:.]+$/.test(text) && text.length >= 2;
+            return ipv4.test(text) || maybeIpv6;
+        }
+
+        async function fetchIpInfo(ip = "") {
+            const target = ip.trim();
+            if (target && !isIpAddress(target)) {
+                throw new Error("请输入合法的 IPv4 或 IPv6 地址");
+            }
+            const endpoint = target
+                ? `https://get.geojs.io/v1/ip/geo/${encodeURIComponent(target)}.json`
+                : "https://get.geojs.io/v1/ip/geo.json";
+            const response = await fetch(endpoint);
+            if (!response.ok) {
+                throw new Error(`接口请求失败：HTTP ${response.status}`);
+            }
+            const data = await response.json();
+            if (!data.ip) {
+                throw new Error(data.message || "IP 查询失败");
+            }
+            return {
+                ip: data.ip,
+                type: data.ip.includes(":") ? "IPv6" : "IPv4",
+                country: data.country || "-",
+                country_code: data.country_code || data.country_code3 || "",
+                region: data.region || data.region_name || "-",
+                city: data.city || "-",
+                postal: data.postal || "-",
+                latitude: Number(data.latitude),
+                longitude: Number(data.longitude),
+                accuracy: data.accuracy,
+                connection: {
+                    asn: data.asn || "-",
+                    org: data.organization_name || data.organization || "-"
+                },
+                timezone: {
+                    id: data.timezone || "-"
+                }
+            };
+        }
+
+        function renderIpInfo(data, title = "IP 查询结果") {
+            const connection = data.connection || {};
+            const timezone = data.timezone || {};
+            const lines = [
+                title,
+                "",
+                `IP: ${data.ip || "-"}`,
+                `类型: ${data.type || "-"}`,
+                `国家/地区: ${data.country || "-"} ${data.country_code ? `(${data.country_code})` : ""}`,
+                `省/州: ${data.region || "-"}`,
+                `城市: ${data.city || "-"}`,
+                `邮编: ${data.postal || "-"}`,
+                `经纬度: ${data.latitude ?? "-"}, ${data.longitude ?? "-"}`,
+                `定位精度: ${data.accuracy ? `${data.accuracy} 米` : "-"}`,
+                `ASN: ${connection.asn || "-"}`,
+                `运营商/组织: ${connection.org || "-"}`,
+                `时区: ${timezone.id || "-"}`,
+                "",
+                "说明: 定位结果来自公网 IP 数据库，精度通常到城市或运营商节点。"
+            ];
+            return lines.join("\n");
+        }
+
+        function renderIpMap(data) {
+            const map = document.getElementById("ipMap");
+            const lat = Number(data.latitude);
+            const lon = Number(data.longitude);
+            if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+                resetIpMap();
+                setStatus("IP 查询成功，但没有可用地图坐标", "warn");
+                return;
+            }
+            const delta = 0.18;
+            const bbox = [
+                lon - delta,
+                lat - delta,
+                lon + delta,
+                lat + delta
+            ].map((item) => item.toFixed(6)).join(",");
+            const marker = `${lat.toFixed(6)},${lon.toFixed(6)}`;
+            map.innerHTML = `<iframe title="IP 出口地图" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(marker)}"></iframe>`;
+            map.classList.remove("empty");
+        }
+
+        async function handleIp(action) {
+            const input = getValue("ipInput").trim();
+            const needsInput = action === "ip-lookup";
+            if (needsInput && !input) {
+                showInputRequired("ipOutput");
+                resetIpMap();
+                return;
+            }
+            try {
+                setStatus("正在查询 IP 信息...");
+                const data = await fetchIpInfo(needsInput ? input : "");
+                if (!needsInput) {
+                    document.getElementById("ipInput").value = data.ip || "";
+                }
+                const title = needsInput ? "IP 地址查询" : "本机公网出口 IP";
+                setOutput("ipOutput", renderIpInfo(data, title));
+                renderIpMap(data);
+                const mapText = action === "ip-map" ? "，地图已更新" : "";
+                setStatus(`IP 查询成功：${data.ip}${mapText}`, "ok");
+            } catch (error) {
+                setOutput("ipOutput", `IP 查询失败: ${error.message}`);
+                resetIpMap();
+                setStatus("IP 查询失败", "error");
+            }
+        }
+
         function countPattern(text, pattern) {
             return (text.match(pattern) || []).length;
         }
@@ -2537,31 +3143,65 @@
         }
 
         function handleTimestamp(action) {
-            let date;
-            const raw = getValue("timestampInput").trim();
-            const unit = getValue("timestampUnit");
-
-            if (action === "timestamp-now") {
-                date = new Date();
-            } else if (!raw) {
-                showInputRequired("timestampOutput");
+            if (action === "timestamp-start") {
+                startTimestampClock();
                 return;
-            } else if (unit === "seconds" || (unit === "auto" && /^\d{10}$/.test(raw))) {
-                date = new Date(Number(raw) * 1000);
-            } else if (unit === "milliseconds" || (unit === "auto" && /^\d{13}$/.test(raw))) {
-                date = new Date(Number(raw));
-            } else {
-                date = new Date(normalizeDateInput(raw));
             }
-
-            if (Number.isNaN(date.getTime())) {
-                setOutput("timestampOutput", "无法识别该时间，请输入秒时间戳、毫秒时间戳或日期时间。");
-                setStatus("时间转换失败", "error");
+            if (action === "timestamp-stop") {
+                stopTimestampClock();
+                return;
+            }
+            if (action === "timestamp-refresh") {
+                updateCurrentTimestamp();
+                setStatus("当前 Unix 时间戳已刷新", "ok");
                 return;
             }
 
-            setOutput("timestampOutput", renderTimestamp(date));
-            setStatus("时间转换成功", "ok");
+            if (action === "timestamp-to-date") {
+                const raw = getValue("timestampUnixInput").trim();
+                if (!raw) {
+                    setStatus("请输入 Unix 时间戳", "warn");
+                    return;
+                }
+                const unit = readTimestampUnit("timestampUnixUnit");
+                const date = parseTimestampValue(raw, unit);
+                if (!date) {
+                    setFieldValue("timestampDateOutput", "");
+                    setStatus("Unix 时间戳格式不正确", "error");
+                    return;
+                }
+                setFieldValue("timestampDateOutput", formatDate(date));
+                setStatus("Unix 时间戳转换成功", "ok");
+                return;
+            }
+
+            if (action === "timestamp-date-to-unix") {
+                const raw = getValue("timestampDateInput").trim();
+                if (!raw) {
+                    setStatus("请输入时间", "warn");
+                    return;
+                }
+                const date = parseLocalDateTime(raw);
+                if (!date) {
+                    setFieldValue("timestampUnixOutput", "");
+                    setStatus("时间格式不正确", "error");
+                    return;
+                }
+                setFieldValue("timestampUnixOutput", formatTimestamp(date, readTimestampUnit("timestampDateUnit")));
+                setStatus("时间转换 Unix 时间戳成功", "ok");
+                return;
+            }
+
+            if (action === "timestamp-parts-to-unix") {
+                const date = readTimestampParts();
+                if (!date) {
+                    setFieldValue("timestampPartsOutput", "");
+                    setStatus("请输入合法的年、月、日、时、分、秒", "error");
+                    return;
+                }
+                setFieldValue("timestampPartsOutput", formatTimestamp(date, readTimestampUnit("timestampPartsUnit")));
+                setStatus("时间转换 Unix 时间戳成功", "ok");
+            }
         }
 
         function handleUuid() {
@@ -2723,6 +3363,8 @@
                     resetOutput(element);
                 } else if (element.id === "jsonPathTree") {
                     resetJsonPathTree();
+                } else if (element.id === "ipMap") {
+                    resetIpMap();
                 } else {
                     element.textContent = "处理结果会显示在这里";
                 }
@@ -2768,6 +3410,7 @@
                     if (action.startsWith("url-")) handleUrl(action);
                     if (action.startsWith("base64-")) handleBase64(action);
                     if (action === "length-count") handleLengthStats();
+                    if (action.startsWith("ip-")) await handleIp(action);
                     if (action.startsWith("timestamp-")) handleTimestamp(action);
                     if (action === "uuid-generate") handleUuid();
                     if (action === "regex-test") handleRegex();
@@ -2820,6 +3463,8 @@
         initPanelBodies();
         initRegexPresets();
         initMockFields();
+        initTimestampTool();
+        startTimestampClock(true);
         renderMockCustomList();
         bindEvents();
     </script>
