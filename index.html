@@ -625,7 +625,7 @@
 
         .color-top {
             display: grid;
-            grid-template-columns: 280px minmax(0, 1fr);
+            grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.08fr);
             gap: 18px;
             align-items: start;
         }
@@ -641,6 +641,108 @@
         .color-preview-panel {
             display: grid;
             gap: 12px;
+        }
+
+        .color-picker-stage {
+            display: grid;
+            gap: 10px;
+        }
+
+        .color-picker-surface {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 6px;
+            background-color: #ff2b00;
+            background-image:
+                linear-gradient(to top, #000, transparent),
+                linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+            overflow: hidden;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .color-picker-handle {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #fff;
+            border-radius: 999px;
+            box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18), 0 3px 8px rgba(15, 23, 42, 0.24);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .color-hue-row {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .color-hue-row label {
+            font-size: 13px;
+        }
+
+        .color-hue-slider {
+            height: 10px;
+            padding: 0;
+            border: 0;
+            border-radius: 999px;
+            appearance: none;
+            background: linear-gradient(90deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+            cursor: pointer;
+        }
+
+        .color-hue-slider::-webkit-slider-thumb {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #fff;
+            border-radius: 999px;
+            appearance: none;
+            background: #fff;
+            box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18);
+        }
+
+        .color-hue-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #fff;
+            border-radius: 999px;
+            background: #fff;
+            box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18);
+            cursor: pointer;
+        }
+
+        .color-hue-badge {
+            min-width: 58px;
+            display: inline-flex;
+            justify-content: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #eef2f7;
+            color: #344051;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .color-slider-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .color-slider-meta span {
+            min-height: 28px;
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #f2f6fb;
+            color: #4d5967;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         .color-preview-box {
@@ -689,15 +791,38 @@
             cursor: pointer;
         }
 
+        .color-group-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .color-field-group {
+            display: grid;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fbfcfe;
+        }
+
+        .color-field-group strong {
+            font-size: 13px;
+            color: #4d5967;
+        }
+
         .color-form-grid {
-            grid-template-columns: repeat(6, minmax(0, 1fr));
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
         }
 
         .color-form-grid .field {
             gap: 6px;
         }
 
-        .color-form-grid label {
+        .color-form-grid label,
+        .color-readout label {
             font-size: 13px;
         }
 
@@ -705,8 +830,30 @@
             font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
         }
 
-        .color-code-output {
-            min-height: 170px;
+        .color-readout-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 10px 12px;
+        }
+
+        .color-readout {
+            display: grid;
+            gap: 6px;
+        }
+
+        .color-readout input {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        .color-code-output,
+        .color-palette-output {
+            min-height: 142px;
+        }
+
+        .color-export-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .color-section-head {
@@ -1153,6 +1300,7 @@
         body[data-theme="dark"] .ip-map,
         body[data-theme="dark"] .color-preview-panel,
         body[data-theme="dark"] .color-section,
+        body[data-theme="dark"] .color-field-group,
         body[data-theme="dark"] .color-chip,
         body[data-theme="dark"] .ip-note {
             background: #0f141b;
@@ -1219,18 +1367,27 @@
 
         body[data-theme="dark"] .color-preview-panel,
         body[data-theme="dark"] .color-section,
+        body[data-theme="dark"] .color-field-group,
         body[data-theme="dark"] .color-chip {
             border-color: #303b4b;
         }
 
         body[data-theme="dark"] .color-preview-meta span,
         body[data-theme="dark"] .color-chip-copy span,
-        body[data-theme="dark"] .color-variation-group strong {
+        body[data-theme="dark"] .color-variation-group strong,
+        body[data-theme="dark"] .color-field-group strong,
+        body[data-theme="dark"] .color-slider-meta span,
+        body[data-theme="dark"] .color-hue-badge {
             color: #9fb0c2;
         }
 
         body[data-theme="dark"] .color-chip-swatch {
             border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        body[data-theme="dark"] .color-slider-meta span,
+        body[data-theme="dark"] .color-hue-badge {
+            background: #202a36;
         }
 
         body[data-theme="dark"] .status {
@@ -1447,6 +1604,11 @@
             .form-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
+
+            .color-group-grid,
+            .color-readout-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 760px) {
@@ -1482,6 +1644,8 @@
             .json-workbench,
             .color-top,
             .color-input-row,
+            .color-group-grid,
+            .color-readout-grid,
             .color-variations,
             .timestamp-result,
             .timestamp-row,
@@ -1797,6 +1961,20 @@
                 <div class="color-tool">
                     <div class="color-top">
                         <section class="color-preview-panel" aria-label="颜色预览">
+                            <div class="color-picker-stage">
+                                <div class="color-picker-surface" id="colorPickerSurface" aria-label="颜色选择区域">
+                                    <span class="color-picker-handle" id="colorPickerHandle"></span>
+                                </div>
+                                <div class="color-hue-row">
+                                    <label for="colorHueSlider">色相</label>
+                                    <input class="color-hue-slider" id="colorHueSlider" type="range" min="0" max="360" value="10">
+                                    <span class="color-hue-badge" id="colorHueBadge">10°</span>
+                                </div>
+                                <div class="color-slider-meta">
+                                    <span id="colorHsvMeta">HSV 10, 84%, 96%</span>
+                                    <span id="colorCmykMeta">CMYK 0%, 70%, 84%, 4%</span>
+                                </div>
+                            </div>
                             <div class="color-preview-box" id="colorPreviewBox"></div>
                             <div class="color-preview-meta">
                                 <strong id="colorPreviewHex">#F54927</strong>
@@ -1813,42 +1991,105 @@
                                 <button class="btn secondary" type="button" data-action="color-reset"><span class="btn-icon">↺</span>重置</button>
                             </div>
 
-                            <div class="form-grid color-form-grid">
-                                <div class="field">
-                                    <label for="colorRedInput">R</label>
-                                    <input id="colorRedInput" type="number" min="0" max="255" value="245" inputmode="numeric">
+                            <div class="color-group-grid">
+                                <div class="color-field-group">
+                                    <strong>RGB</strong>
+                                    <div class="color-form-grid">
+                                        <div class="field">
+                                            <label for="colorRedInput">R</label>
+                                            <input id="colorRedInput" type="number" min="0" max="255" value="245" inputmode="numeric">
+                                        </div>
+                                        <div class="field">
+                                            <label for="colorGreenInput">G</label>
+                                            <input id="colorGreenInput" type="number" min="0" max="255" value="73" inputmode="numeric">
+                                        </div>
+                                        <div class="field">
+                                            <label for="colorBlueInput">B</label>
+                                            <input id="colorBlueInput" type="number" min="0" max="255" value="39" inputmode="numeric">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="field">
-                                    <label for="colorGreenInput">G</label>
-                                    <input id="colorGreenInput" type="number" min="0" max="255" value="73" inputmode="numeric">
+
+                                <div class="color-field-group">
+                                    <strong>HSL</strong>
+                                    <div class="color-form-grid">
+                                        <div class="field">
+                                            <label for="colorHueInput">H</label>
+                                            <input id="colorHueInput" type="number" min="0" max="360" value="10" inputmode="numeric">
+                                        </div>
+                                        <div class="field">
+                                            <label for="colorSaturationInput">S%</label>
+                                            <input id="colorSaturationInput" type="number" min="0" max="100" value="91" inputmode="numeric">
+                                        </div>
+                                        <div class="field">
+                                            <label for="colorLightnessInput">L%</label>
+                                            <input id="colorLightnessInput" type="number" min="0" max="100" value="56" inputmode="numeric">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="field">
-                                    <label for="colorBlueInput">B</label>
-                                    <input id="colorBlueInput" type="number" min="0" max="255" value="39" inputmode="numeric">
+
+                                <div class="color-field-group">
+                                    <strong>HSV</strong>
+                                    <div class="color-form-grid">
+                                        <div class="field">
+                                            <label for="colorHsvHueInput">H</label>
+                                            <input id="colorHsvHueInput" type="number" min="0" max="360" value="10" inputmode="numeric">
+                                        </div>
+                                        <div class="field">
+                                            <label for="colorHsvSaturationInput">S%</label>
+                                            <input id="colorHsvSaturationInput" type="number" min="0" max="100" value="84" inputmode="numeric">
+                                        </div>
+                                        <div class="field">
+                                            <label for="colorValueInput">V%</label>
+                                            <input id="colorValueInput" type="number" min="0" max="100" value="96" inputmode="numeric">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="field">
-                                    <label for="colorHueInput">H</label>
-                                    <input id="colorHueInput" type="number" min="0" max="360" value="10" inputmode="numeric">
+                            </div>
+
+                            <div class="color-readout-grid">
+                                <div class="color-readout">
+                                    <label for="colorHexReadonly">HEX</label>
+                                    <input id="colorHexReadonly" type="text" value="#F54927" readonly>
                                 </div>
-                                <div class="field">
-                                    <label for="colorSaturationInput">S%</label>
-                                    <input id="colorSaturationInput" type="number" min="0" max="100" value="91" inputmode="numeric">
+                                <div class="color-readout">
+                                    <label for="colorRgbReadonly">RGB</label>
+                                    <input id="colorRgbReadonly" type="text" value="rgb(245, 73, 39)" readonly>
                                 </div>
-                                <div class="field">
-                                    <label for="colorLightnessInput">L%</label>
-                                    <input id="colorLightnessInput" type="number" min="0" max="100" value="56" inputmode="numeric">
+                                <div class="color-readout">
+                                    <label for="colorHslReadonly">HSL</label>
+                                    <input id="colorHslReadonly" type="text" value="hsl(10 91% 56%)" readonly>
+                                </div>
+                                <div class="color-readout">
+                                    <label for="colorHsvReadonly">HSV</label>
+                                    <input id="colorHsvReadonly" type="text" value="hsv(10 84% 96%)" readonly>
+                                </div>
+                                <div class="color-readout">
+                                    <label for="colorCmykReadonly">CMYK</label>
+                                    <input id="colorCmykReadonly" type="text" value="cmyk(0% 70% 84% 4%)" readonly>
+                                </div>
+                                <div class="color-readout">
+                                    <label for="colorOklchReadonly">OKLCH</label>
+                                    <input id="colorOklchReadonly" type="text" value="oklch(68.0% 0.219 31.3)" readonly>
                                 </div>
                             </div>
 
                             <pre class="output color-code-output" id="colorCodeOutput">HEX: #F54927
 RGB: rgb(245, 73, 39)
 HSL: hsl(10 91% 56%)
+HSV: hsv(10 84% 96%)
+CMYK: cmyk(0% 70% 84% 4%)
 OKLCH: oklch(68.0% 0.219 31.3)
 
 CSS:
 --color-primary: #F54927;
 color: rgb(245, 73, 39);
 background-color: hsl(10 91% 56%);</pre>
+
+                            <div class="color-export-row">
+                                <button class="btn secondary" type="button" data-action="color-copy-current"><span class="btn-icon">[]</span>复制当前颜色</button>
+                                <button class="btn secondary" type="button" data-action="color-copy-palette"><span class="btn-icon">[]</span>复制调色板</button>
+                            </div>
                         </section>
                     </div>
 
@@ -1865,6 +2106,7 @@ background-color: hsl(10 91% 56%);</pre>
                             </select>
                         </div>
                         <div class="color-palette" id="colorHarmonyPalette"></div>
+                        <pre class="output color-palette-output" id="colorPaletteOutput">调色板导出会显示在这里</pre>
                     </section>
 
                     <section class="color-section" aria-label="颜色变化">
@@ -2524,6 +2766,73 @@ background-color: hsl(10 91% 56%);</pre>
             };
         }
 
+        function rgbToHsv(rgb) {
+            const r = rgb.r / 255;
+            const g = rgb.g / 255;
+            const b = rgb.b / 255;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const delta = max - min;
+            let h = 0;
+
+            if (delta !== 0) {
+                if (max === r) h = ((g - b) / delta) % 6;
+                if (max === g) h = (b - r) / delta + 2;
+                if (max === b) h = (r - g) / delta + 4;
+                h *= 60;
+                if (h < 0) h += 360;
+            }
+
+            return {
+                h: roundNumber(h),
+                s: roundNumber((max === 0 ? 0 : delta / max) * 100),
+                v: roundNumber(max * 100)
+            };
+        }
+
+        function hsvToRgb(hsv) {
+            const h = ((Number(hsv.h) % 360) + 360) % 360;
+            const s = clamp(Number(hsv.s), 0, 100) / 100;
+            const v = clamp(Number(hsv.v), 0, 100) / 100;
+            const c = v * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = v - c;
+            let r1 = 0;
+            let g1 = 0;
+            let b1 = 0;
+
+            if (h < 60) [r1, g1, b1] = [c, x, 0];
+            else if (h < 120) [r1, g1, b1] = [x, c, 0];
+            else if (h < 180) [r1, g1, b1] = [0, c, x];
+            else if (h < 240) [r1, g1, b1] = [0, x, c];
+            else if (h < 300) [r1, g1, b1] = [x, 0, c];
+            else [r1, g1, b1] = [c, 0, x];
+
+            return {
+                r: Math.round((r1 + m) * 255),
+                g: Math.round((g1 + m) * 255),
+                b: Math.round((b1 + m) * 255)
+            };
+        }
+
+        function rgbToCmyk(rgb) {
+            const r = rgb.r / 255;
+            const g = rgb.g / 255;
+            const b = rgb.b / 255;
+            const k = 1 - Math.max(r, g, b);
+
+            if (k >= 1) {
+                return { c: 0, m: 0, y: 0, k: 100 };
+            }
+
+            return {
+                c: roundNumber(((1 - r - k) / (1 - k)) * 100),
+                m: roundNumber(((1 - g - k) / (1 - k)) * 100),
+                y: roundNumber(((1 - b - k) / (1 - k)) * 100),
+                k: roundNumber(k * 100)
+            };
+        }
+
         function rgbToOklch(rgb) {
             const toLinear = (value) => {
                 const channel = value / 255;
@@ -2555,6 +2864,14 @@ background-color: hsl(10 91% 56%);</pre>
             return `hsl(${hsl.h} ${hsl.s}% ${hsl.l}%)`;
         }
 
+        function formatHsv(hsv) {
+            return `hsv(${hsv.h} ${hsv.s}% ${hsv.v}%)`;
+        }
+
+        function formatCmyk(cmyk) {
+            return `cmyk(${cmyk.c}% ${cmyk.m}% ${cmyk.y}% ${cmyk.k}%)`;
+        }
+
         function formatOklch(oklch) {
             return `oklch(${oklch.l}% ${oklch.c} ${oklch.h})`;
         }
@@ -2569,11 +2886,6 @@ background-color: hsl(10 91% 56%);</pre>
                 g: Math.round(base.g + (target.g - base.g) * ratio),
                 b: Math.round(base.b + (target.b - base.b) * ratio)
             };
-        }
-
-        function getColorText(rgb) {
-            const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-            return brightness >= 152 ? "#102033" : "#FFFFFF";
         }
 
         function colorDistance(left, right) {
@@ -2670,11 +2982,15 @@ background-color: hsl(10 91% 56%);</pre>
         function buildColorCodeOutput(rgb) {
             const hex = rgbToHex(rgb);
             const hsl = rgbToHsl(rgb);
+            const hsv = rgbToHsv(rgb);
+            const cmyk = rgbToCmyk(rgb);
             const oklch = rgbToOklch(rgb);
             return [
                 `HEX: ${hex}`,
                 `RGB: ${formatRgb(rgb)}`,
                 `HSL: ${formatHsl(hsl)}`,
+                `HSV: ${formatHsv(hsv)}`,
+                `CMYK: ${formatCmyk(cmyk)}`,
                 `OKLCH: ${formatOklch(oklch)}`,
                 "",
                 "CSS:",
@@ -2684,29 +3000,59 @@ background-color: hsl(10 91% 56%);</pre>
             ].join("\n");
         }
 
+        function buildPaletteOutput(items) {
+            const lines = [
+                "调色板 HEX:"
+            ];
+            items.forEach((item, index) => {
+                lines.push(`${index + 1}. ${item.label}: ${rgbToHex(item.rgb)}`);
+            });
+            lines.push("");
+            lines.push("CSS 变量:");
+            items.forEach((item, index) => {
+                lines.push(`--palette-${index + 1}: ${rgbToHex(item.rgb)};`);
+            });
+            return lines.join("\n");
+        }
+
+        function updateColorPicker(hsv) {
+            const surface = document.getElementById("colorPickerSurface");
+            const handle = document.getElementById("colorPickerHandle");
+            const hueSlider = document.getElementById("colorHueSlider");
+            const hueBadge = document.getElementById("colorHueBadge");
+            if (surface) {
+                surface.style.backgroundColor = `hsl(${hsv.h} 100% 50%)`;
+            }
+            if (handle) {
+                handle.style.left = `${hsv.s}%`;
+                handle.style.top = `${100 - hsv.v}%`;
+            }
+            if (hueSlider) hueSlider.value = String(hsv.h);
+            if (hueBadge) hueBadge.textContent = `${hsv.h}°`;
+        }
+
         function renderColorTool(rgb) {
             const hex = rgbToHex(rgb);
             const hsl = rgbToHsl(rgb);
+            const hsv = rgbToHsv(rgb);
+            const cmyk = rgbToCmyk(rgb);
+            const oklch = rgbToOklch(rgb);
             const nearest = findNearestNamedColor(rgb);
             const preview = document.getElementById("colorPreviewBox");
             const previewHex = document.getElementById("colorPreviewHex");
             const previewName = document.getElementById("colorPreviewName");
             const previewRgb = document.getElementById("colorPreviewRgb");
+            const harmony = document.getElementById("colorHarmonyType")?.value || "complementary";
+            const palette = buildHarmonyPalette(rgb, harmony);
 
             colorToolState.hex = hex;
-            colorToolState.harmony = document.getElementById("colorHarmonyType")?.value || "complementary";
-            if (preview) {
-                preview.style.background = hex;
-            }
-            if (previewHex) {
-                previewHex.textContent = hex;
-            }
-            if (previewName) {
-                previewName.textContent = nearest ? `接近命名色：${nearest.name}` : "接近命名色：-";
-            }
-            if (previewRgb) {
-                previewRgb.textContent = `RGB ${rgb.r}, ${rgb.g}, ${rgb.b}`;
-            }
+            colorToolState.harmony = harmony;
+            colorToolState.palette = palette.map((item) => ({ label: item.label, rgb: { ...item.rgb } }));
+
+            if (preview) preview.style.background = hex;
+            if (previewHex) previewHex.textContent = hex;
+            if (previewName) previewName.textContent = nearest ? `接近命名色：${nearest.name}` : "接近命名色：-";
+            if (previewRgb) previewRgb.textContent = `${formatRgb(rgb)} / ${formatHsv(hsv)}`;
 
             setFieldValue("colorNativeInput", hex);
             setFieldValue("colorHexInput", hex);
@@ -2716,9 +3062,23 @@ background-color: hsl(10 91% 56%);</pre>
             setFieldValue("colorHueInput", String(hsl.h));
             setFieldValue("colorSaturationInput", String(hsl.s));
             setFieldValue("colorLightnessInput", String(hsl.l));
+            setFieldValue("colorHsvHueInput", String(hsv.h));
+            setFieldValue("colorHsvSaturationInput", String(hsv.s));
+            setFieldValue("colorValueInput", String(hsv.v));
+            setFieldValue("colorHexReadonly", hex);
+            setFieldValue("colorRgbReadonly", formatRgb(rgb));
+            setFieldValue("colorHslReadonly", formatHsl(hsl));
+            setFieldValue("colorHsvReadonly", formatHsv(hsv));
+            setFieldValue("colorCmykReadonly", formatCmyk(cmyk));
+            setFieldValue("colorOklchReadonly", formatOklch(oklch));
+            setFieldValue("colorHueSlider", String(hsv.h));
+            document.getElementById("colorHsvMeta").textContent = `HSV ${hsv.h}, ${hsv.s}%, ${hsv.v}%`;
+            document.getElementById("colorCmykMeta").textContent = `CMYK ${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%`;
             setOutput("colorCodeOutput", buildColorCodeOutput(rgb));
+            setOutput("colorPaletteOutput", buildPaletteOutput(palette));
+            updateColorPicker(hsv);
 
-            renderColorPalette("colorHarmonyPalette", buildHarmonyPalette(rgb, colorToolState.harmony));
+            renderColorPalette("colorHarmonyPalette", palette);
             renderColorPalette("colorShadePalette", buildColorScale(rgb, { r: 0, g: 0, b: 0 }, "Shade"));
             renderColorPalette("colorTintPalette", buildColorScale(rgb, { r: 255, g: 255, b: 255 }, "Tint"));
             renderColorPalette("colorTonePalette", buildColorScale(rgb, { r: 128, g: 128, b: 128 }, "Tone"));
@@ -2728,6 +3088,9 @@ background-color: hsl(10 91% 56%);</pre>
             const harmony = document.getElementById("colorHarmonyType");
             if (harmony) harmony.value = "complementary";
             colorToolState.harmony = "complementary";
+            colorToolState.palette = [];
+            colorToolState.dragging = false;
+            bindColorPicker();
             renderColorTool(hexToRgb(defaultColorHex));
         }
 
@@ -2764,6 +3127,56 @@ background-color: hsl(10 91% 56%);</pre>
             setStatus("HSL 已转换为颜色代码", "ok");
         }
 
+        function updateColorFromHsvFields() {
+            const h = Number(getValue("colorHsvHueInput"));
+            const s = Number(getValue("colorHsvSaturationInput"));
+            const v = Number(getValue("colorValueInput"));
+            if (![h, s, v].every(Number.isFinite) || h < 0 || h > 360 || s < 0 || s > 100 || v < 0 || v > 100) {
+                setStatus("HSV 请输入合法范围内的数值", "error");
+                return;
+            }
+            renderColorTool(hsvToRgb({ h, s, v }));
+            setStatus("HSV 已转换为颜色代码", "ok");
+        }
+
+        function updateColorFromPickerEvent(event, announce = false) {
+            const surface = document.getElementById("colorPickerSurface");
+            if (!surface) return;
+            const rect = surface.getBoundingClientRect();
+            const offsetX = clamp(event.clientX - rect.left, 0, rect.width);
+            const offsetY = clamp(event.clientY - rect.top, 0, rect.height);
+            const hsv = rgbToHsv(hexToRgb(colorToolState.hex) || hexToRgb(defaultColorHex));
+            const next = {
+                h: hsv.h,
+                s: roundNumber((offsetX / rect.width) * 100),
+                v: roundNumber((1 - offsetY / rect.height) * 100)
+            };
+            renderColorTool(hsvToRgb(next));
+            if (announce) setStatus("颜色选择器已更新", "ok");
+        }
+
+        function bindColorPicker() {
+            const surface = document.getElementById("colorPickerSurface");
+            if (!surface || surface.dataset.bound === "true") return;
+
+            surface.dataset.bound = "true";
+            surface.addEventListener("pointerdown", (event) => {
+                colorToolState.dragging = true;
+                surface.setPointerCapture(event.pointerId);
+                updateColorFromPickerEvent(event, true);
+            });
+            surface.addEventListener("pointermove", (event) => {
+                if (!colorToolState.dragging) return;
+                updateColorFromPickerEvent(event, false);
+            });
+            surface.addEventListener("pointerup", () => {
+                colorToolState.dragging = false;
+            });
+            surface.addEventListener("pointerleave", () => {
+                colorToolState.dragging = false;
+            });
+        }
+
         async function copyColorValue(text, label) {
             try {
                 await navigator.clipboard.writeText(text);
@@ -2776,12 +3189,13 @@ background-color: hsl(10 91% 56%);</pre>
         async function handleColor(action, colorValue = "") {
             const currentRgb = hexToRgb(colorToolState.hex) || hexToRgb(defaultColorHex);
             const currentHsl = rgbToHsl(currentRgb);
+            const currentPaletteText = buildPaletteOutput(colorToolState.palette || []);
             if (action === "color-random") {
-                const randomRgb = {
-                    r: Math.floor(Math.random() * 256),
-                    g: Math.floor(Math.random() * 256),
-                    b: Math.floor(Math.random() * 256)
-                };
+                const randomRgb = hsvToRgb({
+                    h: Math.floor(Math.random() * 361),
+                    s: Math.floor(55 + Math.random() * 45),
+                    v: Math.floor(65 + Math.random() * 35)
+                });
                 renderColorTool(randomRgb);
                 setStatus("已生成随机颜色", "ok");
                 return;
@@ -2809,6 +3223,14 @@ background-color: hsl(10 91% 56%);</pre>
             }
             if (action === "color-copy-css") {
                 await copyColorValue(buildColorCodeOutput(currentRgb), "CSS 代码");
+                return;
+            }
+            if (action === "color-copy-current") {
+                await copyColorValue(`${colorToolState.hex}\n${formatRgb(currentRgb)}\n${formatHsl(currentHsl)}`, "当前颜色");
+                return;
+            }
+            if (action === "color-copy-palette") {
+                await copyColorValue(currentPaletteText, "调色板");
             }
         }
 
@@ -4169,6 +4591,16 @@ background-color: hsl(10 91% 56%);</pre>
             });
             document.querySelectorAll("#colorHueInput, #colorSaturationInput, #colorLightnessInput").forEach((input) => {
                 input.addEventListener("change", updateColorFromHslFields);
+            });
+            document.querySelectorAll("#colorHsvHueInput, #colorHsvSaturationInput, #colorValueInput").forEach((input) => {
+                input.addEventListener("change", updateColorFromHsvFields);
+            });
+            document.getElementById("colorHueSlider").addEventListener("input", (event) => {
+                const current = rgbToHsv(hexToRgb(colorToolState.hex) || hexToRgb(defaultColorHex));
+                renderColorTool(hsvToRgb({ h: Number(event.target.value), s: current.s, v: current.v }));
+            });
+            document.getElementById("colorHueSlider").addEventListener("change", () => {
+                setStatus("色相已更新", "ok");
             });
             document.getElementById("colorHarmonyType").addEventListener("change", (event) => {
                 colorToolState.harmony = event.target.value;
