@@ -493,6 +493,7 @@
             color: #fff;
             cursor: pointer;
             font-weight: 600;
+            white-space: nowrap;
             transition: background 0.16s ease, transform 0.16s ease;
         }
 
@@ -691,8 +692,15 @@
             border: 0;
             border-radius: 999px;
             appearance: none;
-            background: linear-gradient(90deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+            -webkit-appearance: none;
+            background: transparent;
             cursor: pointer;
+        }
+
+        .color-hue-slider::-webkit-slider-runnable-track {
+            height: 10px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
         }
 
         .color-hue-slider::-webkit-slider-thumb {
@@ -700,9 +708,17 @@
             height: 18px;
             border: 2px solid #fff;
             border-radius: 999px;
+            -webkit-appearance: none;
             appearance: none;
             background: #fff;
             box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18);
+            margin-top: -4px;
+        }
+
+        .color-hue-slider::-moz-range-track {
+            height: 10px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
         }
 
         .color-hue-slider::-moz-range-thumb {
@@ -2131,8 +2147,8 @@ background-color: hsl(10 91% 56%);</pre>
                 </div>
                 <div class="actions">
                     <button class="btn" type="button" data-action="color-copy-hex"><span class="btn-icon">#</span>复制 HEX</button>
-                    <button class="btn secondary" type="button" data-action="color-copy-rgb"><span class="btn-icon">RGB</span>复制 RGB</button>
-                    <button class="btn secondary" type="button" data-action="color-copy-hsl"><span class="btn-icon">HSL</span>复制 HSL</button>
+                    <button class="btn secondary" type="button" data-action="color-copy-rgb"><span class="btn-icon">[]</span>复制 RGB</button>
+                    <button class="btn secondary" type="button" data-action="color-copy-hsl"><span class="btn-icon">[]</span>复制 HSL</button>
                     <button class="btn secondary" type="button" data-action="color-copy-css"><span class="btn-icon">{}</span>复制 CSS</button>
                 </div>
             </div>
