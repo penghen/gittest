@@ -618,6 +618,166 @@
             color: var(--blue-dark);
         }
 
+        .color-tool {
+            display: grid;
+            gap: 18px;
+        }
+
+        .color-top {
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .color-preview-panel,
+        .color-section {
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fbfcfe;
+            padding: 14px;
+        }
+
+        .color-preview-panel {
+            display: grid;
+            gap: 12px;
+        }
+
+        .color-preview-box {
+            min-height: 220px;
+            border-radius: 6px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            background: #f54927;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+
+        .color-preview-meta {
+            display: grid;
+            gap: 4px;
+        }
+
+        .color-preview-meta strong {
+            font-size: 28px;
+            line-height: 1.1;
+            letter-spacing: 0;
+        }
+
+        .color-preview-meta span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .color-controls {
+            display: grid;
+            gap: 14px;
+        }
+
+        .color-input-row {
+            display: grid;
+            grid-template-columns: 64px minmax(0, 1fr) 66px auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .color-native {
+            padding: 4px;
+            cursor: pointer;
+        }
+
+        .color-form-grid {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+        }
+
+        .color-form-grid .field {
+            gap: 6px;
+        }
+
+        .color-form-grid label {
+            font-size: 13px;
+        }
+
+        .color-form-grid input[type="number"] {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        .color-code-output {
+            min-height: 170px;
+        }
+
+        .color-section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .color-section-head label {
+            margin: 0;
+        }
+
+        .color-section-head select {
+            max-width: 220px;
+        }
+
+        .color-variations {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .color-variation-group {
+            display: grid;
+            gap: 8px;
+        }
+
+        .color-variation-group strong {
+            font-size: 13px;
+            color: #4d5967;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+            gap: 10px;
+        }
+
+        .color-chip {
+            min-width: 0;
+            padding: 0;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fff;
+            color: inherit;
+            text-align: left;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .color-chip-swatch {
+            height: 68px;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+        }
+
+        .color-chip-copy {
+            display: grid;
+            gap: 2px;
+            padding: 8px 10px 10px;
+        }
+
+        .color-chip-copy strong {
+            font-size: 13px;
+            line-height: 1.2;
+        }
+
+        .color-chip-copy span {
+            color: var(--muted);
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .json-workbench {
             display: grid;
             grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
@@ -981,6 +1141,9 @@
         body[data-theme="dark"] .json-path-card,
         body[data-theme="dark"] .metric,
         body[data-theme="dark"] .ip-map,
+        body[data-theme="dark"] .color-preview-panel,
+        body[data-theme="dark"] .color-section,
+        body[data-theme="dark"] .color-chip,
         body[data-theme="dark"] .ip-note {
             background: #0f141b;
         }
@@ -1042,6 +1205,22 @@
         body[data-theme="dark"] label,
         body[data-theme="dark"] .diff-detail {
             color: #b6c2cf;
+        }
+
+        body[data-theme="dark"] .color-preview-panel,
+        body[data-theme="dark"] .color-section,
+        body[data-theme="dark"] .color-chip {
+            border-color: #303b4b;
+        }
+
+        body[data-theme="dark"] .color-preview-meta span,
+        body[data-theme="dark"] .color-chip-copy span,
+        body[data-theme="dark"] .color-variation-group strong {
+            color: #9fb0c2;
+        }
+
+        body[data-theme="dark"] .color-chip-swatch {
+            border-bottom-color: rgba(255, 255, 255, 0.08);
         }
 
         body[data-theme="dark"] .status {
@@ -1291,6 +1470,9 @@
             .tool-grid,
             .two-cols,
             .json-workbench,
+            .color-top,
+            .color-input-row,
+            .color-variations,
             .timestamp-result,
             .timestamp-row,
             .timestamp-unix-row,
@@ -1313,6 +1495,15 @@
             .timestamp-label,
             .timestamp-inline-label {
                 text-align: left;
+            }
+
+            .color-section-head {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .color-section-head select {
+                max-width: none;
             }
 
             .timestamp-parts-action {
@@ -1588,6 +1779,108 @@
                 <div class="actions" hidden></div>
             </div>
 
+            <div class="tool-panel" data-panel="colorCode">
+                <div class="color-tool">
+                    <div class="color-top">
+                        <section class="color-preview-panel" aria-label="颜色预览">
+                            <div class="color-preview-box" id="colorPreviewBox"></div>
+                            <div class="color-preview-meta">
+                                <strong id="colorPreviewHex">#F54927</strong>
+                                <span id="colorPreviewName">接近命名色：Tomato</span>
+                                <span id="colorPreviewRgb">RGB 245, 73, 39</span>
+                            </div>
+                        </section>
+
+                        <section class="color-controls">
+                            <div class="color-input-row">
+                                <input class="color-native" id="colorNativeInput" type="color" value="#F54927" aria-label="原生颜色选择器">
+                                <input id="colorHexInput" type="text" value="#F54927" maxlength="7" placeholder="#RRGGBB" aria-label="HEX 颜色值">
+                                <button class="btn secondary" type="button" data-action="color-random"><span class="btn-icon">+</span>随机</button>
+                                <button class="btn secondary" type="button" data-action="color-reset"><span class="btn-icon">↺</span>重置</button>
+                            </div>
+
+                            <div class="form-grid color-form-grid">
+                                <div class="field">
+                                    <label for="colorRedInput">R</label>
+                                    <input id="colorRedInput" type="number" min="0" max="255" value="245" inputmode="numeric">
+                                </div>
+                                <div class="field">
+                                    <label for="colorGreenInput">G</label>
+                                    <input id="colorGreenInput" type="number" min="0" max="255" value="73" inputmode="numeric">
+                                </div>
+                                <div class="field">
+                                    <label for="colorBlueInput">B</label>
+                                    <input id="colorBlueInput" type="number" min="0" max="255" value="39" inputmode="numeric">
+                                </div>
+                                <div class="field">
+                                    <label for="colorHueInput">H</label>
+                                    <input id="colorHueInput" type="number" min="0" max="360" value="10" inputmode="numeric">
+                                </div>
+                                <div class="field">
+                                    <label for="colorSaturationInput">S%</label>
+                                    <input id="colorSaturationInput" type="number" min="0" max="100" value="91" inputmode="numeric">
+                                </div>
+                                <div class="field">
+                                    <label for="colorLightnessInput">L%</label>
+                                    <input id="colorLightnessInput" type="number" min="0" max="100" value="56" inputmode="numeric">
+                                </div>
+                            </div>
+
+                            <pre class="output color-code-output" id="colorCodeOutput">HEX: #F54927
+RGB: rgb(245, 73, 39)
+HSL: hsl(10 91% 56%)
+OKLCH: oklch(68.0% 0.219 31.3)
+
+CSS:
+--color-primary: #F54927;
+color: rgb(245, 73, 39);
+background-color: hsl(10 91% 56%);</pre>
+                        </section>
+                    </div>
+
+                    <section class="color-section" aria-label="配色方案">
+                        <div class="color-section-head">
+                            <label for="colorHarmonyType">和谐配色</label>
+                            <select id="colorHarmonyType">
+                                <option value="complementary">互补色</option>
+                                <option value="analogous">邻近色</option>
+                                <option value="triadic">三角色</option>
+                                <option value="splitComplementary">分裂互补色</option>
+                                <option value="tetradic">四色组</option>
+                                <option value="monochromatic">单色系</option>
+                            </select>
+                        </div>
+                        <div class="color-palette" id="colorHarmonyPalette"></div>
+                    </section>
+
+                    <section class="color-section" aria-label="颜色变化">
+                        <div class="color-section-head">
+                            <label>颜色变化</label>
+                        </div>
+                        <div class="color-variations">
+                            <div class="color-variation-group">
+                                <strong>Shades 深色阶</strong>
+                                <div class="color-palette" id="colorShadePalette"></div>
+                            </div>
+                            <div class="color-variation-group">
+                                <strong>Tints 浅色阶</strong>
+                                <div class="color-palette" id="colorTintPalette"></div>
+                            </div>
+                            <div class="color-variation-group">
+                                <strong>Tones 灰调</strong>
+                                <div class="color-palette" id="colorTonePalette"></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="actions">
+                    <button class="btn" type="button" data-action="color-copy-hex"><span class="btn-icon">#</span>复制 HEX</button>
+                    <button class="btn secondary" type="button" data-action="color-copy-rgb"><span class="btn-icon">RGB</span>复制 RGB</button>
+                    <button class="btn secondary" type="button" data-action="color-copy-hsl"><span class="btn-icon">HSL</span>复制 HSL</button>
+                    <button class="btn secondary" type="button" data-action="color-copy-css"><span class="btn-icon">{}</span>复制 CSS</button>
+                </div>
+            </div>
+
             <div class="tool-panel" data-panel="uuid">
                 <div class="form-grid">
                     <div class="field">
@@ -1768,6 +2061,7 @@
             { id: "length", icon: "LEN", title: "字符串长度统计", desc: "统计字符、字节、行数和字符类型" },
             { id: "ip", icon: "IP", title: "IP工具", desc: "查询 IP、出口地址和地图位置" },
             { id: "timestamp", icon: "TIME", title: "Unix时间戳", desc: "秒、毫秒时间戳与日期互转" },
+            { id: "colorCode", icon: "CLR", title: "HTML颜色代码", desc: "HEX、RGB、HSL、OKLCH 与配色板" },
             { id: "uuid", icon: "UUID", title: "UUID生成", desc: "批量生成 v4 UUID" },
             { id: "regex", icon: ".*", title: "正则测试", desc: "测试表达式并查看匹配结果" },
             { id: "mock", icon: "MOCK", title: "数据Mock工具", desc: "按模板批量生成测试数据" },
@@ -1813,6 +2107,24 @@
         const mockCustomFields = [];
         let mockLastOutput = "";
         let timestampTimer = null;
+        const defaultColorHex = "#F54927";
+        const colorToolState = {
+            hex: defaultColorHex,
+            harmony: "complementary"
+        };
+        const namedColors = [
+            ["Black", "#000000"], ["White", "#FFFFFF"], ["Gray", "#808080"], ["Silver", "#C0C0C0"],
+            ["Red", "#FF0000"], ["Maroon", "#800000"], ["Orange", "#FFA500"], ["Tomato", "#FF6347"],
+            ["Coral", "#FF7F50"], ["Salmon", "#FA8072"], ["Gold", "#FFD700"], ["Yellow", "#FFFF00"],
+            ["Khaki", "#F0E68C"], ["Olive", "#808000"], ["Lime", "#00FF00"], ["Green", "#008000"],
+            ["LimeGreen", "#32CD32"], ["SeaGreen", "#2E8B57"], ["Teal", "#008080"], ["Cyan", "#00FFFF"],
+            ["Turquoise", "#40E0D0"], ["SkyBlue", "#87CEEB"], ["DeepSkyBlue", "#00BFFF"], ["DodgerBlue", "#1E90FF"],
+            ["RoyalBlue", "#4169E1"], ["Blue", "#0000FF"], ["Navy", "#000080"], ["Indigo", "#4B0082"],
+            ["SlateBlue", "#6A5ACD"], ["Purple", "#800080"], ["Magenta", "#FF00FF"], ["Violet", "#EE82EE"],
+            ["Orchid", "#DA70D6"], ["Plum", "#DDA0DD"], ["Pink", "#FFC0CB"], ["HotPink", "#FF69B4"],
+            ["Crimson", "#DC143C"], ["Brown", "#A52A2A"], ["Chocolate", "#D2691E"], ["Tan", "#D2B48C"],
+            ["Beige", "#F5F5DC"], ["Ivory", "#FFFFF0"], ["Lavender", "#E6E6FA"], ["AliceBlue", "#F0F8FF"]
+        ].map(([name, hex]) => ({ name, rgb: hexToRgb(hex) }));
 
         function preferredTheme() {
             const saved = localStorage.getItem("toolbox-theme");
@@ -1970,6 +2282,9 @@
             if (id === "timestamp") {
                 initTimestampTool();
             }
+            if (id === "colorCode") {
+                initColorTool();
+            }
         }
 
         function switchTool(id) {
@@ -2099,6 +2414,388 @@
             setFieldValue("timestampUnixInput", formatTimestamp(now, "seconds"));
             setFieldValue("timestampDateOutput", formatDate(now));
             setFieldValue("timestampYear", String(now.getFullYear()));
+            setFieldValue("timestampMonth", String(now.getMonth() + 1));
+            setFieldValue("timestampDay", String(now.getDate()));
+            setFieldValue("timestampHour", String(now.getHours()));
+            setFieldValue("timestampMinute", String(now.getMinutes()));
+            setFieldValue("timestampSecond", String(now.getSeconds()));
+            setFieldValue("timestampDateInput", formatDate(now));
+            setFieldValue("timestampUnixOutput", formatTimestamp(now, "seconds"));
+            setFieldValue("timestampPartsOutput", formatTimestamp(now, "seconds"));
+        }
+
+        function clamp(value, min, max) {
+            return Math.min(max, Math.max(min, value));
+        }
+
+        function roundNumber(value, digits = 0) {
+            const factor = 10 ** digits;
+            return Math.round(value * factor) / factor;
+        }
+
+        function normalizeHexInput(value) {
+            const cleaned = value.trim().replace(/^#/, "").replace(/[^0-9a-fA-F]/g, "");
+            if (cleaned.length === 3) {
+                return `#${cleaned.split("").map((char) => char + char).join("").toUpperCase()}`;
+            }
+            if (cleaned.length === 6) {
+                return `#${cleaned.toUpperCase()}`;
+            }
+            return null;
+        }
+
+        function hexToRgb(hex) {
+            const normalized = normalizeHexInput(hex);
+            if (!normalized) return null;
+            const value = normalized.slice(1);
+            return {
+                r: Number.parseInt(value.slice(0, 2), 16),
+                g: Number.parseInt(value.slice(2, 4), 16),
+                b: Number.parseInt(value.slice(4, 6), 16)
+            };
+        }
+
+        function rgbToHex(rgb) {
+            return `#${[rgb.r, rgb.g, rgb.b].map((value) => clamp(Math.round(value), 0, 255).toString(16).padStart(2, "0")).join("").toUpperCase()}`;
+        }
+
+        function rgbToHsl(rgb) {
+            const r = rgb.r / 255;
+            const g = rgb.g / 255;
+            const b = rgb.b / 255;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const delta = max - min;
+            let h = 0;
+
+            if (delta !== 0) {
+                if (max === r) h = ((g - b) / delta) % 6;
+                if (max === g) h = (b - r) / delta + 2;
+                if (max === b) h = (r - g) / delta + 4;
+                h *= 60;
+                if (h < 0) h += 360;
+            }
+
+            const l = (max + min) / 2;
+            const s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+            return {
+                h: roundNumber(h),
+                s: roundNumber(s * 100),
+                l: roundNumber(l * 100)
+            };
+        }
+
+        function hslToRgb(hsl) {
+            const h = ((Number(hsl.h) % 360) + 360) % 360;
+            const s = clamp(Number(hsl.s), 0, 100) / 100;
+            const l = clamp(Number(hsl.l), 0, 100) / 100;
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = l - c / 2;
+            let r1 = 0;
+            let g1 = 0;
+            let b1 = 0;
+
+            if (h < 60) [r1, g1, b1] = [c, x, 0];
+            else if (h < 120) [r1, g1, b1] = [x, c, 0];
+            else if (h < 180) [r1, g1, b1] = [0, c, x];
+            else if (h < 240) [r1, g1, b1] = [0, x, c];
+            else if (h < 300) [r1, g1, b1] = [x, 0, c];
+            else [r1, g1, b1] = [c, 0, x];
+
+            return {
+                r: Math.round((r1 + m) * 255),
+                g: Math.round((g1 + m) * 255),
+                b: Math.round((b1 + m) * 255)
+            };
+        }
+
+        function rgbToOklch(rgb) {
+            const toLinear = (value) => {
+                const channel = value / 255;
+                return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+            };
+            const lr = toLinear(rgb.r);
+            const lg = toLinear(rgb.g);
+            const lb = toLinear(rgb.b);
+            const l = Math.cbrt(0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb);
+            const m = Math.cbrt(0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb);
+            const s = Math.cbrt(0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb);
+            const lightness = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
+            const a = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+            const b = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+            const chroma = Math.sqrt(a * a + b * b);
+            const hue = (Math.atan2(b, a) * 180 / Math.PI + 360) % 360;
+            return {
+                l: roundNumber(lightness * 100, 1),
+                c: roundNumber(chroma, 3),
+                h: roundNumber(hue, 1)
+            };
+        }
+
+        function formatRgb(rgb) {
+            return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        }
+
+        function formatHsl(hsl) {
+            return `hsl(${hsl.h} ${hsl.s}% ${hsl.l}%)`;
+        }
+
+        function formatOklch(oklch) {
+            return `oklch(${oklch.l}% ${oklch.c} ${oklch.h})`;
+        }
+
+        function rotateHue(hue, delta) {
+            return ((hue + delta) % 360 + 360) % 360;
+        }
+
+        function mixRgb(base, target, ratio) {
+            return {
+                r: Math.round(base.r + (target.r - base.r) * ratio),
+                g: Math.round(base.g + (target.g - base.g) * ratio),
+                b: Math.round(base.b + (target.b - base.b) * ratio)
+            };
+        }
+
+        function getColorText(rgb) {
+            const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+            return brightness >= 152 ? "#102033" : "#FFFFFF";
+        }
+
+        function colorDistance(left, right) {
+            return Math.sqrt(
+                ((left.r - right.r) ** 2)
+                + ((left.g - right.g) ** 2)
+                + ((left.b - right.b) ** 2)
+            );
+        }
+
+        function findNearestNamedColor(rgb) {
+            return namedColors.reduce((best, item) => (
+                !best || colorDistance(rgb, item.rgb) < best.distance
+                    ? { name: item.name, distance: colorDistance(rgb, item.rgb) }
+                    : best
+            ), null);
+        }
+
+        function buildColorScale(baseRgb, targetRgb, prefix) {
+            return [0, 0.18, 0.34, 0.5, 0.66, 0.82].map((ratio, index) => ({
+                label: `${prefix} ${index + 1}`,
+                rgb: mixRgb(baseRgb, targetRgb, ratio)
+            }));
+        }
+
+        function buildHarmonyPalette(rgb, type) {
+            const hsl = rgbToHsl(rgb);
+            const item = (label, hue, saturation = hsl.s, lightness = hsl.l) => ({
+                label,
+                rgb: hslToRgb({ h: hue, s: saturation, l: lightness })
+            });
+
+            if (type === "analogous") {
+                return [
+                    item("前邻近", rotateHue(hsl.h, -30)),
+                    { label: "当前颜色", rgb },
+                    item("后邻近", rotateHue(hsl.h, 30))
+                ];
+            }
+            if (type === "triadic") {
+                return [
+                    { label: "当前颜色", rgb },
+                    item("三角色 A", rotateHue(hsl.h, 120)),
+                    item("三角色 B", rotateHue(hsl.h, 240))
+                ];
+            }
+            if (type === "splitComplementary") {
+                return [
+                    { label: "当前颜色", rgb },
+                    item("分裂互补 A", rotateHue(hsl.h, 150)),
+                    item("分裂互补 B", rotateHue(hsl.h, 210))
+                ];
+            }
+            if (type === "tetradic") {
+                return [
+                    { label: "当前颜色", rgb },
+                    item("四色组 A", rotateHue(hsl.h, 90)),
+                    item("四色组 B", rotateHue(hsl.h, 180)),
+                    item("四色组 C", rotateHue(hsl.h, 270))
+                ];
+            }
+            if (type === "monochromatic") {
+                return [
+                    item("深色", hsl.h, hsl.s, clamp(hsl.l - 24, 6, 94)),
+                    item("偏深", hsl.h, hsl.s, clamp(hsl.l - 12, 6, 94)),
+                    { label: "当前颜色", rgb },
+                    item("偏浅", hsl.h, hsl.s, clamp(hsl.l + 12, 6, 94)),
+                    item("浅色", hsl.h, hsl.s, clamp(hsl.l + 24, 6, 94))
+                ];
+            }
+            return [
+                { label: "当前颜色", rgb },
+                item("互补色", rotateHue(hsl.h, 180))
+            ];
+        }
+
+        function renderColorPalette(targetId, items) {
+            const target = document.getElementById(targetId);
+            if (!target) return;
+            target.innerHTML = items.map((item) => {
+                const hex = rgbToHex(item.rgb);
+                return `
+                    <button class="color-chip" type="button" data-action="color-apply" data-color-value="${hex}" title="点击应用 ${hex}">
+                        <span class="color-chip-swatch" style="background:${hex};"></span>
+                        <span class="color-chip-copy">
+                            <strong>${escapeHtml(item.label)}</strong>
+                            <span>${hex}</span>
+                        </span>
+                    </button>
+                `;
+            }).join("");
+        }
+
+        function buildColorCodeOutput(rgb) {
+            const hex = rgbToHex(rgb);
+            const hsl = rgbToHsl(rgb);
+            const oklch = rgbToOklch(rgb);
+            return [
+                `HEX: ${hex}`,
+                `RGB: ${formatRgb(rgb)}`,
+                `HSL: ${formatHsl(hsl)}`,
+                `OKLCH: ${formatOklch(oklch)}`,
+                "",
+                "CSS:",
+                `--color-primary: ${hex};`,
+                `color: ${formatRgb(rgb)};`,
+                `background-color: ${formatHsl(hsl)};`
+            ].join("\n");
+        }
+
+        function renderColorTool(rgb) {
+            const hex = rgbToHex(rgb);
+            const hsl = rgbToHsl(rgb);
+            const nearest = findNearestNamedColor(rgb);
+            const preview = document.getElementById("colorPreviewBox");
+            const previewHex = document.getElementById("colorPreviewHex");
+            const previewName = document.getElementById("colorPreviewName");
+            const previewRgb = document.getElementById("colorPreviewRgb");
+
+            colorToolState.hex = hex;
+            colorToolState.harmony = document.getElementById("colorHarmonyType")?.value || "complementary";
+            if (preview) {
+                preview.style.background = hex;
+            }
+            if (previewHex) {
+                previewHex.textContent = hex;
+            }
+            if (previewName) {
+                previewName.textContent = nearest ? `接近命名色：${nearest.name}` : "接近命名色：-";
+            }
+            if (previewRgb) {
+                previewRgb.textContent = `RGB ${rgb.r}, ${rgb.g}, ${rgb.b}`;
+            }
+
+            setFieldValue("colorNativeInput", hex);
+            setFieldValue("colorHexInput", hex);
+            setFieldValue("colorRedInput", String(rgb.r));
+            setFieldValue("colorGreenInput", String(rgb.g));
+            setFieldValue("colorBlueInput", String(rgb.b));
+            setFieldValue("colorHueInput", String(hsl.h));
+            setFieldValue("colorSaturationInput", String(hsl.s));
+            setFieldValue("colorLightnessInput", String(hsl.l));
+            setOutput("colorCodeOutput", buildColorCodeOutput(rgb));
+
+            renderColorPalette("colorHarmonyPalette", buildHarmonyPalette(rgb, colorToolState.harmony));
+            renderColorPalette("colorShadePalette", buildColorScale(rgb, { r: 0, g: 0, b: 0 }, "Shade"));
+            renderColorPalette("colorTintPalette", buildColorScale(rgb, { r: 255, g: 255, b: 255 }, "Tint"));
+            renderColorPalette("colorTonePalette", buildColorScale(rgb, { r: 128, g: 128, b: 128 }, "Tone"));
+        }
+
+        function initColorTool() {
+            const harmony = document.getElementById("colorHarmonyType");
+            if (harmony) harmony.value = "complementary";
+            colorToolState.harmony = "complementary";
+            renderColorTool(hexToRgb(defaultColorHex));
+        }
+
+        function applyColorHex(hex, statusMessage = "颜色已更新") {
+            const rgb = hexToRgb(hex);
+            if (!rgb) {
+                setStatus("请输入合法的 HEX 颜色值", "error");
+                return false;
+            }
+            renderColorTool(rgb);
+            setStatus(statusMessage, "ok");
+            return true;
+        }
+
+        function updateColorFromRgbFields() {
+            const values = ["colorRedInput", "colorGreenInput", "colorBlueInput"].map((id) => Number(getValue(id)));
+            if (values.some((value) => !Number.isInteger(value) || value < 0 || value > 255)) {
+                setStatus("RGB 请输入 0 到 255 的整数", "error");
+                return;
+            }
+            renderColorTool({ r: values[0], g: values[1], b: values[2] });
+            setStatus("RGB 已转换为颜色代码", "ok");
+        }
+
+        function updateColorFromHslFields() {
+            const h = Number(getValue("colorHueInput"));
+            const s = Number(getValue("colorSaturationInput"));
+            const l = Number(getValue("colorLightnessInput"));
+            if (![h, s, l].every(Number.isFinite) || h < 0 || h > 360 || s < 0 || s > 100 || l < 0 || l > 100) {
+                setStatus("HSL 请输入合法范围内的数值", "error");
+                return;
+            }
+            renderColorTool(hslToRgb({ h, s, l }));
+            setStatus("HSL 已转换为颜色代码", "ok");
+        }
+
+        async function copyColorValue(text, label) {
+            try {
+                await navigator.clipboard.writeText(text);
+                setStatus(`${label} 已复制到剪贴板`, "ok");
+            } catch (error) {
+                setStatus("复制失败，请检查浏览器剪贴板权限", "error");
+            }
+        }
+
+        async function handleColor(action, colorValue = "") {
+            const currentRgb = hexToRgb(colorToolState.hex) || hexToRgb(defaultColorHex);
+            const currentHsl = rgbToHsl(currentRgb);
+            if (action === "color-random") {
+                const randomRgb = {
+                    r: Math.floor(Math.random() * 256),
+                    g: Math.floor(Math.random() * 256),
+                    b: Math.floor(Math.random() * 256)
+                };
+                renderColorTool(randomRgb);
+                setStatus("已生成随机颜色", "ok");
+                return;
+            }
+            if (action === "color-reset") {
+                initColorTool();
+                setStatus("颜色模块已重置", "ok");
+                return;
+            }
+            if (action === "color-apply") {
+                applyColorHex(colorValue, `已应用颜色 ${colorValue}`);
+                return;
+            }
+            if (action === "color-copy-hex") {
+                await copyColorValue(colorToolState.hex, "HEX");
+                return;
+            }
+            if (action === "color-copy-rgb") {
+                await copyColorValue(formatRgb(currentRgb), "RGB");
+                return;
+            }
+            if (action === "color-copy-hsl") {
+                await copyColorValue(formatHsl(currentHsl), "HSL");
+                return;
+            }
+            if (action === "color-copy-css") {
+                await copyColorValue(buildColorCodeOutput(currentRgb), "CSS 代码");
+            }
         }
 
         function encodeBase64(text) {
@@ -3412,6 +4109,7 @@
                     if (action === "length-count") handleLengthStats();
                     if (action.startsWith("ip-")) await handleIp(action);
                     if (action.startsWith("timestamp-")) handleTimestamp(action);
+                    if (action.startsWith("color-")) await handleColor(action, actionButton.dataset.colorValue || "");
                     if (action === "uuid-generate") handleUuid();
                     if (action === "regex-test") handleRegex();
                     if (action === "mock-generate") handleMockGenerate();
@@ -3444,6 +4142,25 @@
             document.querySelectorAll("[data-regex-flag]").forEach((box) => {
                 box.addEventListener("change", updateRegexFlagsFromChecks);
             });
+            document.getElementById("colorNativeInput").addEventListener("input", (event) => {
+                applyColorHex(event.target.value, "颜色选择器已更新");
+            });
+            document.getElementById("colorHexInput").addEventListener("change", (event) => {
+                if (!applyColorHex(event.target.value, "HEX 已转换为颜色代码")) {
+                    event.target.value = colorToolState.hex;
+                }
+            });
+            document.querySelectorAll("#colorRedInput, #colorGreenInput, #colorBlueInput").forEach((input) => {
+                input.addEventListener("change", updateColorFromRgbFields);
+            });
+            document.querySelectorAll("#colorHueInput, #colorSaturationInput, #colorLightnessInput").forEach((input) => {
+                input.addEventListener("change", updateColorFromHslFields);
+            });
+            document.getElementById("colorHarmonyType").addEventListener("change", (event) => {
+                colorToolState.harmony = event.target.value;
+                renderColorTool(hexToRgb(colorToolState.hex));
+                setStatus("和谐配色已更新", "ok");
+            });
 
             document.querySelectorAll("[data-mock-tab]").forEach((tab) => {
                 tab.addEventListener("click", () => {
@@ -3464,6 +4181,7 @@
         initRegexPresets();
         initMockFields();
         initTimestampTool();
+        initColorTool();
         startTimestampClock(true);
         renderMockCustomList();
         bindEvents();
