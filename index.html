@@ -1947,6 +1947,9 @@
                             <label class="check-pill" for="dataParserFormatTimestamp">
                                 <input id="dataParserFormatTimestamp" type="checkbox" checked> 自动转换 Ts / Timestamp 时间
                             </label>
+                            <label class="check-pill" for="dataParserExpandJson">
+                                <input id="dataParserExpandJson" type="checkbox" checked> 展开 JSON 节点
+                            </label>
                         </div>
                     </div>
 
@@ -2524,7 +2527,7 @@ background-color: hsl(10 91% 56%);</pre>
         };
         const mockCustomFields = [];
         let mockLastOutput = "";
-        let dataParserState = { rows: [], columns: [], timestampColumns: [], source: "" };
+        let dataParserState = { rawRows: [], rows: [], columns: [], timestampColumns: [], source: "" };
         let timestampTimer = null;
         const defaultColorHex = "#F54927";
         const colorToolState = {
@@ -4078,8 +4081,59 @@ background-color: hsl(10 91% 56%);</pre>
             }
         }
 
+        function isPlainDataObject(value) {
+            return value !== null && typeof value === "object" && !Array.isArray(value);
+        }
+
+        function joinDataParserRows(parentRows, childRows) {
+            const children = childRows.length ? childRows : [{}];
+            return parentRows.flatMap((parent) => children.map((child) => ({ ...parent, ...child })));
+        }
+
+        function flattenDataParserValue(value, path, rows = [{}]) {
+            if (isPlainDataObject(value)) {
+                const entries = Object.entries(value);
+                if (!entries.length) return rows.map((row) => ({ ...row, [path]: "{}" }));
+                return entries.reduce((currentRows, [key, child]) => {
+                    const childPath = path ? `${path}.${key}` : key;
+                    return flattenDataParserValue(child, childPath, currentRows);
+                }, rows);
+            }
+
+            if (Array.isArray(value)) {
+                if (!value.length) return rows.map((row) => ({ ...row, [path]: "[]" }));
+                if (value.every((item) => !isPlainDataObject(item) && !Array.isArray(item))) {
+                    return rows.map((row) => ({ ...row, [path]: JSON.stringify(value) }));
+                }
+
+                const itemRows = value.flatMap((item) => flattenDataParserValue(item, `${path}[]`));
+                return joinDataParserRows(rows, itemRows);
+            }
+
+            return rows.map((row) => ({ ...row, [path]: value }));
+        }
+
+        function expandDataParserRows(rows) {
+            return rows.flatMap((row) => flattenDataParserValue(row, ""));
+        }
+
+        function refreshDataParserState(rawRows = dataParserState.rawRows, source = dataParserState.source) {
+            const expandJson = document.getElementById("dataParserExpandJson")?.checked;
+            const rows = expandJson ? expandDataParserRows(rawRows) : rawRows;
+            const columns = [...new Set(rows.flatMap((row) => Object.keys(row)))];
+            dataParserState = {
+                rawRows,
+                rows,
+                columns,
+                timestampColumns: document.getElementById("dataParserFormatTimestamp")?.checked
+                    ? columns.filter((column) => isUnixTimestampField(column, rows))
+                    : [],
+                source
+            };
+        }
+
         function isUnixTimestampField(column, rows) {
-            const normalized = String(column).replace(/[_-]/g, "").toLowerCase();
+            const normalized = String(column).split(".").pop().replace(/\[\]/g, "").replace(/[_-]/g, "").toLowerCase();
             const candidates = ["ts", "timestamp", "time", "createdat", "updatedat", "createtime", "updatetime", "createdtime", "modifiedat"];
             if (!candidates.includes(normalized)) return false;
             return rows.some((row) => {
@@ -4097,9 +4151,13 @@ background-color: hsl(10 91% 56%);</pre>
         }
 
         function dataParserColumns() {
-            const rawColumns = dataParserState.columns.map((key) => ({ key, label: key }));
-            const timeColumns = dataParserState.timestampColumns.map((key) => ({ key: `__timestamp__${key}`, label: `${key}时间`, timestampOf: key }));
+            const rawColumns = dataParserState.columns.map((key) => ({ key, label: formatDataParserColumnLabel(key) }));
+            const timeColumns = dataParserState.timestampColumns.map((key) => ({ key: `__timestamp__${key}`, label: `${formatDataParserColumnLabel(key)} 时间`, timestampOf: key }));
             return [...rawColumns, ...timeColumns];
+        }
+
+        function formatDataParserColumnLabel(column) {
+            return String(column).split(".").join(" > ");
         }
 
         function dataParserCellValue(row, column) {
@@ -4123,11 +4181,13 @@ background-color: hsl(10 91% 56%);</pre>
         }
 
         function resetDataParser() {
-            dataParserState = { rows: [], columns: [], timestampColumns: [], source: "" };
+            dataParserState = { rawRows: [], rows: [], columns: [], timestampColumns: [], source: "" };
             const input = document.getElementById("dataParserInput");
             const timestampCheck = document.getElementById("dataParserFormatTimestamp");
+            const expandJsonCheck = document.getElementById("dataParserExpandJson");
             if (input) input.value = "";
             if (timestampCheck) timestampCheck.checked = true;
+            if (expandJsonCheck) expandJsonCheck.checked = true;
             const summary = document.getElementById("dataParserSummary");
             if (summary) summary.textContent = "等待解析数据";
             if (document.getElementById("dataParserOutput")) setDataParserEmpty("整理后的表格会显示在这里");
@@ -4236,17 +4296,11 @@ background-color: hsl(10 91% 56%);</pre>
             }
             try {
                 const result = parseDataParserInput(getValue("dataParserInput").trim());
-                const columns = [...new Set(result.rows.flatMap((row) => Object.keys(row)))];
-                dataParserState = {
-                    rows: result.rows,
-                    columns,
-                    timestampColumns: document.getElementById("dataParserFormatTimestamp").checked ? columns.filter((column) => isUnixTimestampField(column, result.rows)) : [],
-                    source: result.source
-                };
+                refreshDataParserState(result.rows, result.source);
                 renderDataParser();
-                setStatus(`整理完成：${result.rows.length} 条记录，${columns.length} 个字段`, "ok");
+                setStatus(`整理完成：${dataParserState.rows.length} 条记录，${dataParserState.columns.length} 个字段`, "ok");
             } catch (error) {
-                dataParserState = { rows: [], columns: [], timestampColumns: [], source: "" };
+                dataParserState = { rawRows: [], rows: [], columns: [], timestampColumns: [], source: "" };
                 setDataParserEmpty(`解析失败：${error.message}`);
                 document.getElementById("dataParserSummary").textContent = "请检查对象花括号、字段名和字段值";
                 setStatus("数据解析失败", "error");
@@ -5156,10 +5210,13 @@ background-color: hsl(10 91% 56%);</pre>
                 box.addEventListener("change", updateRegexFlagsFromChecks);
             });
             document.getElementById("dataParserFormatTimestamp").addEventListener("change", (event) => {
-                if (!dataParserState.rows.length) return;
-                dataParserState.timestampColumns = event.target.checked
-                    ? dataParserState.columns.filter((column) => isUnixTimestampField(column, dataParserState.rows))
-                    : [];
+                if (!dataParserState.rawRows.length) return;
+                refreshDataParserState();
+                renderDataParser();
+            });
+            document.getElementById("dataParserExpandJson").addEventListener("change", () => {
+                if (!dataParserState.rawRows.length) return;
+                refreshDataParserState();
                 renderDataParser();
             });
             document.getElementById("colorNativeInput").addEventListener("input", (event) => {
