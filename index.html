@@ -3948,12 +3948,24 @@ background-color: hsl(10 91% 56%);</pre>
             return value;
         }
 
+        function skipStructuredDelimiters(source, cursor) {
+            while (cursor < source.length && /[\s,]/.test(source[cursor])) cursor++;
+            return cursor;
+        }
+
+        function isStructuredFieldStart(source, cursor) {
+            const match = source.slice(cursor).match(/^([A-Za-z_$][A-Za-z0-9_$.-]*)\s*:/);
+            if (!match) return false;
+            const valueStart = cursor + match[0].length;
+            return !source.slice(valueStart).startsWith("//");
+        }
+
         function parseStructuredObject(source) {
             const record = {};
             let cursor = 0;
 
             while (cursor < source.length) {
-                while (cursor < source.length && /[\s,]/.test(source[cursor])) cursor++;
+                cursor = skipStructuredDelimiters(source, cursor);
                 if (cursor >= source.length) break;
 
                 let key = "";
@@ -3976,6 +3988,20 @@ background-color: hsl(10 91% 56%);</pre>
                 if (cursor >= source.length) {
                     record[key] = "";
                     break;
+                }
+
+                // A blank value may be followed by the next `Field:` token, with or without a comma.
+                if (isStructuredFieldStart(source, cursor)) {
+                    record[key] = "";
+                    continue;
+                }
+                if (source[cursor] === ",") {
+                    const nextFieldStart = skipStructuredDelimiters(source, cursor);
+                    if (isStructuredFieldStart(source, nextFieldStart)) {
+                        record[key] = "";
+                        cursor = nextFieldStart;
+                        continue;
+                    }
                 }
 
                 const valueStart = cursor;
