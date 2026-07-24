@@ -3915,8 +3915,9 @@ background-color: hsl(10 91% 56%);</pre>
                     depth++;
                 } else if (char === "]" || char === "}") {
                     depth--;
-                } else if (char === "," && depth === 0) {
-                    values.push(text.slice(start, index).trim());
+                } else if ((char === "," || /\s/.test(char)) && depth === 0) {
+                    const item = text.slice(start, index).trim();
+                    if (item) values.push(item);
                     start = index + 1;
                 }
             }
@@ -3948,76 +3949,79 @@ background-color: hsl(10 91% 56%);</pre>
             return value;
         }
 
-        function skipStructuredDelimiters(source, cursor) {
-            while (cursor < source.length && /[\s,]/.test(source[cursor])) cursor++;
-            return cursor;
-        }
+        function findStructuredFields(source) {
+            const fields = [];
+            let depth = 0;
+            let quote = "";
+            let escaped = false;
 
-        function isStructuredFieldStart(source, cursor) {
-            const match = source.slice(cursor).match(/^([A-Za-z_$][A-Za-z0-9_$.-]*)\s*:/);
-            if (!match) return false;
-            const valueStart = cursor + match[0].length;
-            return !source.slice(valueStart).startsWith("//");
+            for (let index = 0; index < source.length; index++) {
+                const char = source[index];
+                if (quote) {
+                    if (escaped) {
+                        escaped = false;
+                    } else if (char === "\\") {
+                        escaped = true;
+                    } else if (char === quote) {
+                        quote = "";
+                    }
+                    continue;
+                }
+                const previous = source[index - 1] || "";
+                const isDelimiter = index === 0 || /[\s,]/.test(previous);
+                if (depth === 0 && isDelimiter && (char === '"' || char === "'")) {
+                    const keyEnd = findStructuredQuoteEnd(source, index);
+                    let colonIndex = keyEnd + 1;
+                    while (colonIndex < source.length && /\s/.test(source[colonIndex])) colonIndex++;
+                    if (keyEnd >= 0 && source[colonIndex] === ":") {
+                        fields.push({
+                            key: String(parseStructuredValue(source.slice(index, keyEnd + 1))),
+                            start: index,
+                            valueStart: colonIndex + 1
+                        });
+                        index = colonIndex;
+                        continue;
+                    }
+                }
+                if (char === '"' || char === "'") {
+                    quote = char;
+                    continue;
+                }
+                if (char === "[" || char === "{") {
+                    depth++;
+                    continue;
+                }
+                if (char === "]" || char === "}") {
+                    depth--;
+                    continue;
+                }
+                if (depth !== 0) continue;
+
+                const isAdjacentEmptyValue = previous === ":" && /[A-Z]/.test(char);
+                if (!isDelimiter && !isAdjacentEmptyValue) continue;
+
+                const match = source.slice(index).match(/^([\p{L}_$][\p{L}\p{N}_$.-]*)\s*:/u);
+                if (!match) continue;
+                fields.push({
+                    key: match[1],
+                    start: index,
+                    valueStart: index + match[0].length
+                });
+                index += match[0].length - 1;
+            }
+            return fields;
         }
 
         function parseStructuredObject(source) {
             const record = {};
-            let cursor = 0;
+            const fields = findStructuredFields(source);
+            if (!fields.length) throw new Error("未识别到字段名");
 
-            while (cursor < source.length) {
-                cursor = skipStructuredDelimiters(source, cursor);
-                if (cursor >= source.length) break;
-
-                let key = "";
-                if (source[cursor] === '"' || source[cursor] === "'") {
-                    const keyEnd = findStructuredQuoteEnd(source, cursor);
-                    if (keyEnd < 0) throw new Error("字段名引号未闭合");
-                    key = parseStructuredValue(source.slice(cursor, keyEnd + 1));
-                    cursor = keyEnd + 1;
-                } else {
-                    const keyStart = cursor;
-                    while (cursor < source.length && /[A-Za-z0-9_$.-]/.test(source[cursor])) cursor++;
-                    key = source.slice(keyStart, cursor);
-                }
-                if (!key) throw new Error(`第 ${cursor + 1} 个字符附近缺少字段名`);
-
-                while (cursor < source.length && /\s/.test(source[cursor])) cursor++;
-                if (source[cursor] !== ":") throw new Error(`字段 ${key} 缺少冒号`);
-                cursor++;
-                while (cursor < source.length && /\s/.test(source[cursor])) cursor++;
-                if (cursor >= source.length) {
-                    record[key] = "";
-                    break;
-                }
-
-                // A blank value may be followed by the next `Field:` token, with or without a comma.
-                if (isStructuredFieldStart(source, cursor)) {
-                    record[key] = "";
-                    continue;
-                }
-                if (source[cursor] === ",") {
-                    const nextFieldStart = skipStructuredDelimiters(source, cursor);
-                    if (isStructuredFieldStart(source, nextFieldStart)) {
-                        record[key] = "";
-                        cursor = nextFieldStart;
-                        continue;
-                    }
-                }
-
-                const valueStart = cursor;
-                if (source[cursor] === "[" || source[cursor] === "{") {
-                    const valueEnd = findStructuredClosingIndex(source, cursor);
-                    if (valueEnd < 0) throw new Error(`字段 ${key} 的括号未闭合`);
-                    cursor = valueEnd + 1;
-                } else if (source[cursor] === '"' || source[cursor] === "'") {
-                    const valueEnd = findStructuredQuoteEnd(source, cursor);
-                    if (valueEnd < 0) throw new Error(`字段 ${key} 的字符串未闭合`);
-                    cursor = valueEnd + 1;
-                } else {
-                    while (cursor < source.length && !/[\s,]/.test(source[cursor])) cursor++;
-                }
-                record[key] = parseStructuredValue(source.slice(valueStart, cursor));
-            }
+            fields.forEach((field, index) => {
+                const nextStart = fields[index + 1]?.start ?? source.length;
+                const rawValue = source.slice(field.valueStart, nextStart).replace(/[\s,]+$/, "");
+                record[field.key] = parseStructuredValue(rawValue);
+            });
             return record;
         }
 
@@ -4068,8 +4072,7 @@ background-color: hsl(10 91% 56%);</pre>
                 return { rows, source: "标准 JSON" };
             } catch (jsonError) {
                 const objects = extractStructuredObjects(source);
-                if (!objects.length) throw new Error("未识别到对象数组，请检查花括号和字段格式");
-                const rows = objects.map(parseStructuredObject);
+                const rows = objects.length ? objects.map(parseStructuredObject) : [parseStructuredObject(source)];
                 if (!rows.some((row) => Object.keys(row).length)) throw new Error("未识别到可整理的字段");
                 return { rows, source: "对象文本" };
             }
