@@ -593,6 +593,97 @@
             font-family: inherit;
         }
 
+        .data-parser-tool {
+            display: grid;
+            gap: 16px;
+        }
+
+        .data-parser-input textarea {
+            min-height: 270px;
+        }
+
+        .data-parser-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 22px;
+            align-items: center;
+            min-height: 42px;
+            padding: 9px 12px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: #fbfcfe;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .data-parser-summary strong {
+            margin-left: 5px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .data-parser-table-wrap {
+            min-height: 280px;
+            max-height: 560px;
+            overflow: auto;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fbfcfe;
+            scrollbar-gutter: stable;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .data-parser-table-wrap.empty {
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            color: #98a2ad;
+            font-size: 14px;
+        }
+
+        .data-parser-table {
+            min-width: 100%;
+        }
+
+        .data-parser-table th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            white-space: nowrap;
+        }
+
+        .data-parser-table td {
+            min-width: 94px;
+            max-width: 280px;
+            white-space: pre-wrap;
+        }
+
+        .data-parser-table .data-parser-index {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            min-width: 54px;
+            width: 54px;
+            background: #f7fbff;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .data-parser-table th.data-parser-index {
+            z-index: 3;
+            background: #eef6ff;
+            color: #195f9f;
+        }
+
+        .data-parser-value-array {
+            color: #8c5c00;
+        }
+
+        .data-parser-value-bool {
+            color: #216e48;
+            font-weight: 700;
+        }
+
         .mini-tabs,
         .template-row {
             display: flex;
@@ -1456,6 +1547,26 @@
             border-color: #303b4b;
         }
 
+        body[data-theme="dark"] .data-parser-summary,
+        body[data-theme="dark"] .data-parser-table-wrap,
+        body[data-theme="dark"] .data-parser-table .data-parser-index {
+            background: #0f141b;
+            border-color: #303b4b;
+        }
+
+        body[data-theme="dark"] .data-parser-table th.data-parser-index {
+            background: rgba(88, 166, 255, 0.16);
+            color: #b8d9ff;
+        }
+
+        body[data-theme="dark"] .data-parser-value-array {
+            color: #fcd34d;
+        }
+
+        body[data-theme="dark"] .data-parser-value-bool {
+            color: #86efac;
+        }
+
         body[data-theme="dark"] .json-path-line {
             border-bottom-color: #222b38;
         }
@@ -1624,6 +1735,10 @@
             .color-group-grid,
             .color-readout-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .data-parser-summary {
+                gap: 8px 14px;
             }
         }
 
@@ -1820,6 +1935,36 @@
                     <button class="btn secondary" data-action="json-url-decode"><span class="btn-icon">%</span>URL 解码</button>
                     <button class="btn secondary" data-copy="jsonOutput"><span class="btn-icon">[]</span>复制</button>
                     <button class="btn danger" data-clear="jsonInput,jsonPathInput,jsonOutput,jsonPathTree"><span class="btn-icon">×</span>清空</button>
+                </div>
+            </div>
+
+            <div class="tool-panel" data-panel="dataParser">
+                <div class="data-parser-tool">
+                    <div class="field data-parser-input">
+                        <label for="dataParserInput">输入数据</label>
+                        <textarea id="dataParserInput" spellcheck="false" placeholder="支持 JSON，以及 [{ID:1 Type:4 Tags:[] Enabled:true} {ID:2 Type:1 Tags:[33] Enabled:false}] 这类对象数组"></textarea>
+                        <div class="option-row">
+                            <label class="check-pill" for="dataParserFormatTimestamp">
+                                <input id="dataParserFormatTimestamp" type="checkbox" checked> 自动转换 Ts / Timestamp 时间
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="data-parser-summary" id="dataParserSummary" aria-live="polite">
+                        <span>等待解析数据</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="dataParserOutput">整理结果</label>
+                        <div class="data-parser-table-wrap empty" id="dataParserOutput">整理后的表格会显示在这里</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn" type="button" data-action="data-parser-run"><span class="btn-icon">▦</span>一键整理</button>
+                    <button class="btn secondary" type="button" data-action="data-parser-copy-tsv"><span class="btn-icon">[]</span>复制表格</button>
+                    <button class="btn secondary" type="button" data-action="data-parser-copy-json"><span class="btn-icon">{}</span>复制 JSON</button>
+                    <button class="btn secondary" type="button" data-action="data-parser-download-csv"><span class="btn-icon">↓</span>导出 CSV</button>
+                    <button class="btn danger" type="button" data-action="data-parser-clear"><span class="btn-icon">×</span>清空</button>
                 </div>
             </div>
 
@@ -2333,6 +2478,7 @@ background-color: hsl(10 91% 56%);</pre>
             { id: "length", icon: "LEN", title: "字符串长度统计", desc: "统计字符、字节、行数和字符类型" },
             { id: "ip", icon: "IP", title: "IP工具", desc: "查询 IP、出口地址和地图位置" },
             { id: "timestamp", icon: "TIME", title: "Unix时间戳", desc: "秒、毫秒时间戳与日期互转" },
+            { id: "dataParser", icon: "DATA", title: "数据解析整理", desc: "将对象数组一键整理成清晰表格" },
             { id: "colorCode", icon: "CLR", title: "HTML颜色代码", desc: "HEX、RGB、HSL、OKLCH 与配色板" },
             { id: "uuid", icon: "UUID", title: "UUID生成", desc: "批量生成 v4 UUID" },
             { id: "regex", icon: ".*", title: "正则测试", desc: "测试表达式并查看匹配结果" },
@@ -2378,6 +2524,7 @@ background-color: hsl(10 91% 56%);</pre>
         };
         const mockCustomFields = [];
         let mockLastOutput = "";
+        let dataParserState = { rows: [], columns: [], timestampColumns: [], source: "" };
         let timestampTimer = null;
         const defaultColorHex = "#F54927";
         const colorToolState = {
@@ -2556,6 +2703,9 @@ background-color: hsl(10 91% 56%);</pre>
             }
             if (id === "colorCode") {
                 initColorTool();
+            }
+            if (id === "dataParser") {
+                resetDataParser();
             }
         }
 
@@ -3693,6 +3843,387 @@ background-color: hsl(10 91% 56%);</pre>
             ].join("\n");
         }
 
+        function findStructuredClosingIndex(text, start) {
+            const open = text[start];
+            const close = open === "[" ? "]" : "}";
+            let depth = 0;
+            let quote = "";
+            let escaped = false;
+
+            for (let index = start; index < text.length; index++) {
+                const char = text[index];
+                if (quote) {
+                    if (escaped) {
+                        escaped = false;
+                    } else if (char === "\\") {
+                        escaped = true;
+                    } else if (char === quote) {
+                        quote = "";
+                    }
+                    continue;
+                }
+                if (char === '"' || char === "'") {
+                    quote = char;
+                    continue;
+                }
+                if (char === open) depth++;
+                if (char === close) {
+                    depth--;
+                    if (depth === 0) return index;
+                }
+            }
+            return -1;
+        }
+
+        function findStructuredQuoteEnd(text, start) {
+            const quote = text[start];
+            let escaped = false;
+            for (let index = start + 1; index < text.length; index++) {
+                if (escaped) {
+                    escaped = false;
+                } else if (text[index] === "\\") {
+                    escaped = true;
+                } else if (text[index] === quote) {
+                    return index;
+                }
+            }
+            return -1;
+        }
+
+        function splitStructuredList(text) {
+            const values = [];
+            let start = 0;
+            let depth = 0;
+            let quote = "";
+            let escaped = false;
+
+            for (let index = 0; index < text.length; index++) {
+                const char = text[index];
+                if (quote) {
+                    if (escaped) {
+                        escaped = false;
+                    } else if (char === "\\") {
+                        escaped = true;
+                    } else if (char === quote) {
+                        quote = "";
+                    }
+                    continue;
+                }
+                if (char === '"' || char === "'") {
+                    quote = char;
+                } else if (char === "[" || char === "{") {
+                    depth++;
+                } else if (char === "]" || char === "}") {
+                    depth--;
+                } else if (char === "," && depth === 0) {
+                    values.push(text.slice(start, index).trim());
+                    start = index + 1;
+                }
+            }
+            const last = text.slice(start).trim();
+            if (last) values.push(last);
+            return values;
+        }
+
+        function parseStructuredValue(rawValue) {
+            const value = rawValue.trim();
+            if (!value) return "";
+            if (value === "true") return true;
+            if (value === "false") return false;
+            if (value === "nil" || value === "null") return null;
+            if (/^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(value)) return Number(value);
+            if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+                try {
+                    return value.startsWith('"') ? JSON.parse(value) : value.slice(1, -1).replace(/\\'/g, "'");
+                } catch (error) {
+                    return value.slice(1, -1);
+                }
+            }
+            if (value.startsWith("{") && value.endsWith("}")) return parseStructuredObject(value.slice(1, -1));
+            if (value.startsWith("[") && value.endsWith("]")) {
+                const inner = value.slice(1, -1).trim();
+                if (!inner) return [];
+                return splitStructuredList(inner).map(parseStructuredValue);
+            }
+            return value;
+        }
+
+        function parseStructuredObject(source) {
+            const record = {};
+            let cursor = 0;
+
+            while (cursor < source.length) {
+                while (cursor < source.length && /[\s,]/.test(source[cursor])) cursor++;
+                if (cursor >= source.length) break;
+
+                let key = "";
+                if (source[cursor] === '"' || source[cursor] === "'") {
+                    const keyEnd = findStructuredQuoteEnd(source, cursor);
+                    if (keyEnd < 0) throw new Error("字段名引号未闭合");
+                    key = parseStructuredValue(source.slice(cursor, keyEnd + 1));
+                    cursor = keyEnd + 1;
+                } else {
+                    const keyStart = cursor;
+                    while (cursor < source.length && /[A-Za-z0-9_$.-]/.test(source[cursor])) cursor++;
+                    key = source.slice(keyStart, cursor);
+                }
+                if (!key) throw new Error(`第 ${cursor + 1} 个字符附近缺少字段名`);
+
+                while (cursor < source.length && /\s/.test(source[cursor])) cursor++;
+                if (source[cursor] !== ":") throw new Error(`字段 ${key} 缺少冒号`);
+                cursor++;
+                while (cursor < source.length && /\s/.test(source[cursor])) cursor++;
+                if (cursor >= source.length) {
+                    record[key] = "";
+                    break;
+                }
+
+                const valueStart = cursor;
+                if (source[cursor] === "[" || source[cursor] === "{") {
+                    const valueEnd = findStructuredClosingIndex(source, cursor);
+                    if (valueEnd < 0) throw new Error(`字段 ${key} 的括号未闭合`);
+                    cursor = valueEnd + 1;
+                } else if (source[cursor] === '"' || source[cursor] === "'") {
+                    const valueEnd = findStructuredQuoteEnd(source, cursor);
+                    if (valueEnd < 0) throw new Error(`字段 ${key} 的字符串未闭合`);
+                    cursor = valueEnd + 1;
+                } else {
+                    while (cursor < source.length && !/[\s,]/.test(source[cursor])) cursor++;
+                }
+                record[key] = parseStructuredValue(source.slice(valueStart, cursor));
+            }
+            return record;
+        }
+
+        function extractStructuredObjects(source) {
+            const objects = [];
+            let start = -1;
+            let depth = 0;
+            let quote = "";
+            let escaped = false;
+
+            for (let index = 0; index < source.length; index++) {
+                const char = source[index];
+                if (quote) {
+                    if (escaped) {
+                        escaped = false;
+                    } else if (char === "\\") {
+                        escaped = true;
+                    } else if (char === quote) {
+                        quote = "";
+                    }
+                    continue;
+                }
+                if (char === '"' || char === "'") {
+                    quote = char;
+                } else if (char === "{") {
+                    if (depth === 0) start = index + 1;
+                    depth++;
+                } else if (char === "}") {
+                    depth--;
+                    if (depth < 0) throw new Error("存在未匹配的右花括号");
+                    if (depth === 0 && start >= 0) {
+                        objects.push(source.slice(start, index));
+                        start = -1;
+                    }
+                }
+            }
+            if (depth !== 0) throw new Error("对象花括号未闭合");
+            return objects;
+        }
+
+        function parseDataParserInput(source) {
+            try {
+                const parsed = JSON.parse(source);
+                const rows = Array.isArray(parsed) ? parsed : [parsed];
+                if (!rows.every((row) => row && typeof row === "object" && !Array.isArray(row))) {
+                    throw new Error("JSON 顶层需要是对象或对象数组");
+                }
+                return { rows, source: "标准 JSON" };
+            } catch (jsonError) {
+                const objects = extractStructuredObjects(source);
+                if (!objects.length) throw new Error("未识别到对象数组，请检查花括号和字段格式");
+                const rows = objects.map(parseStructuredObject);
+                if (!rows.some((row) => Object.keys(row).length)) throw new Error("未识别到可整理的字段");
+                return { rows, source: "对象文本" };
+            }
+        }
+
+        function isUnixTimestampField(column, rows) {
+            const normalized = String(column).replace(/[_-]/g, "").toLowerCase();
+            const candidates = ["ts", "timestamp", "time", "createdat", "updatedat", "createtime", "updatetime", "createdtime", "modifiedat"];
+            if (!candidates.includes(normalized)) return false;
+            return rows.some((row) => {
+                const value = Number(row[column]);
+                return Number.isFinite(value) && Math.abs(value) >= 946684800 && Math.abs(value) < 32503680000000;
+            });
+        }
+
+        function formatUnixTimestamp(value) {
+            const number = Number(value);
+            if (!Number.isFinite(number)) return "-";
+            const milliseconds = Math.abs(number) < 100000000000 ? number * 1000 : number;
+            const date = new Date(milliseconds);
+            return Number.isNaN(date.getTime()) ? "-" : formatDate(date);
+        }
+
+        function dataParserColumns() {
+            const rawColumns = dataParserState.columns.map((key) => ({ key, label: key }));
+            const timeColumns = dataParserState.timestampColumns.map((key) => ({ key: `__timestamp__${key}`, label: `${key}时间`, timestampOf: key }));
+            return [...rawColumns, ...timeColumns];
+        }
+
+        function dataParserCellValue(row, column) {
+            if (column.timestampOf) return formatUnixTimestamp(row[column.timestampOf]);
+            const value = row[column.key];
+            if (value === null || value === undefined) return "";
+            if (typeof value === "object") return JSON.stringify(value);
+            return String(value);
+        }
+
+        function dataParserCellClass(value) {
+            if (Array.isArray(value)) return "data-parser-value-array";
+            if (typeof value === "boolean") return "data-parser-value-bool";
+            return "";
+        }
+
+        function setDataParserEmpty(message) {
+            const output = document.getElementById("dataParserOutput");
+            output.textContent = message;
+            output.className = "data-parser-table-wrap empty";
+        }
+
+        function resetDataParser() {
+            dataParserState = { rows: [], columns: [], timestampColumns: [], source: "" };
+            const input = document.getElementById("dataParserInput");
+            const timestampCheck = document.getElementById("dataParserFormatTimestamp");
+            if (input) input.value = "";
+            if (timestampCheck) timestampCheck.checked = true;
+            const summary = document.getElementById("dataParserSummary");
+            if (summary) summary.textContent = "等待解析数据";
+            if (document.getElementById("dataParserOutput")) setDataParserEmpty("整理后的表格会显示在这里");
+        }
+
+        function renderDataParser() {
+            const output = document.getElementById("dataParserOutput");
+            const summary = document.getElementById("dataParserSummary");
+            const columns = dataParserColumns();
+            if (!dataParserState.rows.length || !columns.length) {
+                setDataParserEmpty("没有可展示的数据");
+                summary.textContent = "未解析到对象记录";
+                return;
+            }
+
+            summary.innerHTML = [
+                `<span>数据来源<strong>${escapeHtml(dataParserState.source)}</strong></span>`,
+                `<span>记录数<strong>${dataParserState.rows.length}</strong></span>`,
+                `<span>字段数<strong>${dataParserState.columns.length}${dataParserState.timestampColumns.length ? ` + ${dataParserState.timestampColumns.length} 个时间字段` : ""}</strong></span>`
+            ].join("");
+            output.className = "data-parser-table-wrap";
+            output.innerHTML = `
+                <table class="compact-table data-parser-table">
+                    <thead>
+                        <tr>
+                            <th class="data-parser-index">#</th>
+                            ${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${dataParserState.rows.map((row, index) => `
+                            <tr>
+                                <td class="data-parser-index">${index + 1}</td>
+                                ${columns.map((column) => {
+                                    const value = dataParserCellValue(row, column);
+                                    const className = column.timestampOf ? "" : dataParserCellClass(row[column.key]);
+                                    return `<td class="${className}" title="${escapeHtml(value)}">${escapeHtml(value)}</td>`;
+                                }).join("")}
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>`;
+        }
+
+        function dataParserDelimited(format) {
+            const columns = dataParserColumns();
+            const values = [columns.map((column) => column.label), ...dataParserState.rows.map((row) => columns.map((column) => dataParserCellValue(row, column)))];
+            if (format === "csv") {
+                return values.map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")).join("\n");
+            }
+            return values.map((row) => row.map((value) => String(value).replace(/[\t\r\n]/g, " ")).join("\t")).join("\n");
+        }
+
+        async function copyDataParserText(value, label) {
+            if (!dataParserState.rows.length) {
+                setStatus("请先整理数据", "warn");
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(value);
+                setStatus(`${label}已复制到剪贴板`, "ok");
+            } catch (error) {
+                setStatus("复制失败，请手动选择表格内容", "error");
+            }
+        }
+
+        function downloadDataParserCsv() {
+            if (!dataParserState.rows.length) {
+                setStatus("请先整理数据", "warn");
+                return;
+            }
+            const blob = new Blob(["\ufeff", dataParserDelimited("csv")], { type: "text/csv;charset=utf-8" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = `parsed-data-${Date.now()}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            setStatus("CSV 已导出", "ok");
+        }
+
+        async function handleDataParser(action) {
+            if (action === "data-parser-clear") {
+                resetDataParser();
+                setStatus("已清空", "ok");
+                return;
+            }
+            if (action === "data-parser-copy-tsv") {
+                await copyDataParserText(dataParserDelimited("tsv"), "表格");
+                return;
+            }
+            if (action === "data-parser-copy-json") {
+                await copyDataParserText(JSON.stringify(dataParserState.rows, null, 2), "JSON");
+                return;
+            }
+            if (action === "data-parser-download-csv") {
+                downloadDataParserCsv();
+                return;
+            }
+            if (!hasContent("dataParserInput")) {
+                setDataParserEmpty("请输入要整理的数据");
+                setStatus("请输入内容", "warn");
+                return;
+            }
+            try {
+                const result = parseDataParserInput(getValue("dataParserInput").trim());
+                const columns = [...new Set(result.rows.flatMap((row) => Object.keys(row)))];
+                dataParserState = {
+                    rows: result.rows,
+                    columns,
+                    timestampColumns: document.getElementById("dataParserFormatTimestamp").checked ? columns.filter((column) => isUnixTimestampField(column, result.rows)) : [],
+                    source: result.source
+                };
+                renderDataParser();
+                setStatus(`整理完成：${result.rows.length} 条记录，${columns.length} 个字段`, "ok");
+            } catch (error) {
+                dataParserState = { rows: [], columns: [], timestampColumns: [], source: "" };
+                setDataParserEmpty(`解析失败：${error.message}`);
+                document.getElementById("dataParserSummary").textContent = "请检查对象花括号、字段名和字段值";
+                setStatus("数据解析失败", "error");
+            }
+        }
+
         function parseRegexPattern(rawPattern, rawFlags) {
             const literal = rawPattern.match(/^\/([\s\S]*)\/([gimsuy]*)$/);
             if (literal) return { pattern: literal[1], flags: literal[2] };
@@ -4561,6 +5092,7 @@ background-color: hsl(10 91% 56%);</pre>
                     if (action === "length-count") handleLengthStats();
                     if (action.startsWith("ip-")) await handleIp(action);
                     if (action.startsWith("timestamp-")) handleTimestamp(action);
+                    if (action.startsWith("data-parser-")) await handleDataParser(action);
                     if (action.startsWith("color-")) await handleColor(action, actionButton.dataset.colorValue || "");
                     if (action === "uuid-generate") handleUuid();
                     if (action === "regex-test") handleRegex();
@@ -4593,6 +5125,13 @@ background-color: hsl(10 91% 56%);</pre>
             });
             document.querySelectorAll("[data-regex-flag]").forEach((box) => {
                 box.addEventListener("change", updateRegexFlagsFromChecks);
+            });
+            document.getElementById("dataParserFormatTimestamp").addEventListener("change", (event) => {
+                if (!dataParserState.rows.length) return;
+                dataParserState.timestampColumns = event.target.checked
+                    ? dataParserState.columns.filter((column) => isUnixTimestampField(column, dataParserState.rows))
+                    : [];
+                renderDataParser();
             });
             document.getElementById("colorNativeInput").addEventListener("input", (event) => {
                 applyColorHex(event.target.value, "颜色选择器已更新");
