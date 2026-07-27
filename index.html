@@ -684,6 +684,152 @@
             font-weight: 700;
         }
 
+        .calculator-tool {
+            width: min(100%, 680px);
+            margin: 0 auto;
+        }
+
+        .calculator-shell {
+            padding: 18px;
+            border: 1px solid #d8dee6;
+            border-radius: 8px;
+            background: #f5f7fa;
+            box-shadow: 0 12px 28px rgba(30, 50, 74, 0.08);
+        }
+
+        .calculator-display {
+            min-height: 154px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: stretch;
+            gap: 10px;
+            padding: 16px 18px;
+            border: 1px solid #d8dee6;
+            border-radius: 6px;
+            background: #fff;
+            text-align: right;
+            overflow: hidden;
+        }
+
+        .calculator-expression,
+        .calculator-result {
+            overflow-x: auto;
+            scrollbar-width: none;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .calculator-expression::-webkit-scrollbar,
+        .calculator-result::-webkit-scrollbar {
+            display: none;
+        }
+
+        .calculator-expression {
+            min-height: 28px;
+            color: var(--muted);
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 18px;
+        }
+
+        .calculator-expression.empty {
+            color: #a6afb9;
+        }
+
+        .calculator-result {
+            min-height: 56px;
+            color: var(--text);
+            font-size: 44px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .calculator-result.error {
+            color: var(--red);
+            font-size: 28px;
+            line-height: 1.8;
+        }
+
+        .calculator-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .calculator-icon-key,
+        .calculator-key {
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
+        }
+
+        .calculator-icon-key {
+            width: 38px;
+            height: 34px;
+            border-radius: 6px;
+            background: #e9eef4;
+            color: #344051;
+            font-size: 17px;
+        }
+
+        .calculator-key-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .calculator-key {
+            min-height: 62px;
+            border-radius: 6px;
+            background: #fff;
+            color: #2f343b;
+            box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
+            font-size: 22px;
+        }
+
+        .calculator-key:hover,
+        .calculator-key:focus-visible,
+        .calculator-icon-key:hover,
+        .calculator-icon-key:focus-visible {
+            border-color: #9dccfb;
+            background: var(--blue-soft);
+            color: var(--blue-dark);
+            outline: none;
+        }
+
+        .calculator-key:active,
+        .calculator-icon-key:active {
+            transform: translateY(1px);
+        }
+
+        .calculator-key.function {
+            background: #e9eef4;
+            color: #344051;
+        }
+
+        .calculator-key.operator {
+            background: #e8f4ff;
+            color: var(--blue-dark);
+        }
+
+        .calculator-key.equals {
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .calculator-key.equals:hover,
+        .calculator-key.equals:focus-visible {
+            background: var(--blue-dark);
+            border-color: var(--blue-dark);
+            color: #fff;
+        }
+
+        .calculator-key.zero {
+            grid-column: span 2;
+        }
+
         .mini-tabs,
         .template-row {
             display: flex;
@@ -1413,6 +1559,30 @@
             background: #0f141b;
         }
 
+        body[data-theme="dark"] .calculator-shell {
+            border-color: #303b4b;
+            background: #101720;
+            box-shadow: none;
+        }
+
+        body[data-theme="dark"] .calculator-display,
+        body[data-theme="dark"] .calculator-key {
+            border-color: #303b4b;
+            background: #0f141b;
+            color: var(--text);
+        }
+
+        body[data-theme="dark"] .calculator-key.function,
+        body[data-theme="dark"] .calculator-icon-key {
+            background: #1c2530;
+            color: #d8e1eb;
+        }
+
+        body[data-theme="dark"] .calculator-key.operator {
+            background: rgba(88, 166, 255, 0.16);
+            color: #b8d9ff;
+        }
+
         body[data-theme="dark"] .theme-toggle {
             border-color: var(--blue);
             background: var(--blue);
@@ -1971,6 +2141,47 @@
                 </div>
             </div>
 
+            <div class="tool-panel" data-panel="calculator">
+                <div class="calculator-tool">
+                    <div class="calculator-shell">
+                        <div class="calculator-display" aria-live="polite">
+                            <div class="calculator-expression empty" id="calculatorExpression">0</div>
+                            <div class="calculator-result" id="calculatorResult">0</div>
+                        </div>
+                        <div class="calculator-toolbar" aria-label="计算器辅助按键">
+                            <button class="calculator-icon-key" type="button" data-calculator-value="(" title="左括号" aria-label="左括号">(</button>
+                            <button class="calculator-icon-key" type="button" data-calculator-value=")" title="右括号" aria-label="右括号">)</button>
+                            <button class="calculator-icon-key" type="button" data-calculator-action="backspace" title="退格" aria-label="退格">⌫</button>
+                        </div>
+                        <div class="calculator-key-grid" aria-label="计算器按键">
+                            <button class="calculator-key function" type="button" data-calculator-action="clear">C</button>
+                            <button class="calculator-key function" type="button" data-calculator-action="sign">±</button>
+                            <button class="calculator-key function" type="button" data-calculator-action="percent">%</button>
+                            <button class="calculator-key operator" type="button" data-calculator-value="÷">÷</button>
+                            <button class="calculator-key" type="button" data-calculator-value="7">7</button>
+                            <button class="calculator-key" type="button" data-calculator-value="8">8</button>
+                            <button class="calculator-key" type="button" data-calculator-value="9">9</button>
+                            <button class="calculator-key operator" type="button" data-calculator-value="×">×</button>
+                            <button class="calculator-key" type="button" data-calculator-value="4">4</button>
+                            <button class="calculator-key" type="button" data-calculator-value="5">5</button>
+                            <button class="calculator-key" type="button" data-calculator-value="6">6</button>
+                            <button class="calculator-key operator" type="button" data-calculator-value="-">−</button>
+                            <button class="calculator-key" type="button" data-calculator-value="1">1</button>
+                            <button class="calculator-key" type="button" data-calculator-value="2">2</button>
+                            <button class="calculator-key" type="button" data-calculator-value="3">3</button>
+                            <button class="calculator-key operator" type="button" data-calculator-value="+">+</button>
+                            <button class="calculator-key zero" type="button" data-calculator-value="0">0</button>
+                            <button class="calculator-key" type="button" data-calculator-value=".">.</button>
+                            <button class="calculator-key equals" type="button" data-calculator-action="evaluate">=</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn secondary" type="button" data-copy="calculatorResult"><span class="btn-icon">[]</span>复制结果</button>
+                    <button class="btn danger" type="button" data-calculator-action="clear"><span class="btn-icon">×</span>清空</button>
+                </div>
+            </div>
+
             <div class="tool-panel" data-panel="url">
                 <div class="two-cols">
                     <div class="field">
@@ -2482,6 +2693,7 @@ background-color: hsl(10 91% 56%);</pre>
             { id: "ip", icon: "IP", title: "IP工具", desc: "查询 IP、出口地址和地图位置" },
             { id: "timestamp", icon: "TIME", title: "Unix时间戳", desc: "秒、毫秒时间戳与日期互转" },
             { id: "dataParser", icon: "DATA", title: "数据解析整理", desc: "将对象数组一键整理成清晰表格" },
+            { id: "calculator", icon: "CALC", title: "在线计算器", desc: "支持四则运算、百分比与括号计算" },
             { id: "colorCode", icon: "CLR", title: "HTML颜色代码", desc: "HEX、RGB、HSL、OKLCH 与配色板" },
             { id: "uuid", icon: "UUID", title: "UUID生成", desc: "批量生成 v4 UUID" },
             { id: "regex", icon: ".*", title: "正则测试", desc: "测试表达式并查看匹配结果" },
@@ -2528,6 +2740,7 @@ background-color: hsl(10 91% 56%);</pre>
         const mockCustomFields = [];
         let mockLastOutput = "";
         let dataParserState = { rawRows: [], rows: [], columns: [], timestampColumns: [], source: "" };
+        let calculatorState = { expression: "", result: "0", error: false, justEvaluated: false };
         let timestampTimer = null;
         const defaultColorHex = "#F54927";
         const colorToolState = {
@@ -2709,6 +2922,9 @@ background-color: hsl(10 91% 56%);</pre>
             }
             if (id === "dataParser") {
                 resetDataParser();
+            }
+            if (id === "calculator") {
+                initCalculator();
             }
         }
 
@@ -3891,6 +4107,153 @@ background-color: hsl(10 91% 56%);</pre>
                 }
             }
             return -1;
+        }
+
+        function calculatorFormatNumber(value) {
+            if (!Number.isFinite(value)) throw new Error("结果超出可计算范围");
+            const normalized = Math.abs(value) < 1e-12 ? 0 : Number(value.toPrecision(12));
+            return String(normalized);
+        }
+
+        function calculatorEvaluate(expression) {
+            const normalized = expression
+                .replace(/×/g, "*")
+                .replace(/÷/g, "/")
+                .replace(/−/g, "-")
+                .replace(/(\d+(?:\.\d+)?)%/g, "($1/100)");
+            if (!normalized || !/^[0-9+\-*/().\s]+$/.test(normalized)) {
+                throw new Error("表达式无效");
+            }
+            const balance = [...normalized].reduce((total, char) => total + (char === "(" ? 1 : char === ")" ? -1 : 0), 0);
+            if (balance !== 0 || /[+\-*/.]\s*$/.test(normalized)) throw new Error("表达式未完成");
+            const value = Function(`"use strict"; return (${normalized});`)();
+            return calculatorFormatNumber(value);
+        }
+
+        function calculatorPreview() {
+            const expression = calculatorState.expression;
+            if (!expression || expression === "-") return "0";
+            const completed = expression.replace(/[+×÷-]$/, "");
+            if (!completed || completed === "-") return "0";
+            try {
+                return calculatorEvaluate(completed);
+            } catch (error) {
+                return calculatorState.result || "0";
+            }
+        }
+
+        function renderCalculator() {
+            const expression = document.getElementById("calculatorExpression");
+            const result = document.getElementById("calculatorResult");
+            if (!expression || !result) return;
+            expression.textContent = calculatorState.expression || "0";
+            expression.classList.toggle("empty", !calculatorState.expression);
+            result.textContent = calculatorState.error ? "无法计算" : calculatorPreview();
+            result.classList.toggle("error", calculatorState.error);
+            expression.scrollLeft = expression.scrollWidth;
+            result.scrollLeft = result.scrollWidth;
+        }
+
+        function initCalculator() {
+            calculatorState = { expression: "", result: "0", error: false, justEvaluated: false };
+            renderCalculator();
+        }
+
+        function insertCalculatorValue(rawValue) {
+            let value = rawValue === "*" ? "×" : rawValue === "/" ? "÷" : rawValue;
+            let expression = calculatorState.expression;
+            const isDigit = /^\d$/.test(value);
+            const isOperator = ["+", "-", "×", "÷"].includes(value);
+
+            if (calculatorState.justEvaluated && (isDigit || value === "." || value === "(")) {
+                expression = "";
+            }
+            calculatorState.justEvaluated = false;
+            calculatorState.error = false;
+
+            if (isDigit) {
+                calculatorState.expression = expression + value;
+            } else if (value === ".") {
+                const currentNumber = expression.split(/[+\-×÷()]/).pop();
+                if (currentNumber.includes(".")) return;
+                calculatorState.expression = expression + (currentNumber ? "." : "0.");
+            } else if (isOperator) {
+                if (!expression) {
+                    if (value === "-") calculatorState.expression = value;
+                    else return;
+                } else if (/[+\-×÷]$/.test(expression)) {
+                    calculatorState.expression = expression.slice(0, -1) + value;
+                } else if (expression.endsWith("(")) {
+                    if (value === "-") calculatorState.expression = expression + value;
+                    else return;
+                } else {
+                    calculatorState.expression = expression + value;
+                }
+            } else if (value === "(") {
+                calculatorState.expression = expression && /[\d)%]/.test(expression.at(-1)) ? `${expression}×(` : `${expression}(`;
+            } else if (value === ")") {
+                const opened = [...expression].filter((char) => char === "(").length;
+                const closed = [...expression].filter((char) => char === ")").length;
+                if (opened > closed && /[\d)%]/.test(expression.at(-1))) calculatorState.expression = expression + ")";
+            }
+            renderCalculator();
+        }
+
+        function handleCalculatorAction(action) {
+            if (action === "clear") {
+                initCalculator();
+                setStatus("计算器已清空", "ok");
+                return;
+            }
+            if (action === "backspace") {
+                calculatorState.expression = calculatorState.expression.slice(0, -1);
+                calculatorState.justEvaluated = false;
+                calculatorState.error = false;
+                renderCalculator();
+                return;
+            }
+            if (action === "percent") {
+                if (/\d$/.test(calculatorState.expression)) {
+                    calculatorState.expression += "%";
+                    calculatorState.justEvaluated = false;
+                    calculatorState.error = false;
+                    renderCalculator();
+                }
+                return;
+            }
+            if (action === "sign") {
+                const match = calculatorState.expression.match(/(\d*\.?\d+%?)$/);
+                if (!match) {
+                    if (!calculatorState.expression) calculatorState.expression = "-";
+                } else {
+                    const number = match[0];
+                    const before = calculatorState.expression.slice(0, -number.length);
+                    if (!before) {
+                        calculatorState.expression = `-${number}`;
+                    } else if (before.endsWith("-") && (before.length === 1 || /[+×÷(]/.test(before.at(-2)))) {
+                        calculatorState.expression = before.slice(0, -1) + number;
+                    } else {
+                        calculatorState.expression = `${before}(-${number})`;
+                    }
+                }
+                calculatorState.justEvaluated = false;
+                calculatorState.error = false;
+                renderCalculator();
+                return;
+            }
+            if (action === "evaluate") {
+                try {
+                    const result = calculatorEvaluate(calculatorState.expression);
+                    calculatorState = { expression: result, result, error: false, justEvaluated: true };
+                    renderCalculator();
+                    setStatus(`计算结果：${result}`, "ok");
+                } catch (error) {
+                    calculatorState.error = true;
+                    calculatorState.justEvaluated = false;
+                    renderCalculator();
+                    setStatus(error.message || "表达式无效", "error");
+                }
+            }
         }
 
         function splitStructuredList(text) {
@@ -5150,6 +5513,18 @@ background-color: hsl(10 91% 56%);</pre>
                 const copyButton = event.target.closest("[data-copy]");
                 const clearButton = event.target.closest("[data-clear]");
                 const jsonPathButton = event.target.closest("[data-json-path]");
+                const calculatorValueButton = event.target.closest("[data-calculator-value]");
+                const calculatorActionButton = event.target.closest("[data-calculator-action]");
+
+                if (calculatorValueButton) {
+                    insertCalculatorValue(calculatorValueButton.dataset.calculatorValue);
+                    return;
+                }
+
+                if (calculatorActionButton) {
+                    handleCalculatorAction(calculatorActionButton.dataset.calculatorAction);
+                    return;
+                }
 
                 if (jsonPathButton) {
                     if (!hasContent("jsonInput")) {
@@ -5260,6 +5635,34 @@ background-color: hsl(10 91% 56%);</pre>
             document.querySelectorAll("[data-mock-template]").forEach((template) => {
                 template.addEventListener("click", () => loadMockTemplate(template.dataset.mockTemplate));
             });
+            document.addEventListener("keydown", (event) => {
+                if (!document.querySelector('[data-panel="calculator"]')?.classList.contains("active")) return;
+                if (event.ctrlKey || event.metaKey || event.altKey) return;
+                if (/^\d$/.test(event.key) || ["+", "-", "−", "*", "/", "×", "÷", ".", "(", ")"].includes(event.key)) {
+                    event.preventDefault();
+                    insertCalculatorValue(event.key);
+                    return;
+                }
+                if (event.key === "%") {
+                    event.preventDefault();
+                    handleCalculatorAction("percent");
+                    return;
+                }
+                if (event.key === "Enter" || event.key === "=") {
+                    event.preventDefault();
+                    handleCalculatorAction("evaluate");
+                    return;
+                }
+                if (event.key === "Backspace") {
+                    event.preventDefault();
+                    handleCalculatorAction("backspace");
+                    return;
+                }
+                if (event.key === "Escape" || event.key === "Delete") {
+                    event.preventDefault();
+                    handleCalculatorAction("clear");
+                }
+            });
         }
 
         applyTheme(preferredTheme());
@@ -5269,6 +5672,7 @@ background-color: hsl(10 91% 56%);</pre>
         initMockFields();
         initTimestampTool();
         initColorTool();
+        initCalculator();
         startTimestampClock(true);
         renderMockCustomList();
         bindEvents();
