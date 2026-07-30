@@ -2073,7 +2073,7 @@
                         <div class="form-grid">
                             <div class="field full">
                                 <label for="jsonPathInput">JSONPath 提取</label>
-                                <input id="jsonPathInput" type="text" value="$" placeholder="例如：$.data.items[*].name、$..name">
+                                <input id="jsonPathInput" type="text" value="$" placeholder="例如：$.data.list.id、$.data.items[*].name、$..name">
                                 <div class="option-row">
                                     <label class="check-pill" for="jsonAutoDecode">
                                         <input id="jsonAutoDecode" type="checkbox"> 自动解码
@@ -3976,6 +3976,10 @@ background-color: hsl(10 91% 56%);</pre>
                 if (!prop) return;
                 const key = prop[1];
                 const rest = prop[2];
+                if (Array.isArray(value)) {
+                    value.forEach((item, index) => walk(item, expression, `${currentPath}[${index}]`));
+                    return;
+                }
                 if (key === "*") {
                     if (value && typeof value === "object") {
                         Object.entries(value).forEach(([childKey, childValue]) => {
@@ -5577,6 +5581,22 @@ background-color: hsl(10 91% 56%);</pre>
             });
             document.getElementById("regexSearch").addEventListener("input", (event) => {
                 filterRegexPresets(event.target.value);
+            });
+            document.getElementById("jsonPathInput").addEventListener("keydown", (event) => {
+                if (event.key !== "Enter") return;
+                event.preventDefault();
+                if (!hasContent("jsonInput")) {
+                    showInputRequired("jsonOutput");
+                    return;
+                }
+                try {
+                    const parsed = parseJsonInput();
+                    renderJsonPathTree(parsed);
+                    runJsonPathExtraction(parsed, event.currentTarget.value);
+                } catch (error) {
+                    setOutput("jsonOutput", `JSON 校验失败: ${error.message}`);
+                    setStatus("JSON 校验失败", "error");
+                }
             });
             document.getElementById("regexFlags").addEventListener("input", (event) => {
                 syncRegexFlagChecks(event.target.value);
