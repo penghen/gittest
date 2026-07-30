@@ -4004,7 +4004,7 @@ background-color: hsl(10 91% 56%);</pre>
             const valueSummary = results.length === 1 ? results[0].value : results.map((item) => item.value);
             return [
                 "Value 汇总",
-                JSON.stringify(valueSummary, null, 2),
+                JSON.stringify(valueSummary),
                 "",
                 `找到 ${results.length} 个结果`,
                 "",
