@@ -4695,6 +4695,22 @@ background-color: hsl(10 91% 56%);</pre>
             document.getElementById("regexFlags").value = flags;
         }
 
+        function escapeRegexLiteral(value) {
+            return value
+                .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+                .replace(/\r/g, "\\r")
+                .replace(/\n/g, "\\n")
+                .replace(/\t/g, "\\t");
+        }
+
+        function generateRegexFromSelectedText() {
+            const input = document.getElementById("regexInput");
+            const selectedText = input.value.slice(input.selectionStart, input.selectionEnd);
+            if (!selectedText) return;
+            document.getElementById("regexPattern").value = escapeRegexLiteral(selectedText);
+            handleRegex();
+        }
+
         function applyRegexPreset(key) {
             const preset = regexPresets.find((item) => item.key === key);
             if (!preset) return;
@@ -5586,6 +5602,7 @@ background-color: hsl(10 91% 56%);</pre>
             document.getElementById("regexSearch").addEventListener("input", (event) => {
                 filterRegexPresets(event.target.value);
             });
+            document.getElementById("regexInput").addEventListener("select", generateRegexFromSelectedText);
             document.getElementById("jsonPathInput").addEventListener("keydown", (event) => {
                 if (event.key !== "Enter") return;
                 event.preventDefault();
