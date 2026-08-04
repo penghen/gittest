@@ -684,6 +684,32 @@
             font-weight: 700;
         }
 
+        .data-parser-filter {
+            display: grid;
+            gap: 10px;
+            margin-top: 12px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: #fbfcfe;
+        }
+
+        .data-parser-filter-form {
+            display: grid;
+            grid-template-columns: minmax(150px, 0.55fr) minmax(180px, 0.8fr) auto auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .data-parser-filter-form .field {
+            gap: 6px;
+        }
+
+        .data-parser-filter-status {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
         .calculator-tool {
             width: min(100%, 680px);
             margin: 0 auto;
@@ -1719,7 +1745,8 @@
 
         body[data-theme="dark"] .data-parser-summary,
         body[data-theme="dark"] .data-parser-table-wrap,
-        body[data-theme="dark"] .data-parser-table .data-parser-index {
+        body[data-theme="dark"] .data-parser-table .data-parser-index,
+        body[data-theme="dark"] .data-parser-filter {
             background: #0f141b;
             border-color: #303b4b;
         }
@@ -1957,7 +1984,8 @@
             .timestamp-parts-action,
             .form-grid,
             .field-check-grid,
-            .custom-field-row {
+            .custom-field-row,
+            .data-parser-filter-form {
                 grid-template-columns: 1fr;
             }
 
@@ -2130,6 +2158,21 @@
                     <div class="field">
                         <label for="dataParserOutput">整理结果</label>
                         <div class="data-parser-table-wrap empty" id="dataParserOutput">整理后的表格会显示在这里</div>
+                        <div class="data-parser-filter" id="dataParserFilter" hidden>
+                            <div class="data-parser-filter-form">
+                                <div class="field">
+                                    <label for="dataParserHideColumn">隐藏列</label>
+                                    <select id="dataParserHideColumn"></select>
+                                </div>
+                                <div class="field">
+                                    <label for="dataParserHideValue">等于</label>
+                                    <input id="dataParserHideValue" type="text" placeholder="例如：4">
+                                </div>
+                                <button class="btn secondary" type="button" data-action="data-parser-hide"><span class="btn-icon">−</span>隐藏匹配行</button>
+                                <button class="btn secondary" type="button" data-action="data-parser-show-all"><span class="btn-icon">↺</span>恢复全部</button>
+                            </div>
+                            <div class="data-parser-filter-status" id="dataParserFilterStatus"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="actions">
@@ -2739,7 +2782,7 @@ background-color: hsl(10 91% 56%);</pre>
         };
         const mockCustomFields = [];
         let mockLastOutput = "";
-        let dataParserState = { rawRows: [], rows: [], columns: [], timestampColumns: [], source: "" };
+        let dataParserState = { rawRows: [], rows: [], columns: [], timestampColumns: [], hiddenConditions: [], source: "" };
         let calculatorState = { expression: "", result: "0", error: false, justEvaluated: false };
         let timestampTimer = null;
         const defaultColorHex = "#F54927";
@@ -4488,7 +4531,7 @@ background-color: hsl(10 91% 56%);</pre>
             return rows.flatMap((row) => flattenDataParserValue(row, ""));
         }
 
-        function refreshDataParserState(rawRows = dataParserState.rawRows, source = dataParserState.source) {
+        function refreshDataParserState(rawRows = dataParserState.rawRows, source = dataParserState.source, hiddenConditions = dataParserState.hiddenConditions || []) {
             const expandJson = document.getElementById("dataParserExpandJson")?.checked;
             const rows = expandJson ? expandDataParserRows(rawRows) : rawRows;
             const columns = [...new Set(rows.flatMap((row) => Object.keys(row)))];
@@ -4499,6 +4542,7 @@ background-color: hsl(10 91% 56%);</pre>
                 timestampColumns: document.getElementById("dataParserFormatTimestamp")?.checked
                     ? columns.filter((column) => isUnixTimestampField(column, rows))
                     : [],
+                hiddenConditions: hiddenConditions.filter((condition) => columns.includes(condition.column)),
                 source
             };
         }
@@ -4552,16 +4596,84 @@ background-color: hsl(10 91% 56%);</pre>
         }
 
         function resetDataParser() {
-            dataParserState = { rawRows: [], rows: [], columns: [], timestampColumns: [], source: "" };
+            dataParserState = { rawRows: [], rows: [], columns: [], timestampColumns: [], hiddenConditions: [], source: "" };
             const input = document.getElementById("dataParserInput");
             const timestampCheck = document.getElementById("dataParserFormatTimestamp");
             const expandJsonCheck = document.getElementById("dataParserExpandJson");
+            const hideValueInput = document.getElementById("dataParserHideValue");
             if (input) input.value = "";
             if (timestampCheck) timestampCheck.checked = true;
             if (expandJsonCheck) expandJsonCheck.checked = true;
+            if (hideValueInput) hideValueInput.value = "";
             const summary = document.getElementById("dataParserSummary");
             if (summary) summary.textContent = "等待解析数据";
             if (document.getElementById("dataParserOutput")) setDataParserEmpty("整理后的表格会显示在这里");
+            renderDataParserFilter();
+        }
+
+        function dataParserRowMatchesCondition(row, condition) {
+            return dataParserCellValue(row, { key: condition.column }) === condition.value;
+        }
+
+        function getVisibleDataParserEntries() {
+            return dataParserState.rows.map((row, index) => ({ row, index })).filter(({ row }) => (
+                !dataParserState.hiddenConditions.some((condition) => dataParserRowMatchesCondition(row, condition))
+            ));
+        }
+
+        function renderDataParserFilter() {
+            const filter = document.getElementById("dataParserFilter");
+            const columnSelect = document.getElementById("dataParserHideColumn");
+            const status = document.getElementById("dataParserFilterStatus");
+            if (!filter || !columnSelect || !status) return;
+            const columns = dataParserState.columns;
+            filter.hidden = !columns.length;
+            if (!columns.length) {
+                columnSelect.innerHTML = "";
+                status.textContent = "";
+                return;
+            }
+
+            const previousValue = columnSelect.value;
+            columnSelect.innerHTML = columns.map((column) => (
+                `<option value="${escapeHtml(column)}">${escapeHtml(formatDataParserColumnLabel(column))}</option>`
+            )).join("");
+            columnSelect.value = columns.includes(previousValue) ? previousValue : columns[0];
+            const conditions = dataParserState.hiddenConditions;
+            status.textContent = conditions.length
+                ? `已隐藏条件：${conditions.map((condition) => `${formatDataParserColumnLabel(condition.column)} = ${condition.value}`).join("；")}`
+                : "未设置隐藏条件";
+        }
+
+        function addDataParserHideCondition() {
+            if (!dataParserState.rows.length) {
+                setStatus("请先整理数据", "warn");
+                return;
+            }
+            const column = document.getElementById("dataParserHideColumn").value;
+            const value = document.getElementById("dataParserHideValue").value.trim();
+            if (!column || !value) {
+                setStatus("请选择列并输入要隐藏的值", "warn");
+                return;
+            }
+            if (dataParserState.hiddenConditions.some((condition) => condition.column === column && condition.value === value)) {
+                setStatus("该隐藏条件已生效", "warn");
+                return;
+            }
+            const matchedCount = dataParserState.rows.filter((row) => dataParserRowMatchesCondition(row, { column, value })).length;
+            dataParserState.hiddenConditions.push({ column, value });
+            renderDataParser();
+            setStatus(`已隐藏 ${matchedCount} 条 ${formatDataParserColumnLabel(column)} = ${value} 的记录`, matchedCount ? "ok" : "warn");
+        }
+
+        function clearDataParserHideConditions() {
+            if (!dataParserState.hiddenConditions.length) {
+                setStatus("当前没有隐藏条件", "warn");
+                return;
+            }
+            dataParserState.hiddenConditions = [];
+            renderDataParser();
+            setStatus("已恢复全部记录", "ok");
         }
 
         function renderDataParser() {
@@ -4571,12 +4683,16 @@ background-color: hsl(10 91% 56%);</pre>
             if (!dataParserState.rows.length || !columns.length) {
                 setDataParserEmpty("没有可展示的数据");
                 summary.textContent = "未解析到对象记录";
+                renderDataParserFilter();
                 return;
             }
 
+            const visibleEntries = getVisibleDataParserEntries();
+            renderDataParserFilter();
+
             summary.innerHTML = [
                 `<span>数据来源<strong>${escapeHtml(dataParserState.source)}</strong></span>`,
-                `<span>记录数<strong>${dataParserState.rows.length}</strong></span>`,
+                `<span>记录数<strong>${visibleEntries.length}${visibleEntries.length !== dataParserState.rows.length ? ` / ${dataParserState.rows.length}` : ""}</strong></span>`,
                 `<span>字段数<strong>${dataParserState.columns.length}${dataParserState.timestampColumns.length ? ` + ${dataParserState.timestampColumns.length} 个时间字段` : ""}</strong></span>`
             ].join("");
             output.className = "data-parser-table-wrap";
@@ -4589,7 +4705,7 @@ background-color: hsl(10 91% 56%);</pre>
                         </tr>
                     </thead>
                     <tbody>
-                        ${dataParserState.rows.map((row, index) => `
+                        ${visibleEntries.length ? visibleEntries.map(({ row, index }) => `
                             <tr>
                                 <td class="data-parser-index">${index + 1}</td>
                                 ${columns.map((column) => {
@@ -4598,14 +4714,15 @@ background-color: hsl(10 91% 56%);</pre>
                                     return `<td class="${className}" title="${escapeHtml(value)}">${escapeHtml(value)}</td>`;
                                 }).join("")}
                             </tr>
-                        `).join("")}
+                        `).join("") : `<tr><td colspan="${columns.length + 1}">当前隐藏条件已隐藏全部记录</td></tr>`}
                     </tbody>
                 </table>`;
         }
 
         function dataParserDelimited(format) {
             const columns = dataParserColumns();
-            const values = [columns.map((column) => column.label), ...dataParserState.rows.map((row) => columns.map((column) => dataParserCellValue(row, column)))];
+            const rows = getVisibleDataParserEntries().map(({ row }) => row);
+            const values = [columns.map((column) => column.label), ...rows.map((row) => columns.map((column) => dataParserCellValue(row, column)))];
             if (format === "csv") {
                 return values.map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")).join("\n");
             }
@@ -4613,8 +4730,8 @@ background-color: hsl(10 91% 56%);</pre>
         }
 
         async function copyDataParserText(value, label) {
-            if (!dataParserState.rows.length) {
-                setStatus("请先整理数据", "warn");
+            if (!getVisibleDataParserEntries().length) {
+                setStatus("当前没有可复制的记录", "warn");
                 return;
             }
             try {
@@ -4626,8 +4743,8 @@ background-color: hsl(10 91% 56%);</pre>
         }
 
         function downloadDataParserCsv() {
-            if (!dataParserState.rows.length) {
-                setStatus("请先整理数据", "warn");
+            if (!getVisibleDataParserEntries().length) {
+                setStatus("当前没有可导出的记录", "warn");
                 return;
             }
             const blob = new Blob(["\ufeff", dataParserDelimited("csv")], { type: "text/csv;charset=utf-8" });
@@ -4653,11 +4770,19 @@ background-color: hsl(10 91% 56%);</pre>
                 return;
             }
             if (action === "data-parser-copy-json") {
-                await copyDataParserText(JSON.stringify(dataParserState.rows, null, 2), "JSON");
+                await copyDataParserText(JSON.stringify(getVisibleDataParserEntries().map(({ row }) => row), null, 2), "JSON");
                 return;
             }
             if (action === "data-parser-download-csv") {
                 downloadDataParserCsv();
+                return;
+            }
+            if (action === "data-parser-hide") {
+                addDataParserHideCondition();
+                return;
+            }
+            if (action === "data-parser-show-all") {
+                clearDataParserHideConditions();
                 return;
             }
             if (!hasContent("dataParserInput")) {
@@ -4667,11 +4792,11 @@ background-color: hsl(10 91% 56%);</pre>
             }
             try {
                 const result = parseDataParserInput(getValue("dataParserInput").trim());
-                refreshDataParserState(result.rows, result.source);
+                refreshDataParserState(result.rows, result.source, []);
                 renderDataParser();
                 setStatus(`整理完成：${dataParserState.rows.length} 条记录，${dataParserState.columns.length} 个字段`, "ok");
             } catch (error) {
-                dataParserState = { rawRows: [], rows: [], columns: [], timestampColumns: [], source: "" };
+                dataParserState = { rawRows: [], rows: [], columns: [], timestampColumns: [], hiddenConditions: [], source: "" };
                 setDataParserEmpty(`解析失败：${error.message}`);
                 document.getElementById("dataParserSummary").textContent = "请检查对象花括号、字段名和字段值";
                 setStatus("数据解析失败", "error");
