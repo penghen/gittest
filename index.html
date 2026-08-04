@@ -692,7 +692,7 @@
 
         .data-parser-filter-form {
             display: grid;
-            grid-template-columns: minmax(150px, 0.55fr) minmax(180px, 0.8fr) auto auto;
+            grid-template-columns: minmax(130px, 0.45fr) 120px minmax(180px, 0.8fr) auto auto;
             gap: 10px;
             align-items: end;
         }
@@ -2208,8 +2208,15 @@
                                     <select id="dataParserHideColumn"></select>
                                 </div>
                                 <div class="field">
+                                    <label for="dataParserHideMatchMode">匹配方式</label>
+                                    <select id="dataParserHideMatchMode">
+                                        <option value="exact">完全匹配</option>
+                                        <option value="contains">包含匹配</option>
+                                    </select>
+                                </div>
+                                <div class="field">
                                     <label for="dataParserHideValue">等于</label>
-                                    <input id="dataParserHideValue" type="text" placeholder="例如：4">
+                                    <input id="dataParserHideValue" type="text" placeholder="多个值用逗号或换行分隔，例如：4,我的,nide">
                                 </div>
                                 <button class="btn secondary" type="button" data-action="data-parser-hide"><span class="btn-icon">+</span>增加隐藏条件</button>
                                 <button class="btn secondary" type="button" data-action="data-parser-show-all"><span class="btn-icon">↺</span>恢复全部</button>
@@ -2220,8 +2227,15 @@
                                     <select id="dataParserShowColumn"></select>
                                 </div>
                                 <div class="field">
+                                    <label for="dataParserShowMatchMode">匹配方式</label>
+                                    <select id="dataParserShowMatchMode">
+                                        <option value="exact">完全匹配</option>
+                                        <option value="contains">包含匹配</option>
+                                    </select>
+                                </div>
+                                <div class="field">
                                     <label for="dataParserShowValue">等于</label>
-                                    <input id="dataParserShowValue" type="text" placeholder="例如：1">
+                                    <input id="dataParserShowValue" type="text" placeholder="多个值用逗号或换行分隔，例如：4,我的,nide">
                                 </div>
                                 <button class="btn secondary" type="button" data-action="data-parser-show"><span class="btn-icon">+</span>增加展示条件</button>
                             </div>
@@ -4668,8 +4682,28 @@ background-color: hsl(10 91% 56%);</pre>
             renderDataParserFilter();
         }
 
+        function dataParserConditionValues(condition) {
+            return Array.isArray(condition.values) ? condition.values : condition.value ? [condition.value] : [];
+        }
+
+        function parseDataParserConditionValues(value) {
+            return [...new Set(value.split(/[,，\r\n]+/).map((item) => item.trim()).filter(Boolean))];
+        }
+
         function dataParserRowMatchesCondition(row, condition) {
-            return dataParserCellValue(row, { key: condition.column }) === condition.value;
+            const cellValue = dataParserCellValue(row, { key: condition.column });
+            return dataParserConditionValues(condition).some((value) => (
+                condition.matchMode === "contains" ? cellValue.includes(value) : cellValue === value
+            ));
+        }
+
+        function dataParserConditionsEqual(first, second) {
+            const firstValues = dataParserConditionValues(first);
+            const secondValues = dataParserConditionValues(second);
+            return first.column === second.column
+                && (first.matchMode || "exact") === (second.matchMode || "exact")
+                && firstValues.length === secondValues.length
+                && firstValues.every((value) => secondValues.includes(value));
         }
 
         function getVisibleDataParserEntries() {
@@ -4711,12 +4745,16 @@ background-color: hsl(10 91% 56%);</pre>
             ];
             conditionsContainer.innerHTML = conditionRows.length
                 ? conditionRows.map((condition) => {
+                    const values = dataParserConditionValues(condition);
+                    const matchLabel = condition.matchMode === "contains"
+                        ? values.length > 1 ? "包含任一值" : "包含"
+                        : values.length > 1 ? "等于任一值" : "等于";
                     const matchedCount = dataParserState.rows.filter((row) => dataParserRowMatchesCondition(row, condition)).length;
                     return `<div class="data-parser-filter-condition">
                         <span>${condition.label}列</span>
                         <strong>${escapeHtml(formatDataParserColumnLabel(condition.column))}</strong>
-                        <span>等于</span>
-                        <span class="data-parser-filter-condition-value">${escapeHtml(condition.value)}</span>
+                        <span>${matchLabel}</span>
+                        <span class="data-parser-filter-condition-value">${escapeHtml(values.join(", "))}</span>
                         <span class="data-parser-filter-condition-count">匹配 ${matchedCount} 条</span>
                         <button class="btn secondary data-parser-filter-remove" type="button" data-action="data-parser-remove-condition" data-condition-type="${condition.type}" data-condition-index="${condition.index}"><span class="btn-icon">×</span>删除条件</button>
                     </div>`;
@@ -4731,21 +4769,23 @@ background-color: hsl(10 91% 56%);</pre>
             }
             const isDisplay = type === "show";
             const column = document.getElementById(isDisplay ? "dataParserShowColumn" : "dataParserHideColumn").value;
-            const value = document.getElementById(isDisplay ? "dataParserShowValue" : "dataParserHideValue").value.trim();
-            if (!column || !value) {
+            const matchMode = document.getElementById(isDisplay ? "dataParserShowMatchMode" : "dataParserHideMatchMode").value;
+            const values = parseDataParserConditionValues(document.getElementById(isDisplay ? "dataParserShowValue" : "dataParserHideValue").value);
+            if (!column || !values.length) {
                 setStatus("请选择列并输入条件值", "warn");
                 return;
             }
             const conditions = isDisplay ? dataParserState.displayConditions : dataParserState.hiddenConditions;
             const label = isDisplay ? "展示" : "隐藏";
-            if (conditions.some((condition) => condition.column === column && condition.value === value)) {
+            const newCondition = { column, values, matchMode };
+            if (conditions.some((condition) => dataParserConditionsEqual(condition, newCondition))) {
                 setStatus(`该${label}条件已生效`, "warn");
                 return;
             }
-            const matchedCount = dataParserState.rows.filter((row) => dataParserRowMatchesCondition(row, { column, value })).length;
-            conditions.push({ column, value });
+            const matchedCount = dataParserState.rows.filter((row) => dataParserRowMatchesCondition(row, newCondition)).length;
+            conditions.push(newCondition);
             renderDataParser();
-            setStatus(`已增加${label}条件：${formatDataParserColumnLabel(column)} = ${value}，匹配 ${matchedCount} 条记录`, matchedCount ? "ok" : "warn");
+            setStatus(`已增加${label}条件：${formatDataParserColumnLabel(column)} = ${values.join(", ")}，匹配 ${matchedCount} 条记录`, matchedCount ? "ok" : "warn");
         }
 
         function removeDataParserCondition(type, index) {
