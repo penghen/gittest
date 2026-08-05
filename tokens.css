@@ -41,7 +41,7 @@
     --control-height: 2.75rem;
     --header-height: 4.5rem;
     --header-height-mobile: 3.75rem;
-    --layout-max: 105rem;
+    --layout-max: 135rem;
     --shadow-header: 0 1px 0 oklch(90% 0.008 255);
     --dur-fast: 120ms;
     --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
