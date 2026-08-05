@@ -2187,7 +2187,7 @@
         }
 
         h1 {
-            color: var(--color-ink);
+            color: var(--color-accent);
             font-family: var(--font-display);
             font-size: var(--text-xl);
             font-weight: 700;
@@ -2221,6 +2221,7 @@
 
         .tool-nav,
         .workspace {
+            border: 1px solid var(--color-rule);
             border-color: var(--color-rule);
             border-radius: var(--radius-lg);
             background: var(--color-surface);
@@ -2258,7 +2259,7 @@
         .tool-card.active {
             color: var(--color-accent-strong);
             background: var(--color-accent-soft);
-            border-color: transparent;
+            border-color: var(--color-accent);
         }
 
         .tool-card.active .tool-icon {
@@ -2290,7 +2291,7 @@
             padding: var(--space-4) var(--space-5);
             gap: var(--space-3);
             border-bottom-color: var(--color-rule);
-            background: var(--color-surface);
+            background: var(--color-surface-soft);
         }
 
         .workspace-title h2 {
@@ -2310,7 +2311,7 @@
         .status {
             min-height: 2rem;
             padding: var(--space-1) var(--space-2);
-            border: 1px solid var(--color-rule);
+            border: 1px solid var(--color-rule-strong);
             border-radius: var(--radius-pill);
             color: var(--color-ink-soft);
             background: var(--color-surface-soft);
@@ -2485,6 +2486,7 @@
         .color-field-group,
         .ip-note,
         .metric {
+            border: 1px solid var(--color-rule);
             border-color: var(--color-rule);
             border-radius: var(--radius-md);
             color: var(--color-ink);
@@ -2604,6 +2606,21 @@
             color: var(--color-ink-soft);
             border-color: var(--color-rule);
             background: var(--color-surface-raised);
+        }
+
+        @media (min-width: 131.25rem) {
+            .page {
+                grid-template-columns: 22.5rem minmax(0, 1fr);
+                gap: var(--space-6);
+            }
+
+            .tool-nav {
+                padding: var(--space-5);
+            }
+
+            .tool-panel {
+                padding: var(--space-6) 2rem;
+            }
         }
 
         @media (max-width: 48rem) {
