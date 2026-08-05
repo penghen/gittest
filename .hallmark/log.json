@@ -1,0 +1,9 @@
+[
+  {
+    "date": "2026-08-05",
+    "macrostructure": "Workbench",
+    "theme": "Quiet Workbench",
+    "enrichment": "none",
+    "brief": "Redesign the existing testing-tool workbench without changing functionality"
+  }
+]

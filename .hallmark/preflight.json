@@ -1,0 +1,9 @@
+{
+  "created": "2026-08-05",
+  "framework": "vanilla HTML",
+  "entry": "index.html",
+  "fontStack": "System UI with a monospace output stack",
+  "palette": "Existing CSS custom properties in index.html",
+  "motion": "CSS transitions only; no motion library detected",
+  "spacing": "Existing mixed spacing scale; normalized through tokens.css for the redesign"
+}
