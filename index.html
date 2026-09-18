@@ -2717,6 +2717,26 @@
             }
         }
 
+        .notepad-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: var(--space-2) var(--space-3);
+        }
+
+        .notepad-meta {
+            color: var(--color-muted);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .notepad-text {
+            min-height: clamp(260px, 46vh, 660px);
+            line-height: 1.6;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *,
             *::before,
@@ -3420,6 +3440,21 @@ background-color: hsl(10 91% 56%);</pre>
                 </div>
                 <pre class="output empty" id="diffOutput">处理结果会显示在这里</pre>
             </div>
+
+            <div class="tool-panel" data-panel="notepad">
+                <div class="field">
+                    <div class="notepad-bar">
+                        <label for="notepadText">临时笔记</label>
+                        <span class="notepad-meta" id="notepadMeta">0 字符 · 0 行</span>
+                    </div>
+                    <textarea id="notepadText" class="notepad-text" spellcheck="false" placeholder="随手记录临时文本，支持 Ctrl+C / Ctrl+V 直接复制粘贴；内容自动保存在本机浏览器，切换工具或刷新页面都不会丢失"></textarea>
+                </div>
+                <div class="actions">
+                    <button class="btn" type="button" data-action="notepad-copy"><span class="btn-icon">[]</span>复制</button>
+                    <button class="btn secondary" type="button" data-action="notepad-paste"><span class="btn-icon">⇩</span>粘贴</button>
+                    <button class="btn danger" type="button" data-action="notepad-clear"><span class="btn-icon">×</span>清空</button>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -3438,7 +3473,8 @@ background-color: hsl(10 91% 56%);</pre>
             { id: "regex", icon: ".*", title: "正则测试", desc: "测试表达式并查看匹配结果" },
             { id: "mock", icon: "MOCK", title: "数据Mock工具", desc: "按模板批量生成测试数据" },
             { id: "hash", icon: "HASH", title: "Hash生成", desc: "生成 SHA 系列摘要" },
-            { id: "diff", icon: "DIFF", title: "Diff文本比较", desc: "按行比较两段文本差异" }
+            { id: "diff", icon: "DIFF", title: "Diff文本比较", desc: "按行比较两段文本差异" },
+            { id: "notepad", icon: "NOTE", title: "临时笔记本", desc: "随手记录临时文本，支持复制、粘贴与导出" }
         ];
 
         const toolGrid = document.getElementById("toolGrid");
@@ -3626,6 +3662,11 @@ background-color: hsl(10 91% 56%);</pre>
         function clearPanel(id) {
             const panel = document.querySelector(`[data-panel="${id}"]`);
             if (!panel) return;
+
+            if (id === "notepad") {
+                updateNotepadMeta();
+                return;
+            }
 
             panel.querySelectorAll("textarea, input").forEach((field) => {
                 if (field.type === "checkbox") {
@@ -6372,6 +6413,101 @@ background-color: hsl(10 91% 56%);</pre>
             setStatus(`文本比较完成：${changedBlocks} 处不同`, "warn");
         }
 
+        const notepadStorageKey = "toolbox-notepad";
+        let notepadSaveTimer = null;
+
+        function notepadField() {
+            return document.getElementById("notepadText");
+        }
+
+        function updateNotepadMeta() {
+            const field = notepadField();
+            const meta = document.getElementById("notepadMeta");
+            if (!field || !meta) return;
+            const value = field.value;
+            const lines = value ? value.split(/\r\n|\r|\n/).length : 0;
+            meta.textContent = `${Array.from(value).length} 字符 · ${lines} 行`;
+        }
+
+        function saveNotepad() {
+            const field = notepadField();
+            if (!field) return;
+            try {
+                localStorage.setItem(notepadStorageKey, field.value);
+            } catch (error) {
+                setStatus("笔记内容保存失败，请先复制备份", "warn");
+            }
+        }
+
+        function scheduleNotepadSave() {
+            updateNotepadMeta();
+            clearTimeout(notepadSaveTimer);
+            notepadSaveTimer = setTimeout(saveNotepad, 400);
+        }
+
+        function initNotepad() {
+            const field = notepadField();
+            if (!field) return;
+            try {
+                field.value = localStorage.getItem(notepadStorageKey) || "";
+            } catch (error) {
+                field.value = "";
+            }
+            updateNotepadMeta();
+        }
+
+        function insertNotepadText(text) {
+            const field = notepadField();
+            const start = field.selectionStart ?? field.value.length;
+            const end = field.selectionEnd ?? field.value.length;
+            field.setRangeText(text, start, end, "end");
+            field.focus();
+        }
+
+        async function handleNotepad(action) {
+            const field = notepadField();
+            if (!field) return;
+
+            if (action === "notepad-copy") {
+                if (!field.value) {
+                    setStatus("笔记为空，没有可复制的内容", "warn");
+                    return;
+                }
+                try {
+                    await navigator.clipboard.writeText(field.value);
+                    setStatus("已复制全部笔记内容", "ok");
+                } catch (error) {
+                    field.select();
+                    setStatus("复制失败，已选中全部内容，请按 Ctrl+C", "error");
+                }
+                return;
+            }
+
+            if (action === "notepad-paste") {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (!text) {
+                        setStatus("剪贴板中没有文本内容", "warn");
+                        return;
+                    }
+                    insertNotepadText(text);
+                    scheduleNotepadSave();
+                    setStatus("已粘贴剪贴板内容", "ok");
+                } catch (error) {
+                    field.focus();
+                    setStatus("浏览器未授权读取剪贴板，请按 Ctrl+V 粘贴", "warn");
+                }
+                return;
+            }
+
+            if (action === "notepad-clear") {
+                field.value = "";
+                saveNotepad();
+                updateNotepadMeta();
+                setStatus("已清空临时笔记", "ok");
+            }
+        }
+
         function escapeHtml(value) {
             return value
                 .replace(/&/g, "&amp;")
@@ -6477,6 +6613,7 @@ background-color: hsl(10 91% 56%);</pre>
                     if (action === "mock-clear") clearMock();
                     if (action === "hash-generate") await handleHash();
                     if (action === "diff-run") handleDiff();
+                    if (action.startsWith("notepad-")) await handleNotepad(action);
                 }
 
                 if (copyButton) {
@@ -6491,6 +6628,7 @@ background-color: hsl(10 91% 56%);</pre>
             document.getElementById("regexPreset").addEventListener("change", (event) => {
                 applyRegexPreset(event.target.value);
             });
+            document.getElementById("notepadText").addEventListener("input", scheduleNotepadSave);
             document.getElementById("regexSearch").addEventListener("input", (event) => {
                 filterRegexPresets(event.target.value);
             });
@@ -6603,6 +6741,7 @@ background-color: hsl(10 91% 56%);</pre>
         initPanelBodies();
         initRegexPresets();
         initMockFields();
+        initNotepad();
         initTimestampTool();
         initColorTool();
         initCalculator();
