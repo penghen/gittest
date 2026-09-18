@@ -9,6 +9,10 @@
     <style>
         /* Hallmark · macrostructure: Workbench · tone: focused utility · anchor hue: cool blue */
         /* Hallmark · pre-emit critique: P5 H4 E5 S4 R5 V4 */
+        [hidden] {
+            display: none !important;
+        }
+
         :root {
             --blue: #2f8ee8;
             --blue-dark: #176fc2;
@@ -2737,6 +2741,42 @@
             line-height: 1.6;
         }
 
+        .chart-data {
+            min-height: 118px;
+        }
+
+        .chart-canvas-wrap {
+            position: relative;
+            height: clamp(260px, 40vh, 440px);
+            margin-top: var(--space-4);
+            padding: var(--space-3);
+            border: 1px solid var(--color-rule);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface);
+        }
+
+        .chart-placeholder {
+            position: absolute;
+            inset: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-muted);
+            font-size: var(--text-sm);
+            pointer-events: none;
+        }
+
+        .chart-file-name {
+            align-self: center;
+            min-width: 0;
+            overflow: hidden;
+            color: var(--color-muted);
+            font-size: var(--text-xs);
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *,
             *::before,
@@ -3455,6 +3495,115 @@ background-color: hsl(10 91% 56%);</pre>
                     <button class="btn danger" type="button" data-action="notepad-clear"><span class="btn-icon">×</span>清空</button>
                 </div>
             </div>
+
+            <div class="tool-panel" data-panel="chart">
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="chartDataFormat">数据格式</label>
+                        <select id="chartDataFormat">
+                            <option value="simple">简单数据（标签,数值）</option>
+                            <option value="series">系列数据（系列名,数值…）</option>
+                            <option value="csv">CSV 表格（首行标题）</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="chartType">图表类型</label>
+                        <select id="chartType">
+                            <option value="bar">柱状图</option>
+                            <option value="horizontalBar">水平柱状图</option>
+                            <option value="line">折线图</option>
+                            <option value="area">面积图</option>
+                            <option value="stackedBar">堆叠柱状图</option>
+                            <option value="stackedArea">堆叠面积图</option>
+                            <option value="pie">饼图</option>
+                            <option value="doughnut">环形图</option>
+                            <option value="polarArea">极地面积图</option>
+                            <option value="radar">雷达图</option>
+                            <option value="scatter">散点图</option>
+                            <option value="bubble">气泡图</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="chartColorScheme">颜色方案</label>
+                        <select id="chartColorScheme">
+                            <option value="default">默认方案</option>
+                            <option value="pastel">柔和色系</option>
+                            <option value="bright">明亮色系</option>
+                            <option value="cool">冷色调</option>
+                            <option value="warm">暖色调</option>
+                            <option value="corporate">企业风格</option>
+                            <option value="contrast">高对比度</option>
+                            <option value="rainbow">彩虹色系</option>
+                            <option value="earth">大地色系</option>
+                            <option value="ocean">海洋色系</option>
+                            <option value="vintage">复古色系</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="chartLegendPosition">图例位置</label>
+                        <select id="chartLegendPosition">
+                            <option value="top">顶部</option>
+                            <option value="right">右侧</option>
+                            <option value="bottom">底部</option>
+                            <option value="left">左侧</option>
+                            <option value="none">不显示</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="field wide">
+                        <label for="chartTitle">图表标题</label>
+                        <input type="text" id="chartTitle" placeholder="图表标题">
+                    </div>
+                    <div class="field">
+                        <label for="chartXLabel">X 轴标签</label>
+                        <input type="text" id="chartXLabel" placeholder="X 轴标签">
+                    </div>
+                    <div class="field">
+                        <label for="chartYLabel">Y 轴标签</label>
+                        <input type="text" id="chartYLabel" placeholder="Y 轴标签">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="chartDataInput">数据</label>
+                    <textarea id="chartDataInput" class="chart-data" spellcheck="false" placeholder="产品A,120&#10;产品B,80&#10;产品C,60"></textarea>
+                </div>
+
+                <div class="field" id="chartSeriesField" hidden>
+                    <label for="chartSeriesLabels">标签（逗号分隔）</label>
+                    <input type="text" id="chartSeriesLabels" placeholder="产品A,产品B,产品C">
+                </div>
+
+                <div class="option-row" id="chartCsvOptions" hidden>
+                    <label class="check-pill"><input type="checkbox" id="chartFirstRowHeader" checked> 首行为标题</label>
+                    <label class="check-pill"><input type="checkbox" id="chartFirstColLabels" checked> 首列为标签</label>
+                </div>
+
+                <div class="option-row">
+                    <label class="check-pill"><input type="checkbox" id="chartShowGrid" checked> 显示网格线</label>
+                    <label class="check-pill"><input type="checkbox" id="chartShowLabels"> 显示数据标签</label>
+                    <label class="check-pill"><input type="checkbox" id="chartAnimate" checked> 启用动画</label>
+                    <input type="file" id="chartFile" accept=".csv,.txt,.xlsx,.xls" hidden>
+                    <button class="btn secondary" type="button" data-action="chart-file"><span class="btn-icon">↑</span>选择 CSV/Excel</button>
+                    <span class="chart-file-name" id="chartFileName"></span>
+                </div>
+
+                <div class="chart-canvas-wrap">
+                    <canvas id="chartCanvas" role="img" aria-label="图表预览"></canvas>
+                    <p class="chart-placeholder" id="chartPlaceholder">填入或粘贴数据后点击「生成图表」</p>
+                </div>
+
+                <div class="actions">
+                    <button class="btn" type="button" data-action="chart-generate"><span class="btn-icon">▦</span>生成图表</button>
+                    <button class="btn secondary" type="button" data-action="chart-sample"><span class="btn-icon">☆</span>样例数据</button>
+                    <button class="btn secondary" type="button" data-action="chart-export-png"><span class="btn-icon">↓</span>导出 PNG</button>
+                    <button class="btn secondary" type="button" data-action="chart-export-jpg"><span class="btn-icon">↓</span>导出 JPG</button>
+                    <button class="btn secondary" type="button" data-action="chart-copy-image"><span class="btn-icon">[]</span>复制图片</button>
+                    <button class="btn danger" type="button" data-action="chart-clear"><span class="btn-icon">×</span>清空</button>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -3474,7 +3623,8 @@ background-color: hsl(10 91% 56%);</pre>
             { id: "mock", icon: "MOCK", title: "数据Mock工具", desc: "按模板批量生成测试数据" },
             { id: "hash", icon: "HASH", title: "Hash生成", desc: "生成 SHA 系列摘要" },
             { id: "diff", icon: "DIFF", title: "Diff文本比较", desc: "按行比较两段文本差异" },
-            { id: "notepad", icon: "NOTE", title: "临时笔记本", desc: "随手记录临时文本，支持复制、粘贴与导出" }
+            { id: "notepad", icon: "NOTE", title: "临时笔记本", desc: "随手记录临时文本，支持复制、粘贴与导出" },
+            { id: "chart", icon: "CHART", title: "图表生成", desc: "粘贴数据生成柱状图、折线图、饼图等 12 种图表" }
         ];
 
         const toolGrid = document.getElementById("toolGrid");
@@ -3554,6 +3704,7 @@ background-color: hsl(10 91% 56%);</pre>
             const next = document.body.dataset.theme === "dark" ? "light" : "dark";
             localStorage.setItem("toolbox-theme", next);
             applyTheme(next);
+            refreshChart();
         }
 
         function initCards() {
@@ -3705,6 +3856,9 @@ background-color: hsl(10 91% 56%);</pre>
             }
             if (id === "calculator") {
                 initCalculator();
+            }
+            if (id === "chart") {
+                resetChartTool();
             }
         }
 
@@ -6508,6 +6662,621 @@ background-color: hsl(10 91% 56%);</pre>
             }
         }
 
+        const chartPalettes = {
+            default: ["#4e73df", "#1cc88a", "#36b9cc", "#f6c23e", "#e74a3b", "#6f42c1", "#fd7e14", "#20c9a6", "#858796", "#5a5c69"],
+            pastel: ["#FFB6C1", "#FFD700", "#98FB98", "#87CEFA", "#FFA07A", "#DDA0DD", "#FFDAB9", "#B0E0E6", "#F0E68C", "#E6E6FA"],
+            bright: ["#FF1E1E", "#FFFF00", "#00FF00", "#00FFFF", "#0000FF", "#FF00FF", "#FF7F00", "#FF1493", "#00FA9A", "#7B68EE"],
+            cool: ["#5F4B8B", "#42BFDD", "#00A7E1", "#00344B", "#143642", "#0F8B8D", "#4CB5F5", "#1D3557", "#A8DADC", "#457B9D"],
+            warm: ["#FF7700", "#FF9E00", "#FFCF00", "#FFF400", "#E20000", "#D91A1A", "#A60000", "#FF5252", "#FF7B7B", "#FFBF69"],
+            corporate: ["#003F5C", "#2F4B7C", "#665191", "#A05195", "#D45087", "#F95D6A", "#FF7C43", "#FFA600", "#004D40", "#00695C"],
+            contrast: ["#000000", "#E63946", "#457B9D", "#F1C40F", "#2ECC71", "#9B59B6", "#1ABC9C", "#F39C12", "#D35400", "#7F8C8D"],
+            rainbow: ["#FF0000", "#FF7F00", "#FFFF00", "#00FF00", "#0000FF", "#4B0082", "#9400D3", "#FF1493", "#00FFFF", "#FF00FF"],
+            earth: ["#5D4037", "#795548", "#A1887F", "#4E342E", "#3E2723", "#33691E", "#558B2F", "#7CB342", "#8D6E63", "#6D4C41"],
+            ocean: ["#006064", "#00838F", "#0097A7", "#00ACC1", "#00BCD4", "#26C6DA", "#4DD0E1", "#80DEEA", "#01579B", "#0277BD"],
+            vintage: ["#8D8741", "#659DBD", "#DAAD86", "#BC986A", "#FBEEC1", "#605B56", "#837A75", "#9E8B8B", "#D8C3A5", "#E8DDCD"]
+        };
+        const chartTypeConfig = {
+            bar: { type: "bar" },
+            horizontalBar: { type: "bar", horizontal: true },
+            line: { type: "line" },
+            area: { type: "line", fill: true },
+            stackedBar: { type: "bar", stacked: true },
+            stackedArea: { type: "line", fill: true, stacked: true },
+            pie: { type: "pie" },
+            doughnut: { type: "doughnut" },
+            polarArea: { type: "polarArea" },
+            radar: { type: "radar" },
+            scatter: { type: "scatter" },
+            bubble: { type: "bubble" }
+        };
+        const sheetJsUrl = "https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js";
+        let chartInstance = null;
+        let chartRawData = null;
+        let chartFileData = null;
+        let chartLibsPromise = null;
+        let sheetJsPromise = null;
+
+        function loadScriptOnce(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                script.src = src;
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error(`脚本加载失败：${src}`));
+                document.head.appendChild(script);
+            });
+        }
+
+        function ensureChartLibs() {
+            if (typeof Chart !== "undefined") return Promise.resolve();
+            if (!chartLibsPromise) {
+                chartLibsPromise = loadScriptOnce("vendor/chart.min.js")
+                    .then(() => loadScriptOnce("vendor/chartjs-plugin-datalabels.min.js").catch(() => {}))
+                    .then(() => {
+                        if (window.ChartDataLabels && Chart.register) Chart.register(window.ChartDataLabels);
+                    })
+                    .catch((error) => {
+                        chartLibsPromise = null;
+                        throw new Error(`图表库加载失败：${error.message}`);
+                    });
+            }
+            return chartLibsPromise;
+        }
+
+        function ensureSheetJs() {
+            if (window.XLSX) return Promise.resolve();
+            if (!sheetJsPromise) {
+                sheetJsPromise = loadScriptOnce(sheetJsUrl).catch(() => {
+                    sheetJsPromise = null;
+                    throw new Error("Excel 解析库加载失败，请检查网络或改用 CSV 文件");
+                });
+            }
+            return sheetJsPromise;
+        }
+
+        function chartTheme() {
+            const dark = document.body.dataset.theme === "dark";
+            return {
+                text: dark ? "#e8ebf0" : "#2b3038",
+                muted: dark ? "#9aa4b2" : "#5b6673",
+                grid: dark ? "rgba(255, 255, 255, 0.14)" : "rgba(0, 0, 0, 0.1)"
+            };
+        }
+
+        function hexToRgba(hex, alpha) {
+            const raw = (hex || "").replace("#", "");
+            const full = raw.length === 3 ? raw.split("").map((ch) => ch + ch).join("") : raw;
+            const red = parseInt(full.slice(0, 2), 16);
+            const green = parseInt(full.slice(2, 4), 16);
+            const blue = parseInt(full.slice(4, 6), 16);
+            return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+        }
+
+        function isDarkColor(color) {
+            if (typeof color !== "string") return false;
+            let red;
+            let green;
+            let blue;
+            const rgba = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+            if (rgba) {
+                [, red, green, blue] = rgba.map(Number);
+            } else if (color.startsWith("#")) {
+                const raw = color.slice(1);
+                const full = raw.length === 3 ? raw.split("").map((ch) => ch + ch).join("") : raw;
+                red = parseInt(full.slice(0, 2), 16);
+                green = parseInt(full.slice(2, 4), 16);
+                blue = parseInt(full.slice(4, 6), 16);
+            } else {
+                return false;
+            }
+            return (0.299 * red + 0.587 * green + 0.114 * blue) / 255 < 0.68;
+        }
+
+        function parseChartSimple(text) {
+            const labels = [];
+            const values = [];
+            text.split(/\r\n|\r|\n/).filter((row) => row.trim()).forEach((row) => {
+                const cells = row.split(",").map((cell) => cell.trim());
+                if (cells.length < 2) return;
+                const value = Number(cells[1]);
+                if (!Number.isFinite(value)) throw new Error(`"${cells[1]}" 不是有效的数值`);
+                labels.push(cells[0]);
+                values.push(value);
+            });
+            if (!labels.length) throw new Error("无法解析数据，请检查格式是否为「标签,数值」");
+            return { labels, datasets: [{ label: "数值", data: values }] };
+        }
+
+        function parseChartSeries(text, labelsText) {
+            const labels = labelsText.split(",").map((item) => item.trim()).filter(Boolean);
+            if (!labels.length) throw new Error("请输入标签（逗号分隔）");
+            const datasets = [];
+            text.split(/\r\n|\r|\n/).filter((row) => row.trim()).forEach((row) => {
+                const cells = row.split(",").map((cell) => cell.trim());
+                if (cells.length < 2) return;
+                const data = cells.slice(1).map((cell) => {
+                    const value = Number(cell);
+                    if (!Number.isFinite(value)) throw new Error(`"${cell}" 不是有效的数值`);
+                    return value;
+                });
+                datasets.push({ label: cells[0] || `系列${datasets.length + 1}`, data });
+            });
+            if (!datasets.length) throw new Error("无法解析数据，请检查格式是否为「系列名,数值…」");
+            return { labels, datasets };
+        }
+
+        function parseChartCsv(text, firstRowHeader, firstColLabels) {
+            const rows = text.split(/\r\n|\r|\n/).filter((row) => row.trim()).map((row) => row.split(",").map((cell) => cell.trim()));
+            if (rows.length < 2) throw new Error("CSV 数据至少需要两行");
+            const header = firstRowHeader ? rows[0] : null;
+            const body = firstRowHeader ? rows.slice(1) : rows;
+            if (!body.length) throw new Error("CSV 数据至少需要一行数据");
+            const startCol = firstColLabels ? 1 : 0;
+            const columnCount = Math.max(...body.map((row) => row.length));
+            const labels = firstColLabels
+                ? body.map((row) => row[0] ?? "")
+                : body.map((row, index) => `标签${index + 1}`);
+            const datasets = [];
+            for (let col = startCol; col < columnCount; col += 1) {
+                const data = body.map((row) => {
+                    const cell = row[col];
+                    if (cell === undefined || cell === "") return 0;
+                    const value = Number(cell);
+                    if (!Number.isFinite(value)) throw new Error(`"${cell}" 不是有效的数值`);
+                    return value;
+                });
+                datasets.push({ label: header && header[col] ? header[col] : `系列${col - startCol + 1}`, data });
+            }
+            if (!datasets.length) throw new Error("无法解析数据，请检查 CSV 格式");
+            return { labels, datasets };
+        }
+
+        function parseChartSheet(rows) {
+            const header = rows[0];
+            const body = rows.slice(1);
+            const columnCount = Math.max(...rows.map((row) => row.length));
+            const labels = body.map((row) => (row[0] === undefined || row[0] === null ? "" : String(row[0])));
+            const datasets = [];
+            for (let col = 1; col < columnCount; col += 1) {
+                const data = body.map((row) => {
+                    const value = Number(row[col]);
+                    return Number.isFinite(value) ? value : 0;
+                });
+                datasets.push({ label: header[col] ? String(header[col]) : `系列${col}`, data });
+            }
+            if (!labels.length || !datasets.length) throw new Error("表格数据不完整，至少需要表头行、数据行和数值列");
+            return { labels, datasets };
+        }
+
+        async function parseChartFile(file) {
+            const name = file.name.toLowerCase();
+            if (name.endsWith(".csv") || name.endsWith(".txt")) {
+                return parseChartCsv(await file.text(), true, true);
+            }
+            await ensureSheetJs();
+            const workbook = XLSX.read(new Uint8Array(await file.arrayBuffer()), { type: "array" });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }).filter((row) => row && row.length);
+            if (rows.length < 2) throw new Error("表格至少需要表头行和数据行");
+            return parseChartSheet(rows);
+        }
+
+        function updateChartFormatFields() {
+            const format = getValue("chartDataFormat");
+            document.getElementById("chartSeriesField").hidden = format !== "series";
+            document.getElementById("chartCsvOptions").hidden = format !== "csv";
+            const placeholders = {
+                simple: "每行一条：标签,数值\n产品A,120\n产品B,80\n产品C,60",
+                series: "每行一个系列：系列名,数值,数值…\n一季度,120,80,60\n二季度,130,70,65",
+                csv: "首行标题、首列标签\n类别,一季度,二季度\n产品A,120,130\n产品B,80,70"
+            };
+            document.getElementById("chartDataInput").placeholder = placeholders[format] || placeholders.simple;
+        }
+
+        function chartSettings() {
+            const type = getValue("chartType");
+            const config = chartTypeConfig[type] || chartTypeConfig.bar;
+            return {
+                type,
+                fill: Boolean(config.fill),
+                horizontal: Boolean(config.horizontal),
+                stacked: Boolean(config.stacked),
+                title: getValue("chartTitle").trim(),
+                xLabel: getValue("chartXLabel").trim(),
+                yLabel: getValue("chartYLabel").trim(),
+                colorScheme: getValue("chartColorScheme"),
+                legendPosition: getValue("chartLegendPosition"),
+                showGridLines: document.getElementById("chartShowGrid").checked,
+                showDataLabels: document.getElementById("chartShowLabels").checked,
+                animate: document.getElementById("chartAnimate").checked
+            };
+        }
+
+        function transformChartPoints(datasets, withRadius) {
+            return datasets.map((dataset) => ({
+                ...dataset,
+                data: dataset.data.map((value, index) => {
+                    const point = Number(value);
+                    const y = Number.isFinite(point) ? point : 0;
+                    return withRadius
+                        ? { x: index + 1, y, r: Math.max(5, Math.min(20, y / 10)) }
+                        : { x: index + 1, y };
+                })
+            }));
+        }
+
+        function buildChartData(raw, type) {
+            const data = {
+                labels: [...raw.labels],
+                datasets: raw.datasets.map((dataset) => ({ ...dataset, data: [...dataset.data] }))
+            };
+            if (type === "scatter" || type === "bubble") {
+                data.labels = undefined;
+                data.datasets = transformChartPoints(data.datasets, type === "bubble");
+            }
+            if (["pie", "doughnut", "polarArea"].includes(type) && data.datasets.length > 1) {
+                data.datasets = [data.datasets[0]];
+            }
+            return data;
+        }
+
+        function applyChartColors(data, settings, palette) {
+            const radial = ["pie", "doughnut", "polarArea"].includes(settings.type);
+            const lineLike = ["line", "area", "stackedArea"].includes(settings.type);
+            const pointLike = ["scatter", "bubble"].includes(settings.type);
+            data.datasets.forEach((dataset, index) => {
+                const color = palette[index % palette.length];
+                if (radial) {
+                    dataset.backgroundColor = dataset.data.map((item, itemIndex) => palette[itemIndex % palette.length]);
+                    dataset.borderColor = "#ffffff";
+                    dataset.borderWidth = 1;
+                    return;
+                }
+                if (lineLike) {
+                    dataset.borderColor = color;
+                    dataset.backgroundColor = hexToRgba(color, settings.fill ? 0.28 : 0.08);
+                    dataset.pointBackgroundColor = color;
+                    dataset.pointBorderColor = "#ffffff";
+                    dataset.borderWidth = 2;
+                    dataset.tension = 0.3;
+                    dataset.fill = settings.fill;
+                    return;
+                }
+                if (settings.type === "radar") {
+                    dataset.borderColor = color;
+                    dataset.backgroundColor = hexToRgba(color, 0.2);
+                    dataset.pointBackgroundColor = color;
+                    dataset.pointBorderColor = "#ffffff";
+                    dataset.borderWidth = 2;
+                    return;
+                }
+                if (pointLike) {
+                    dataset.backgroundColor = hexToRgba(color, 0.75);
+                    dataset.borderColor = color;
+                    dataset.pointBackgroundColor = hexToRgba(color, 0.75);
+                    dataset.pointBorderColor = color;
+                    return;
+                }
+                dataset.backgroundColor = hexToRgba(color, 0.72);
+                dataset.borderColor = color;
+                dataset.borderWidth = 1;
+                dataset.hoverBackgroundColor = color;
+            });
+            return data;
+        }
+
+        function chartLabelColor(context) {
+            const background = context.dataset.backgroundColor;
+            const color = Array.isArray(background) ? background[context.dataIndex] : background;
+            return isDarkColor(color) ? "#ffffff" : "#1f2430";
+        }
+
+        function chartLabelText(value, context, type) {
+            const numeric = value && typeof value === "object" ? value.y : value;
+            if (["pie", "doughnut", "polarArea"].includes(type)) {
+                const total = context.dataset.data.reduce((sum, item) => sum + (Number(item && typeof item === "object" ? item.y : item) || 0), 0);
+                if (!total) return `${numeric}`;
+                const percent = ((Number(numeric) / total) * 100).toFixed(1);
+                return Number(percent) < 5 ? `${percent}%` : `${numeric} (${percent}%)`;
+            }
+            return numeric;
+        }
+
+        function buildChartOptions(settings) {
+            const theme = chartTheme();
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: { padding: 6 },
+                plugins: {
+                    title: {
+                        display: Boolean(settings.title),
+                        text: settings.title,
+                        color: theme.text,
+                        font: { size: 16, weight: "700" },
+                        padding: { top: 4, bottom: 14 }
+                    },
+                    legend: {
+                        display: settings.legendPosition !== "none",
+                        position: settings.legendPosition === "none" ? "top" : settings.legendPosition,
+                        labels: { color: theme.text, usePointStyle: true, padding: 14, font: { size: 12 } }
+                    },
+                    tooltip: { backgroundColor: "rgba(17, 20, 26, 0.88)", padding: 10, displayColors: true },
+                    datalabels: settings.showDataLabels
+                        ? {
+                            display: true,
+                            color: chartLabelColor,
+                            align: ["line", "area", "stackedArea", "scatter", "bubble"].includes(settings.type) ? "top" : "center",
+                            font: { size: 11, weight: "700" },
+                            formatter: (value, context) => chartLabelText(value, context, settings.type)
+                        }
+                        : { display: false }
+                },
+                animation: { duration: settings.animate ? 800 : 0, easing: "easeOutQuart" }
+            };
+
+            if (settings.type === "radar" || settings.type === "polarArea") {
+                options.scales = {
+                    r: {
+                        beginAtZero: true,
+                        grid: { color: theme.grid },
+                        angleLines: { color: theme.grid },
+                        pointLabels: { color: theme.text, font: { size: 12 } },
+                        ticks: { color: theme.muted, backdropColor: "transparent", font: { size: 10 } }
+                    }
+                };
+                return options;
+            }
+
+            if (["pie", "doughnut"].includes(settings.type)) return options;
+
+            const xScale = {
+                title: { display: Boolean(settings.xLabel), text: settings.xLabel, color: theme.text, font: { size: 12, weight: "600" }, padding: { top: 8 } },
+                grid: { display: settings.showGridLines, color: theme.grid },
+                ticks: { color: theme.muted, font: { size: 11 } }
+            };
+            const yScale = {
+                beginAtZero: true,
+                title: { display: Boolean(settings.yLabel), text: settings.yLabel, color: theme.text, font: { size: 12, weight: "600" }, padding: { bottom: 8 } },
+                grid: { display: settings.showGridLines, color: theme.grid },
+                ticks: { color: theme.muted, font: { size: 11 } }
+            };
+            if (settings.stacked) {
+                xScale.stacked = true;
+                yScale.stacked = true;
+            }
+            options.scales = settings.horizontal ? { x: yScale, y: xScale } : { x: xScale, y: yScale };
+            return options;
+        }
+
+        function renderChart(raw, settings) {
+            const canvas = document.getElementById("chartCanvas");
+            if (!canvas || typeof Chart === "undefined") return;
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+            const palette = chartPalettes[settings.colorScheme] || chartPalettes.default;
+            const config = chartTypeConfig[settings.type] || chartTypeConfig.bar;
+            chartInstance = new Chart(canvas.getContext("2d"), {
+                type: config.type,
+                data: applyChartColors(buildChartData(raw, settings.type), settings, palette),
+                options: buildChartOptions(settings)
+            });
+            document.getElementById("chartPlaceholder").hidden = true;
+        }
+
+        function refreshChart() {
+            if (!chartInstance || !chartRawData) return;
+            renderChart(chartRawData, chartSettings());
+        }
+
+        async function handleChartGenerate() {
+            try {
+                setStatus("正在准备图表库…");
+                await ensureChartLibs();
+                let raw;
+                if (chartFileData) {
+                    raw = chartFileData;
+                } else {
+                    const text = getValue("chartDataInput");
+                    if (!text.trim()) {
+                        setStatus("请输入数据", "warn");
+                        return;
+                    }
+                    const format = getValue("chartDataFormat");
+                    if (format === "series") {
+                        raw = parseChartSeries(text, getValue("chartSeriesLabels"));
+                    } else if (format === "csv") {
+                        raw = parseChartCsv(
+                            text,
+                            document.getElementById("chartFirstRowHeader").checked,
+                            document.getElementById("chartFirstColLabels").checked
+                        );
+                    } else {
+                        raw = parseChartSimple(text);
+                    }
+                }
+                chartRawData = raw;
+                renderChart(raw, chartSettings());
+                const points = raw.datasets.reduce((sum, dataset) => sum + dataset.data.length, 0);
+                setStatus(`图表已生成：${raw.datasets.length} 个系列 / ${points} 个数据点`, "ok");
+            } catch (error) {
+                setStatus(error.message, "error");
+            }
+        }
+
+        function loadChartSample() {
+            const format = getValue("chartDataFormat");
+            const titleEl = document.getElementById("chartTitle");
+            const xEl = document.getElementById("chartXLabel");
+            const yEl = document.getElementById("chartYLabel");
+            if (format === "series") {
+                document.getElementById("chartDataInput").value = "第一季度,2458,1678,1892,986,1342\n第二季度,2612,1524,1953,1104,1587\n第三季度,2845,1701,2135,1287,1643";
+                document.getElementById("chartSeriesLabels").value = "智能手机,平板电脑,笔记本电脑,智能手表,耳机";
+                titleEl.value = "电子产品季度销量";
+                xEl.value = "产品类别";
+                yEl.value = "销量（万台）";
+            } else if (format === "csv") {
+                document.getElementById("chartDataInput").value = "品牌,2022年,2023年\n华为,845.2,921.6\n小米,712.8,768.3\n苹果,642.1,724.5\n三星,575.8,612.4";
+                titleEl.value = "品牌销量对比";
+                xEl.value = "品牌";
+                yEl.value = "销量（万台）";
+            } else {
+                document.getElementById("chartDataInput").value = "智能手机,2458\n平板电脑,1678\n笔记本电脑,1892\n智能手表,986\n耳机,1342";
+                titleEl.value = "电子产品销量";
+                xEl.value = "产品类别";
+                yEl.value = "销量（万台）";
+            }
+            chartFileData = null;
+            document.getElementById("chartFileName").textContent = "";
+            setStatus("已填入样例数据，点击「生成图表」查看效果", "ok");
+        }
+
+        async function handleChartFile(file) {
+            if (!file) return;
+            const nameEl = document.getElementById("chartFileName");
+            try {
+                setStatus(`正在解析 ${file.name}…`);
+                const raw = await parseChartFile(file);
+                chartFileData = raw;
+                chartRawData = raw;
+                document.getElementById("chartDataInput").value = "";
+                nameEl.textContent = file.name;
+                document.getElementById("chartPlaceholder").hidden = true;
+                await ensureChartLibs();
+                renderChart(raw, chartSettings());
+                setStatus(`已解析 ${file.name}：${raw.datasets.length} 个系列`, "ok");
+            } catch (error) {
+                chartFileData = null;
+                nameEl.textContent = "";
+                setStatus(error.message, "error");
+            }
+        }
+
+        function chartExportCanvas(scale) {
+            const source = document.getElementById("chartCanvas");
+            const width = source.clientWidth || source.width;
+            const height = source.clientHeight || source.height;
+            const settings = chartSettings();
+            const config = chartTypeConfig[settings.type] || chartTypeConfig.bar;
+            const palette = chartPalettes[settings.colorScheme] || chartPalettes.default;
+
+            const offscreen = document.createElement("canvas");
+            offscreen.width = width;
+            offscreen.height = height;
+            const exportChart = new Chart(offscreen.getContext("2d"), {
+                type: config.type,
+                data: applyChartColors(buildChartData(chartRawData, settings.type), settings, palette),
+                options: {
+                    ...buildChartOptions(settings),
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    devicePixelRatio: scale
+                }
+            });
+
+            const output = document.createElement("canvas");
+            output.width = offscreen.width;
+            output.height = offscreen.height;
+            const context = output.getContext("2d");
+            context.fillStyle = "#ffffff";
+            context.fillRect(0, 0, output.width, output.height);
+            context.drawImage(offscreen, 0, 0);
+            exportChart.destroy();
+            return output;
+        }
+
+        function chartFileName() {
+            const base = (getValue("chartTitle") || "图表").replace(/[^\w\u4e00-\u9fa5-]/g, "_");
+            return base || "图表";
+        }
+
+        function exportChartImage(format) {
+            if (!chartInstance) {
+                setStatus("请先生成图表", "warn");
+                return;
+            }
+            const canvas = chartExportCanvas(3);
+            const link = document.createElement("a");
+            link.href = canvas.toDataURL(format === "jpg" ? "image/jpeg" : "image/png", 0.95);
+            link.download = `${chartFileName()}.${format}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setStatus(`已导出 ${format.toUpperCase()} 图片（${canvas.width}×${canvas.height}）`, "ok");
+        }
+
+        async function copyChartImage() {
+            if (!chartInstance) {
+                setStatus("请先生成图表", "warn");
+                return;
+            }
+            if (!navigator.clipboard || typeof ClipboardItem === "undefined") {
+                exportChartImage("png");
+                setStatus("当前环境不支持直接复制图片，已改为下载 PNG", "warn");
+                return;
+            }
+            const canvas = chartExportCanvas(2);
+            canvas.toBlob(async (blob) => {
+                try {
+                    await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+                    setStatus("图表已复制到剪贴板", "ok");
+                } catch (error) {
+                    exportChartImage("png");
+                    setStatus("复制图片失败，已改为下载 PNG", "warn");
+                }
+            }, "image/png");
+        }
+
+        function clearChart() {
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+            chartRawData = null;
+            chartFileData = null;
+            document.getElementById("chartFileName").textContent = "";
+            document.getElementById("chartPlaceholder").hidden = false;
+            setStatus("已清空图表", "ok");
+        }
+
+        function resetChartTool() {
+            clearChart();
+            updateChartFormatFields();
+            ensureChartLibs().catch((error) => setStatus(error.message, "warn"));
+        }
+
+        async function handleChart(action) {
+            if (action === "chart-generate") {
+                await handleChartGenerate();
+                return;
+            }
+            if (action === "chart-sample") {
+                loadChartSample();
+                return;
+            }
+            if (action === "chart-export-png") {
+                exportChartImage("png");
+                return;
+            }
+            if (action === "chart-export-jpg") {
+                exportChartImage("jpg");
+                return;
+            }
+            if (action === "chart-copy-image") {
+                await copyChartImage();
+                return;
+            }
+            if (action === "chart-file") {
+                document.getElementById("chartFile").click();
+                return;
+            }
+            if (action === "chart-clear") {
+                clearChart();
+            }
+        }
+
         function escapeHtml(value) {
             return value
                 .replace(/&/g, "&amp;")
@@ -6614,6 +7383,7 @@ background-color: hsl(10 91% 56%);</pre>
                     if (action === "hash-generate") await handleHash();
                     if (action === "diff-run") handleDiff();
                     if (action.startsWith("notepad-")) await handleNotepad(action);
+                    if (action.startsWith("chart-")) await handleChart(action);
                 }
 
                 if (copyButton) {
@@ -6629,6 +7399,29 @@ background-color: hsl(10 91% 56%);</pre>
                 applyRegexPreset(event.target.value);
             });
             document.getElementById("notepadText").addEventListener("input", scheduleNotepadSave);
+            document.getElementById("chartDataFormat").addEventListener("change", () => {
+                chartFileData = null;
+                document.getElementById("chartFileName").textContent = "";
+                updateChartFormatFields();
+            });
+            document.getElementById("chartDataInput").addEventListener("input", () => {
+                if (!chartFileData) return;
+                chartFileData = null;
+                document.getElementById("chartFileName").textContent = "";
+            });
+            [
+                "chartType", "chartColorScheme", "chartLegendPosition",
+                "chartShowGrid", "chartShowLabels", "chartAnimate",
+                "chartFirstRowHeader", "chartFirstColLabels"
+            ].forEach((id) => {
+                document.getElementById(id).addEventListener("change", refreshChart);
+            });
+            ["chartTitle", "chartXLabel", "chartYLabel"].forEach((id) => {
+                document.getElementById(id).addEventListener("input", refreshChart);
+            });
+            document.getElementById("chartFile").addEventListener("change", (event) => {
+                handleChartFile(event.target.files[0]);
+            });
             document.getElementById("regexSearch").addEventListener("input", (event) => {
                 filterRegexPresets(event.target.value);
             });
