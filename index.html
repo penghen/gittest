@@ -1434,12 +1434,12 @@
         .timestamp-tool {
             max-width: 1180px;
             margin: 0 auto;
-            padding: 6px 0 10px;
+            padding: 0;
         }
 
         .timestamp-section {
-            padding: 0 0 30px;
-            margin-bottom: 26px;
+            padding: 0 0 12px;
+            margin-bottom: 12px;
             border-bottom: 1px solid var(--line);
         }
 
@@ -1450,17 +1450,25 @@
         }
 
         .timestamp-section-title {
-            margin: 0 0 20px;
+            margin: 0 0 10px;
             color: var(--text);
-            font-size: 22px;
-            line-height: 1.25;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
+        .timestamp-current-utc {
+            margin-left: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 500;
         }
 
         .timestamp-now {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
+            margin-bottom: 8px;
         }
 
         .timestamp-now-label,
@@ -1481,8 +1489,8 @@
         }
 
         .timestamp-btn {
-            min-height: 40px;
-            padding: 8px 16px;
+            min-height: 36px;
+            padding: 6px 14px;
             border: 1px solid var(--blue);
             border-radius: 4px;
             background: transparent;
@@ -1501,7 +1509,7 @@
 
         .timestamp-grid {
             display: grid;
-            gap: 26px;
+            gap: 14px;
         }
 
         .timestamp-grid + .timestamp-grid {
@@ -1510,8 +1518,13 @@
 
         .timestamp-row {
             display: grid;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
+        }
+
+        .timestamp-tool input:not([type="checkbox"]),
+        .timestamp-tool select {
+            height: 34px;
         }
 
         .timestamp-unix-row {
@@ -3152,7 +3165,7 @@
                     </section>
 
                     <section class="timestamp-section" aria-labelledby="timestampUtcTitle">
-                        <h3 class="timestamp-section-title" id="timestampUtcTitle">UTC时间戳</h3>
+                        <h3 class="timestamp-section-title" id="timestampUtcTitle">UTC时间戳 <span class="timestamp-current-utc" id="timestampCurrentUtc"></span></h3>
                         <div class="timestamp-grid">
                             <div class="timestamp-row timestamp-unix-row">
                                 <label class="timestamp-label" for="timestampUnixInput">Unix时间戳（Unix timestamp）</label>
@@ -4000,7 +4013,12 @@ background-color: hsl(10 91% 56%);</pre>
         }
 
         function updateCurrentTimestamp() {
-            setFieldValue("timestampCurrent", String(Math.floor(Date.now() / 1000)));
+            const now = new Date();
+            setFieldValue("timestampCurrent", String(Math.floor(now.getTime() / 1000)));
+            const utcBadge = document.getElementById("timestampCurrentUtc");
+            if (utcBadge) {
+                utcBadge.textContent = `${formatUTCDate(now)} UTC`;
+            }
         }
 
         function startTimestampClock(silent = false) {
