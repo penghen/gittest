@@ -1495,7 +1495,7 @@
         }
 
         .timestamp-unix-row {
-            grid-template-columns: 260px minmax(120px, 0.85fr) 72px max-content minmax(150px, 1fr);
+            grid-template-columns: 260px minmax(120px, 0.85fr) 72px max-content minmax(150px, 1fr) max-content minmax(150px, 1fr);
         }
 
         .timestamp-date-row {
@@ -3087,7 +3087,9 @@
                                 <option value="milliseconds">毫秒</option>
                             </select>
                             <button class="timestamp-btn" type="button" data-action="timestamp-to-date">转换</button>
-                            <input class="timestamp-output" id="timestampDateOutput" type="text" readonly aria-label="转换后的时间">
+                            <input class="timestamp-output" id="timestampDateOutput" type="text" readonly aria-label="转换后的本地时间">
+                            <button class="timestamp-btn" type="button" data-action="timestamp-to-utc">转UTC</button>
+                            <input class="timestamp-output" id="timestampUtcOutput" type="text" readonly aria-label="转换后的 UTC 时间">
                         </div>
 
                         <div class="timestamp-row timestamp-date-row">
@@ -3891,6 +3893,11 @@ background-color: hsl(10 91% 56%);</pre>
             return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
         }
 
+        function formatUTCDate(date) {
+            const pad = (num) => String(num).padStart(2, "0");
+            return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`;
+        }
+
         function renderTimestamp(date) {
             const millis = date.getTime();
             const seconds = Math.floor(millis / 1000);
@@ -3988,6 +3995,7 @@ background-color: hsl(10 91% 56%);</pre>
             updateCurrentTimestamp();
             setFieldValue("timestampUnixInput", formatTimestamp(now, "seconds"));
             setFieldValue("timestampDateOutput", formatDate(now));
+            setFieldValue("timestampUtcOutput", formatUTCDate(now));
             setFieldValue("timestampYear", String(now.getFullYear()));
             setFieldValue("timestampMonth", String(now.getMonth() + 1));
             setFieldValue("timestampDay", String(now.getDate()));
@@ -6394,7 +6402,7 @@ background-color: hsl(10 91% 56%);</pre>
                 return;
             }
 
-            if (action === "timestamp-to-date") {
+            if (action === "timestamp-to-date" || action === "timestamp-to-utc") {
                 const raw = getValue("timestampUnixInput").trim();
                 if (!raw) {
                     setStatus("请输入 Unix 时间戳", "warn");
@@ -6404,11 +6412,13 @@ background-color: hsl(10 91% 56%);</pre>
                 const date = parseTimestampValue(raw, unit);
                 if (!date) {
                     setFieldValue("timestampDateOutput", "");
+                    setFieldValue("timestampUtcOutput", "");
                     setStatus("Unix 时间戳格式不正确", "error");
                     return;
                 }
                 setFieldValue("timestampDateOutput", formatDate(date));
-                setStatus("Unix 时间戳转换成功", "ok");
+                setFieldValue("timestampUtcOutput", formatUTCDate(date));
+                setStatus(action === "timestamp-to-utc" ? "Unix 时间戳转 UTC 时间成功" : "Unix 时间戳转换成功", "ok");
                 return;
             }
 
