@@ -1499,7 +1499,7 @@
         }
 
         .timestamp-date-row {
-            grid-template-columns: 235px minmax(130px, 1fr) max-content minmax(110px, 1fr) 72px;
+            grid-template-columns: 235px minmax(130px, 1fr) max-content minmax(110px, 1fr) 72px max-content minmax(150px, 1fr);
         }
 
         .timestamp-parts-row {
@@ -1530,10 +1530,10 @@
         .timestamp-parts-action {
             grid-column: 2;
             display: grid;
-            grid-template-columns: max-content minmax(140px, 1fr) 72px;
+            grid-template-columns: max-content minmax(140px, 1fr) 72px max-content minmax(150px, 1fr);
             gap: 8px;
             align-items: center;
-            max-width: 470px;
+            max-width: 760px;
         }
 
         .timestamp-output {
@@ -3101,6 +3101,8 @@
                                 <option value="seconds">秒</option>
                                 <option value="milliseconds">毫秒</option>
                             </select>
+                            <button class="timestamp-btn" type="button" data-action="timestamp-date-to-utc">转UTC</button>
+                            <input class="timestamp-output" id="timestampDateUtcOutput" type="text" readonly aria-label="时间对应的 UTC 时间">
                         </div>
 
                         <div class="timestamp-row timestamp-parts-row">
@@ -3126,6 +3128,8 @@
                                     <option value="seconds">秒</option>
                                     <option value="milliseconds">毫秒</option>
                                 </select>
+                                <button class="timestamp-btn" type="button" data-action="timestamp-parts-to-utc">转UTC</button>
+                                <input class="timestamp-output" id="timestampPartsUtcOutput" type="text" readonly aria-label="组件时间对应的 UTC 时间">
                             </div>
                         </div>
                     </div>
@@ -4004,7 +4008,9 @@ background-color: hsl(10 91% 56%);</pre>
             setFieldValue("timestampSecond", String(now.getSeconds()));
             setFieldValue("timestampDateInput", formatDate(now));
             setFieldValue("timestampUnixOutput", formatTimestamp(now, "seconds"));
+            setFieldValue("timestampDateUtcOutput", formatUTCDate(now));
             setFieldValue("timestampPartsOutput", formatTimestamp(now, "seconds"));
+            setFieldValue("timestampPartsUtcOutput", formatUTCDate(now));
         }
 
         function clamp(value, min, max) {
@@ -6422,7 +6428,7 @@ background-color: hsl(10 91% 56%);</pre>
                 return;
             }
 
-            if (action === "timestamp-date-to-unix") {
+            if (action === "timestamp-date-to-unix" || action === "timestamp-date-to-utc") {
                 const raw = getValue("timestampDateInput").trim();
                 if (!raw) {
                     setStatus("请输入时间", "warn");
@@ -6431,23 +6437,27 @@ background-color: hsl(10 91% 56%);</pre>
                 const date = parseLocalDateTime(raw);
                 if (!date) {
                     setFieldValue("timestampUnixOutput", "");
+                    setFieldValue("timestampDateUtcOutput", "");
                     setStatus("时间格式不正确", "error");
                     return;
                 }
                 setFieldValue("timestampUnixOutput", formatTimestamp(date, readTimestampUnit("timestampDateUnit")));
-                setStatus("时间转换 Unix 时间戳成功", "ok");
+                setFieldValue("timestampDateUtcOutput", formatUTCDate(date));
+                setStatus(action === "timestamp-date-to-utc" ? "时间转 UTC 成功" : "时间转换 Unix 时间戳成功", "ok");
                 return;
             }
 
-            if (action === "timestamp-parts-to-unix") {
+            if (action === "timestamp-parts-to-unix" || action === "timestamp-parts-to-utc") {
                 const date = readTimestampParts();
                 if (!date) {
                     setFieldValue("timestampPartsOutput", "");
+                    setFieldValue("timestampPartsUtcOutput", "");
                     setStatus("请输入合法的年、月、日、时、分、秒", "error");
                     return;
                 }
                 setFieldValue("timestampPartsOutput", formatTimestamp(date, readTimestampUnit("timestampPartsUnit")));
-                setStatus("时间转换 Unix 时间戳成功", "ok");
+                setFieldValue("timestampPartsUtcOutput", formatUTCDate(date));
+                setStatus(action === "timestamp-parts-to-utc" ? "组件时间转 UTC 成功" : "时间转换 Unix 时间戳成功", "ok");
             }
         }
 
