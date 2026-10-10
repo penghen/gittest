@@ -1437,14 +1437,30 @@
             padding: 6px 0 10px;
         }
 
+        .timestamp-section {
+            padding: 0 0 30px;
+            margin-bottom: 26px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .timestamp-section:last-child {
+            padding-bottom: 0;
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .timestamp-section-title {
+            margin: 0 0 20px;
+            color: var(--text);
+            font-size: 22px;
+            line-height: 1.25;
+        }
+
         .timestamp-now {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            padding: 0 0 30px;
-            margin-bottom: 26px;
-            border-bottom: 1px solid var(--line);
         }
 
         .timestamp-now-label,
@@ -1486,6 +1502,10 @@
         .timestamp-grid {
             display: grid;
             gap: 26px;
+        }
+
+        .timestamp-grid + .timestamp-grid {
+            margin-top: 26px;
         }
 
         .timestamp-row {
@@ -3070,69 +3090,118 @@
 
             <div class="tool-panel" data-panel="timestamp">
                 <div class="timestamp-tool">
-                    <div class="timestamp-now">
-                        <span class="timestamp-now-label">现在的Unix时间戳(Unix timestamp)是：</span>
-                        <input class="timestamp-current" id="timestampCurrent" type="text" readonly aria-label="现在的 Unix 时间戳">
-                        <button class="timestamp-btn" type="button" data-action="timestamp-start">开始</button>
-                        <button class="timestamp-btn" type="button" data-action="timestamp-stop">停止</button>
-                        <button class="timestamp-btn" type="button" data-action="timestamp-refresh">刷新</button>
-                    </div>
-
-                    <div class="timestamp-grid">
-                        <div class="timestamp-row timestamp-unix-row">
-                            <label class="timestamp-label" for="timestampUnixInput">Unix时间戳（Unix timestamp）</label>
-                            <input id="timestampUnixInput" type="text" inputmode="numeric">
-                            <select id="timestampUnixUnit" aria-label="时间戳单位">
-                                <option value="seconds">秒</option>
-                                <option value="milliseconds">毫秒</option>
-                            </select>
-                            <button class="timestamp-btn" type="button" data-action="timestamp-to-date">转换</button>
-                            <input class="timestamp-output" id="timestampDateOutput" type="text" readonly aria-label="转换后的本地时间">
-                            <button class="timestamp-btn" type="button" data-action="timestamp-to-utc">转UTC</button>
-                            <input class="timestamp-output" id="timestampUtcOutput" type="text" readonly aria-label="转换后的 UTC 时间">
+                    <section class="timestamp-section" aria-labelledby="timestampUnixTitle">
+                        <h3 class="timestamp-section-title" id="timestampUnixTitle">Unix时间戳</h3>
+                        <div class="timestamp-now">
+                            <span class="timestamp-now-label">现在的Unix时间戳(Unix timestamp)是：</span>
+                            <input class="timestamp-current" id="timestampCurrent" type="text" readonly aria-label="现在的 Unix 时间戳">
+                            <button class="timestamp-btn" type="button" data-action="timestamp-start">开始</button>
+                            <button class="timestamp-btn" type="button" data-action="timestamp-stop">停止</button>
+                            <button class="timestamp-btn" type="button" data-action="timestamp-refresh">刷新</button>
                         </div>
 
-                        <div class="timestamp-row timestamp-date-row">
-                            <label class="timestamp-label" for="timestampDateInput">时间（年/月/日 时:分:秒）</label>
-                            <input id="timestampDateInput" type="text" placeholder="2026-07-07 16:31:55">
-                            <button class="timestamp-btn" type="button" data-action="timestamp-date-to-unix">转换成Unix时间戳</button>
-                            <input class="timestamp-output" id="timestampUnixOutput" type="text" readonly aria-label="转换后的 Unix 时间戳">
-                            <select id="timestampDateUnit" aria-label="输出时间戳单位">
-                                <option value="seconds">秒</option>
-                                <option value="milliseconds">毫秒</option>
-                            </select>
-                            <button class="timestamp-btn" type="button" data-action="timestamp-date-to-utc">转UTC</button>
-                            <input class="timestamp-output" id="timestampDateUtcOutput" type="text" readonly aria-label="时间对应的 UTC 时间">
-                        </div>
-
-                        <div class="timestamp-row timestamp-parts-row">
-                            <span class="timestamp-label">时间</span>
-                            <div class="timestamp-parts-fields">
-                                <input class="timestamp-part" id="timestampYear" type="number" aria-label="年">
-                                <span class="timestamp-inline-label">年</span>
-                                <input class="timestamp-part" id="timestampMonth" type="number" min="1" max="12" aria-label="月">
-                                <span class="timestamp-inline-label">月</span>
-                                <input class="timestamp-part" id="timestampDay" type="number" min="1" max="31" aria-label="日">
-                                <span class="timestamp-inline-label">日</span>
-                                <input class="timestamp-part" id="timestampHour" type="number" min="0" max="23" aria-label="时">
-                                <span class="timestamp-inline-label">时</span>
-                                <input class="timestamp-part" id="timestampMinute" type="number" min="0" max="59" aria-label="分">
-                                <span class="timestamp-inline-label">分</span>
-                                <input class="timestamp-part" id="timestampSecond" type="number" min="0" max="59" aria-label="秒">
-                                <span class="timestamp-inline-label">秒</span>
-                            </div>
-                            <div class="timestamp-parts-action">
-                                <button class="timestamp-btn" type="button" data-action="timestamp-parts-to-unix">转换Unix时间戳</button>
-                                <input class="timestamp-output" id="timestampPartsOutput" type="text" readonly aria-label="组件时间转换后的 Unix 时间戳">
-                                <select id="timestampPartsUnit" aria-label="组件时间输出时间戳单位">
+                        <div class="timestamp-grid">
+                            <div class="timestamp-row timestamp-unix-row">
+                                <label class="timestamp-label" for="timestampUnixInput">Unix时间戳（Unix timestamp）</label>
+                                <input id="timestampUnixInput" type="text" inputmode="numeric">
+                                <select id="timestampUnixUnit" aria-label="时间戳单位">
                                     <option value="seconds">秒</option>
                                     <option value="milliseconds">毫秒</option>
                                 </select>
-                                <button class="timestamp-btn" type="button" data-action="timestamp-parts-to-utc">转UTC</button>
-                                <input class="timestamp-output" id="timestampPartsUtcOutput" type="text" readonly aria-label="组件时间对应的 UTC 时间">
+                                <button class="timestamp-btn" type="button" data-action="timestamp-to-date">转换</button>
+                                <input class="timestamp-output" id="timestampDateOutput" type="text" readonly aria-label="转换后的本地时间">
+                            </div>
+
+                            <div class="timestamp-row timestamp-date-row">
+                                <label class="timestamp-label" for="timestampDateInput">时间（年/月/日 时:分:秒）</label>
+                                <input id="timestampDateInput" type="text" placeholder="2026-07-07 16:31:55">
+                                <button class="timestamp-btn" type="button" data-action="timestamp-date-to-unix">转换成Unix时间戳</button>
+                                <input class="timestamp-output" id="timestampUnixOutput" type="text" readonly aria-label="转换后的 Unix 时间戳">
+                                <select id="timestampDateUnit" aria-label="输出时间戳单位">
+                                    <option value="seconds">秒</option>
+                                    <option value="milliseconds">毫秒</option>
+                                </select>
+                            </div>
+
+                            <div class="timestamp-row timestamp-parts-row">
+                                <span class="timestamp-label">时间</span>
+                                <div class="timestamp-parts-fields">
+                                    <input class="timestamp-part" id="timestampYear" type="number" aria-label="年">
+                                    <span class="timestamp-inline-label">年</span>
+                                    <input class="timestamp-part" id="timestampMonth" type="number" min="1" max="12" aria-label="月">
+                                    <span class="timestamp-inline-label">月</span>
+                                    <input class="timestamp-part" id="timestampDay" type="number" min="1" max="31" aria-label="日">
+                                    <span class="timestamp-inline-label">日</span>
+                                    <input class="timestamp-part" id="timestampHour" type="number" min="0" max="23" aria-label="时">
+                                    <span class="timestamp-inline-label">时</span>
+                                    <input class="timestamp-part" id="timestampMinute" type="number" min="0" max="59" aria-label="分">
+                                    <span class="timestamp-inline-label">分</span>
+                                    <input class="timestamp-part" id="timestampSecond" type="number" min="0" max="59" aria-label="秒">
+                                    <span class="timestamp-inline-label">秒</span>
+                                </div>
+                                <div class="timestamp-parts-action">
+                                    <button class="timestamp-btn" type="button" data-action="timestamp-parts-to-unix">转换Unix时间戳</button>
+                                    <input class="timestamp-output" id="timestampPartsOutput" type="text" readonly aria-label="组件时间转换后的 Unix 时间戳">
+                                    <select id="timestampPartsUnit" aria-label="组件时间输出时间戳单位">
+                                        <option value="seconds">秒</option>
+                                        <option value="milliseconds">毫秒</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </section>
+
+                    <section class="timestamp-section" aria-labelledby="timestampUtcTitle">
+                        <h3 class="timestamp-section-title" id="timestampUtcTitle">UTC时间戳</h3>
+                        <div class="timestamp-grid">
+                            <div class="timestamp-row timestamp-unix-row">
+                                <label class="timestamp-label" for="timestampUnixInput">Unix时间戳（Unix timestamp）</label>
+                                <input id="timestampUnixInput" type="text" inputmode="numeric">
+                                <select id="timestampUnixUnit" aria-label="时间戳单位">
+                                    <option value="seconds">秒</option>
+                                    <option value="milliseconds">毫秒</option>
+                                </select>
+                                <button class="timestamp-btn" type="button" data-action="timestamp-to-utc">转UTC</button>
+                                <input class="timestamp-output" id="timestampUtcOutput" type="text" readonly aria-label="转换后的 UTC 时间">
+                            </div>
+
+                            <div class="timestamp-row timestamp-date-row">
+                                <label class="timestamp-label" for="timestampDateInput">时间（年/月/日 时:分:秒）</label>
+                                <input id="timestampDateInput" type="text" placeholder="2026-07-07 16:31:55">
+                                <button class="timestamp-btn" type="button" data-action="timestamp-date-to-utc">转UTC</button>
+                                <input class="timestamp-output" id="timestampDateUtcOutput" type="text" readonly aria-label="时间对应的 UTC 时间">
+                                <select id="timestampDateUnit" aria-label="输出时间戳单位">
+                                    <option value="seconds">秒</option>
+                                    <option value="milliseconds">毫秒</option>
+                                </select>
+                            </div>
+
+                            <div class="timestamp-row timestamp-parts-row">
+                                <span class="timestamp-label">时间</span>
+                                <div class="timestamp-parts-fields">
+                                    <input class="timestamp-part" id="timestampYear" type="number" aria-label="年">
+                                    <span class="timestamp-inline-label">年</span>
+                                    <input class="timestamp-part" id="timestampMonth" type="number" min="1" max="12" aria-label="月">
+                                    <span class="timestamp-inline-label">月</span>
+                                    <input class="timestamp-part" id="timestampDay" type="number" min="1" max="31" aria-label="日">
+                                    <span class="timestamp-inline-label">日</span>
+                                    <input class="timestamp-part" id="timestampHour" type="number" min="0" max="23" aria-label="时">
+                                    <span class="timestamp-inline-label">时</span>
+                                    <input class="timestamp-part" id="timestampMinute" type="number" min="0" max="59" aria-label="分">
+                                    <span class="timestamp-part" id="timestampSecond" type="number" min="0" max="59" aria-label="秒">
+                                    <span class="timestamp-inline-label">秒</span>
+                                </div>
+                                <div class="timestamp-parts-action">
+                                    <button class="timestamp-btn" type="button" data-action="timestamp-parts-to-utc">转UTC</button>
+                                    <input class="timestamp-output" id="timestampPartsUtcOutput" type="text" readonly aria-label="组件时间对应的 UTC 时间">
+                                    <select id="timestampPartsUnit" aria-label="组件时间输出时间戳单位">
+                                        <option value="seconds">秒</option>
+                                        <option value="milliseconds">毫秒</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
                 <div class="actions" hidden></div>
             </div>
@@ -3620,7 +3689,7 @@ background-color: hsl(10 91% 56%);</pre>
             { id: "base64", icon: "B64", title: "Base64转码/解码", desc: "支持中文 UTF-8 文本转换" },
             { id: "length", icon: "LEN", title: "字符串长度统计", desc: "统计字符、字节、行数和字符类型" },
             { id: "ip", icon: "IP", title: "IP工具", desc: "查询 IP、出口地址和地图位置" },
-            { id: "timestamp", icon: "TIME", title: "Unix时间戳", desc: "秒、毫秒时间戳与日期互转" },
+            { id: "timestamp", icon: "TIME", title: "Unix/UTC时间戳", desc: "秒、毫秒时间戳与日期、UTC 时间互转" },
             { id: "dataParser", icon: "DATA", title: "数据解析整理", desc: "将对象数组一键整理成清晰表格" },
             { id: "calculator", icon: "CALC", title: "在线计算器", desc: "支持四则运算、百分比与括号计算" },
             { id: "colorCode", icon: "CLR", title: "HTML颜色代码", desc: "HEX、RGB、HSL、OKLCH 与配色板" },
